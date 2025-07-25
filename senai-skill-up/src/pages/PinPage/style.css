@@ -1,0 +1,102 @@
+/* Bloqueio de scroll específico para PinPage */
+body.pinpage-body {
+  overflow: hidden;
+  height: 100vh;
+  position: fixed;
+  width: 100%;
+}
+
+html.pinpage-html {
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* Remover header fixo para seguir padrão das outras páginas */
+.pinpage-header {
+  position: static !important;
+  top: unset !important;
+  left: unset !important;
+  width: 100vw;
+  z-index: unset !important;
+}
+
+.pinpage-bg {
+  min-height: 100vh;
+  width: 100vw;
+  background: linear-gradient(180deg, #00A6FF 0%, #22C0EC 100%);
+}
+
+.pinpage-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  position: relative;
+  min-height: 100vh;
+}
+
+.pinpage-logo {
+  width: 685px;
+  height: 638px;
+  margin-bottom: 0;
+  margin-top: -250px;
+  object-fit: contain;
+  display: block;
+}
+
+.pinpage-form {
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 2px 12px #0001;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  min-width: 320px;
+  margin-top: -200px;
+  margin-left: auto;
+  margin-right: auto;
+  z-index: 2;
+}
+
+@media (max-width: 400px) {
+  .pinpage-logo {
+    width: 90vw;
+    min-width: 0;
+  }
+  .pinpage-form {
+    min-width: 0;
+    width: 95vw;
+    padding: 10px;
+  }
+}
+
+.pinpage-input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 4px;
+  border: 1px solid #bbb;
+  font-size: 16px;
+  margin-bottom: 10px;
+  outline: none;
+}
+
+.pinpage-btn {
+  width: 100%;
+  background: #0094FF;
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 0;
+  font-size: 15px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: background 0.2s;
+}
+
+.pinpage-btn:hover {
+  background: #007ad6;
+} 

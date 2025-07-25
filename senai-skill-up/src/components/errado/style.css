@@ -1,0 +1,15 @@
+.corretopage-bg {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #00A6FF 0%, #22C0EC 100%);
+}
+
+.cancel-icon {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 20px;
+}

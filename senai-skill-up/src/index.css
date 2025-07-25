@@ -1,0 +1,13 @@
+@import './assets/font/imports.css';
+
+body {
+  font-family: 'Poppins', 'Blinker', 'Inria Sans', Arial, sans-serif;
+}
+
+.titulo-blinker {
+  font-family: 'Blinker', Arial, sans-serif;
+}
+
+.titulo-inria {
+  font-family: 'Inria Sans', Arial, sans-serif;
+}
