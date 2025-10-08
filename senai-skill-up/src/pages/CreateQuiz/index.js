@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './style.css';
-import Header_padrao from '../../components/Header_padrao';
+import Header from '../../components/header';
+import { createFormulario } from '../../services/formularioService';
+import { createPergunta } from '../../services/perguntaService';
+import { createAlternativa } from '../../services/alternativaService';
 
 import verifiedIcon from '../../assets/images/verified 1.png';
 import cancelIcon from '../../assets/images/cancel 1.png';
@@ -25,10 +28,37 @@ function RespostaInput({ value, onChange, isCorrect, isFalse, onSelectCorrect, o
   );
 }
 
-function MiniCard({ selected, onClick, index }) {
+function MiniCard({ selected, onClick, index, pergunta }) {
   return (
     <div className={`question-thumb${selected ? ' selected' : ''}`} onClick={onClick}>
-      Pergunta {index + 1}
+      <div className="mini-question-header">
+        <span className="mini-question-number">Pergunta {index + 1}</span>
+      </div>
+      
+      <div className="mini-question-content">
+        <div className="mini-question-text">
+          {pergunta.pergunta || "Pergunta sem texto"}
+        </div>
+        
+        <div className="mini-answers">
+          {pergunta.respostas.map((resposta, idx) => (
+            <div 
+              key={idx} 
+              className={`mini-answer ${
+                resposta.correta ? 'correct' : 
+                resposta.falsa ? 'incorrect' : 
+                'neutral'
+              }`}
+            >
+              <span className="mini-answer-text">
+                {resposta.texto || `Resposta ${idx + 1}`}
+              </span>
+              {resposta.correta && <span className="mini-answer-indicator correct">✓</span>}
+              {resposta.falsa && <span className="mini-answer-indicator incorrect">✗</span>}
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -49,6 +79,7 @@ export default function CreateQuiz() {
     },
   ]);
   const [perguntaAtual, setPerguntaAtual] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const handlePerguntaChange = (value) => {
     const novas = [...perguntas];
@@ -97,22 +128,114 @@ export default function CreateQuiz() {
     setPerguntaAtual(idx);
   };
 
-  const handleFinalizarQuiz = () => {
-    const quiz = {
-      titulo,
-      materia,
-      descricao,
-      perguntas,
-    };
+  const handleFinalizarQuiz = async () => {
+    // Validações básicas
+    if (!titulo.trim()) {
+      alert('Por favor, insira um título para o questionário');
+      return;
+    }
 
-    console.log('Quiz Finalizado:', quiz);
-    alert('Questionário finalizado com sucesso!');
-    // Aqui você pode enviar via API, salvar local ou redirecionar
+    if (perguntas.length === 0 || !perguntas[0].pergunta.trim()) {
+      alert('Por favor, adicione pelo menos uma pergunta');
+      return;
+    }
+
+    // Verifica se todas as perguntas têm pelo menos uma resposta correta
+    const perguntasInvalidas = perguntas.filter(p => {
+      const temRespostaCorreta = p.respostas.some(r => r.correta);
+      return !p.pergunta.trim() || !temRespostaCorreta;
+    });
+
+    if (perguntasInvalidas.length > 0) {
+      alert('Todas as perguntas devem ter texto e pelo menos uma resposta marcada como correta');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      console.log('📝 Iniciando criação do questionário...');
+
+      // 1. Criar o formulário
+      console.log('1️⃣ Criando formulário:', titulo);
+      const formulario = await createFormulario(titulo);
+      const idFormulario = formulario.idFormulario;
+      console.log('✅ Formulário criado com ID:', idFormulario);
+
+      // 2. Para cada pergunta (sem tema por enquanto)
+      for (let i = 0; i < perguntas.length; i++) {
+        const perguntaData = perguntas[i];
+
+        console.log(`2️⃣ Criando pergunta ${i + 1}:`, perguntaData.pergunta);
+
+        // Criar a pergunta (sem tema por enquanto - usar idTema: 1 como padrão)
+        const novaPergunta = await createPergunta({
+          textoPergunta: perguntaData.pergunta,
+          tema: { idTema: 1 }, // Tema padrão por enquanto
+          idFormulario: idFormulario
+        });
+
+        const idPergunta = novaPergunta.idPergunta;
+        console.log(`✅ Pergunta ${i + 1} criada com ID:`, idPergunta);
+
+        // 3. Para cada alternativa da pergunta
+        for (let j = 0; j < perguntaData.respostas.length; j++) {
+          const resposta = perguntaData.respostas[j];
+
+          if (resposta.texto.trim()) {
+            console.log(`3️⃣ Criando alternativa ${j + 1}:`, resposta.texto);
+
+            await createAlternativa({
+              idPergunta: idPergunta,
+              textoAlternativa: resposta.texto,
+              correta: resposta.correta
+            });
+
+            console.log(`✅ Alternativa ${j + 1} criada`);
+          }
+        }
+      }
+
+      console.log('🎉 Questionário criado com sucesso!');
+      alert(`Questionário "${titulo}" criado com sucesso!\n\n` +
+            `Total de perguntas: ${perguntas.length}`);
+
+      // Limpar formulário
+      setTitulo('');
+      setMateria('');
+      setDescricao('');
+      setPerguntas([{
+        pergunta: '',
+        respostas: [
+          { texto: '', correta: false, falsa: false },
+          { texto: '', correta: false, falsa: false },
+          { texto: '', correta: false, falsa: false },
+          { texto: '', correta: false, falsa: false },
+        ],
+      }]);
+      setPerguntaAtual(0);
+
+    } catch (error) {
+      console.error('❌ Erro ao criar questionário:', error);
+
+      let mensagemErro = 'Erro ao criar questionário. ';
+      if (error.response?.data) {
+        mensagemErro += typeof error.response.data === 'string'
+          ? error.response.data
+          : JSON.stringify(error.response.data);
+      } else {
+        mensagemErro += error.message;
+      }
+
+      alert(mensagemErro);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <>
-      <Header_padrao />
+      <Header />
       <div className="quiz-container">
         <div className="sidebar-left">
           <input
@@ -122,6 +245,7 @@ export default function CreateQuiz() {
             value={titulo}
             onChange={e => setTitulo(e.target.value)}
           />
+          
           <input
             type="text"
             placeholder="Matéria "
@@ -129,6 +253,7 @@ export default function CreateQuiz() {
             value={materia}
             onChange={e => setMateria(e.target.value)}
           />
+
           <textarea
             placeholder="INSERIR DESCRICAO"
             className="quiz-description"
@@ -159,19 +284,25 @@ export default function CreateQuiz() {
                   onSelectFalse={() => handleSelectResposta(idx, 'falsa')}
                 />
               ))}
-              <button className="finalize-quiz-btn" onClick={handleFinalizarQuiz}>
-                Finalizar Questionário
+              <button 
+                className="finalize-quiz-btn" 
+                onClick={handleFinalizarQuiz}
+                disabled={loading}
+                style={{ opacity: loading ? 0.6 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}
+              >
+                {loading ? '⏳ Criando questionário...' : '✅ Finalizar Questionário'}
               </button>
             </div>
           </div>
         </div>
         <div className="sidebar-right">
-          {perguntas.map((_, idx) => (
+          {perguntas.map((pergunta, idx) => (
             <MiniCard
               key={idx}
               selected={perguntaAtual === idx}
               onClick={() => handleSelectPergunta(idx)}
               index={idx}
+              pergunta={pergunta}
             />
           ))}
           <div className="add-question" onClick={handleAddPergunta}>+</div>

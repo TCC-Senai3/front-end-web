@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import slogan from '../../assets/images/slogan com brilhos.svg';
 import './style.css';
-import Header from '../../components/Header_padrao';
+import Header from '../../components/header';
 
 export default function PinPage() {
   useEffect(() => {

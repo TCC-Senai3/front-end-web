@@ -1,0 +1,82 @@
+.input-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+    max-width: 380px;
+    width: 100%;
+    background-color: #f0f0f0;
+    margin: 10px 0;
+    height: 55px;
+    border-radius: 55px;
+    padding: 0 0.4rem;
+    position: relative;
+}
+
+.input-field input {
+    background: none;
+    outline: none;
+    border: none;
+    line-height: 1;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #333;
+    flex: 1;
+    padding-left: 10px;
+    padding-right: 60px;
+}
+
+.input-field input::placeholder {
+    color: #aaa;
+    font-weight: 500;
+}
+
+.input-field i {
+    text-align: center;
+    line-height: 55px;
+    color: #acacac;
+    transition: 0.5s;
+    font-size: 1.1rem;
+    min-width: 50px;
+}
+
+.password-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    margin-right: 10px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    color: #acacac;
+    position: absolute;
+    right: 10px;
+}
+
+.password-toggle:hover {
+    background-color: #e0e0e0;
+    color: #666;
+}
+
+.password-toggle:focus {
+    outline: none;
+    background-color: #e0e0e0;
+    color: #666;
+}
+
+.password-toggle i {
+    font-size: 1rem;
+    transition: color 0.3s ease;
+}
+
+/* Estilo para quando a senha está visível */
+.input-field input[type="text"] + .password-toggle i {
+    color: #4CAF50;
+}
+
+/* Responsividade removida */

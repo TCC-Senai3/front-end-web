@@ -1,0 +1,220 @@
+/* Fundo geral */
+.game-quiz-container {
+  height: 100vh;
+  width: 100vw;
+  background: linear-gradient(180deg, #00A6FF 0%, #22C0EC 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Arial', sans-serif;
+  position: relative;
+  padding-top: 60px; /* espaço para o header */
+  box-sizing: border-box;
+}
+
+/* Card branco */
+.quiz-paper-container {
+
+  width: 600px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+
+/* Área principal */
+.quiz-main {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.quiz-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Controles (timer e sair) */
+.quiz-controls {
+  position: absolute;
+  top: 0;
+  right: -80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.timer-text {
+  color: red;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.exit-btn {
+  background: red;
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.exit-btn:hover {
+  background: #b30000;
+}
+
+/* Pergunta */
+.question-card {
+  width: 100%;
+}
+
+.question-theme {
+  font-size: 20px;
+  font-weight: bold;
+  color: #000;
+  margin-bottom: 20px;
+}
+
+.question-text {
+  font-size: 18px;
+  font-weight: bold;
+  color: #000;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+  line-height: 1.5;
+}
+
+/* Alternativas */
+.alternatives-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+}
+
+.alternative-btn {
+  background: #1E90FF;
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s;
+  width: 100%;
+}
+
+.alternative-btn:hover:not(:disabled) {
+  background: #187bcd;
+}
+
+.alternative-btn.correct {
+  background: #27ae60;
+}
+
+.alternative-btn.incorrect {
+  background: #e74c3c;
+}
+
+.alternative-btn.show-correct {
+  background: #27ae60;
+}
+
+/* Resultado */
+.result-section {
+  margin-top: 30px;
+  border-top: 2px solid #ddd;
+  padding-top: 20px;
+}
+
+.result-message {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.result-message.correct {
+  color: #27ae60;
+}
+
+.result-message.incorrect {
+  color: #e74c3c;
+}
+
+.next-btn {
+  background: #27ae60;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.next-btn:hover {
+  background: #229954;
+}
+/* Removido bloqueio global de scroll do body para permitir rolagem nas páginas */
+
+/* Modal de saída */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.modal-card {
+  width: 360px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  padding: 24px 20px 28px;
+  position: relative;
+  text-align: center;
+}
+
+.modal-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  border: none;
+  background: transparent;
+  font-size: 22px;
+  cursor: pointer;
+  color: #555;
+}
+
+.modal-title {
+  color: #2c2c2c;
+  font-weight: 800;
+  margin: 16px 0 18px;
+}
+
+.modal-exit-btn {
+  background: #ff1f1f;
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.modal-exit-btn:hover {
+  background: #e21919;
+}

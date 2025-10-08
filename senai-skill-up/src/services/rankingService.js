@@ -1,55 +1,124 @@
-import api from './api';
+import localStorageService from './localStorageService';
 
-export const getGlobalRanking = () => {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      const mockUsers = [
-        { id: 'user1', nome: 'Alice', pontos: 1200, icon: '/assets/images/image 6.svg' },
-        { id: 'user2', nome: 'Bob', pontos: 1100, icon: '/assets/images/image 7.svg' },
-        { id: 'user3', nome: 'Charlie', pontos: 1000, icon: '/assets/images/image 8.svg' },
-      ];
-
-      for (let i = 4; i <= 25; i++) {
-        mockUsers.push({
-          id: `user${i}`,
-          nome: `Usuario${i}`,
-          pontos: 1000 - (i * 20),
-        });
-      }
-
-      resolve({
-        data: mockUsers
-      });
-    }, 500);
-  });
-};
-
-export const getUserScore = (userId) => {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      const mockScores = {
-        'mockUserId': { score: 950 },
-        'user1': { score: 1200 },
-        'user2': { score: 1100 },
-        'user3': { score: 1000 },
+// Buscar ranking global - retorna vazio
+  export const getRankingGlobal = async () => {
+    try {
+      return {
+        success: true,
+        data: []
       };
+    } catch (error) {
+      console.error('Erro ao buscar ranking global:', error);
+      return {
+        success: false,
+        message: 'Erro ao buscar ranking'
+      };
+    }
+  };
 
-      for (let i = 4; i <= 25; i++) {
-        mockScores[`user${i}`] = { score: 1000 - (i * 20) };
-      }
+  // Buscar pontuação do usuário - retorna erro
+  export const getPontuacaoUsuario = async (userId) => {
+    try {
+      return {
+        success: false,
+        message: 'Sistema de pontuação removido'
+      };
+    } catch (error) {
+      console.error('Erro ao buscar pontuação do usuário:', error);
+      return {
+        success: false,
+        message: 'Erro ao buscar pontuação'
+      };
+    }
+  };
 
-      resolve({
-        data: mockScores[userId] || { score: 0 }
-      });
-    }, 500);
-  });
-};
+  // Adicionar pontos ao usuário - retorna erro
+  export const adicionarPontos = async (userId, pontos) => {
+    try {
+      return {
+        success: false,
+        message: 'Sistema de pontuação removido'
+      };
+    } catch (error) {
+      console.error('Erro ao adicionar pontos:', error);
+      return {
+        success: false,
+        message: 'Erro interno do servidor'
+      };
+    }
+  };
 
-export const updateScore = (userId, score) => {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      console.log(`Mock: Pontuação do usuário ${userId} atualizada para ${score}`);
-      resolve({ data: { success: true, userId, score } });
-    }, 500);
-  });
-}; 
+  // Definir pontuação específica - retorna erro
+  export const definirPontuacao = async (userId, pontos) => {
+    try {
+      return {
+        success: false,
+        message: 'Sistema de pontuação removido'
+      };
+    } catch (error) {
+      console.error('Erro ao definir pontuação:', error);
+      return {
+        success: false,
+        message: 'Erro interno do servidor'
+      };
+    }
+  };
+
+  // Buscar histórico de partidas do usuário - retorna vazio
+  export const getHistoricoUsuario = async (userId) => {
+    try {
+      return {
+        success: true,
+        data: []
+      };
+    } catch (error) {
+      console.error('Erro ao buscar histórico do usuário:', error);
+      return {
+        success: false,
+        message: 'Erro ao buscar histórico'
+      };
+    }
+  };
+
+  // Obter estatísticas do usuário - retorna estatísticas vazias
+  export const getEstatisticasUsuario = async (userId) => {
+    try {
+      const estatisticas = {
+        totalPartidas: 0,
+        totalAcertos: 0,
+        totalErros: 0,
+        pontuacaoAtual: 0,
+        melhorPontuacao: 0,
+        piorPontuacao: 0,
+        posicaoRanking: null,
+        taxaAcerto: 0
+      };
+      
+      return {
+        success: true,
+        data: estatisticas
+      };
+    } catch (error) {
+      console.error('Erro ao buscar estatísticas do usuário:', error);
+      return {
+        success: false,
+        message: 'Erro interno do servidor'
+      };
+    }
+  };
+
+  // Buscar top usuários - retorna vazio
+  export const getTopRanking = async (limit = 10) => {
+    try {
+      return {
+        success: true,
+        data: []
+      };
+    } catch (error) {
+      console.error('Erro ao buscar top ranking:', error);
+      return {
+        success: false,
+        message: 'Erro ao buscar top ranking'
+      };
+    }
+  };

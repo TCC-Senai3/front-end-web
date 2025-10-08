@@ -1,15 +1,6 @@
-/* Bloqueio de scroll específico para PinPage */
-body.pinpage-body {
-  overflow: hidden;
-  height: 100vh;
-  position: fixed;
-  width: 100%;
-}
+@import './responsive.css';
 
-html.pinpage-html {
-  overflow: hidden;
-  height: 100vh;
-}
+/* Removido bloqueio global de scroll do body/html para permitir rolagem */
 
 /* Remover header fixo para seguir padrão das outras páginas */
 .pinpage-header {
@@ -61,17 +52,7 @@ html.pinpage-html {
   z-index: 2;
 }
 
-@media (max-width: 400px) {
-  .pinpage-logo {
-    width: 90vw;
-    min-width: 0;
-  }
-  .pinpage-form {
-    min-width: 0;
-    width: 95vw;
-    padding: 10px;
-  }
-}
+/* Responsividade removida */
 
 .pinpage-input {
   width: 100%;

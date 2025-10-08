@@ -1,8 +1,20 @@
 import React from 'react';
-import Header from '../../components/Header_padrao';
+import { useNavigate } from 'react-router-dom';
+import Header from '../../components/header';
 import './style.css';
 
 export default function LoadHost() {
+  const navigate = useNavigate();
+
+  const handleSair = () => {
+    // Volta para a página anterior ou para home se não houver histórico
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
+
   return (
     <div className="loadhost-bg">
       <Header />
@@ -21,9 +33,9 @@ export default function LoadHost() {
           <button
             type="button"
             className="loadhost-btn"
-            disabled
+            onClick={handleSair}
           >
-            Carregando...
+            Sair
           </button>
         </form>
       </div>

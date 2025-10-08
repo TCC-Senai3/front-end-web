@@ -1,3 +1,5 @@
+@import './responsive.css';
+
 /* Estilo para a página LoadHost */
 .loadhost-bg {
   min-height: 100vh;

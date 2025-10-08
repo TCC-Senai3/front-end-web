@@ -1,0 +1,13 @@
+.game-content-wrapper {
+    display: flex;
+    justify-content: center;
+    margin: 60px auto 0 auto;
+    gap: 30px;
+    box-sizing: border-box;
+}
+
+.game-spacing {
+    height: 80px;
+}
+
+/* Responsividade removida */

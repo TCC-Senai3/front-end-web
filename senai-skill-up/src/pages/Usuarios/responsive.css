@@ -1,0 +1,69 @@
+/* ========================================
+   RESPONSIVIDADE - PÁGINA USUÁRIOS
+   ======================================== */
+
+/* ========================================
+   LAYOUT PRINCIPAL
+   ======================================== */
+
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) {
+    .usuarios-content {
+        padding: 25px;
+    }
+
+    .users-list {
+        gap: 10px;
+    }
+}
+
+/* Mobile Grande (576px - 768px) */
+@media (max-width: 768px) {
+    .usuarios-container {
+        padding: 20px 10px;
+    }
+    
+    .usuarios-content {
+        padding: 20px;
+        border-radius: 16px;
+    }
+
+    .users-list {
+        gap: 8px;
+        margin-top: 15px;
+    }
+}
+
+/* Mobile Médio (480px - 576px) */
+@media (max-width: 576px) {
+    .usuarios-container {
+        padding: 15px 8px;
+    }
+    
+    .usuarios-content {
+        padding: 15px;
+        border-radius: 12px;
+    }
+
+    .users-list {
+        gap: 6px;
+        margin-top: 12px;
+    }
+}
+
+/* Mobile Pequeno (até 480px) */
+@media (max-width: 480px) {
+    .usuarios-container {
+        padding: 10px 5px;
+    }
+    
+    .usuarios-content {
+        padding: 12px;
+        border-radius: 8px;
+    }
+
+    .users-list {
+        gap: 5px;
+        margin-top: 10px;
+    }
+}

@@ -1,0 +1,52 @@
+.ranking-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tab-button {
+  padding: 12px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: #007bff;
+  color: white;
+  box-shadow: 0 2px 6px rgba(0, 123, 255, 0.2);
+  text-align: center;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-button:hover {
+  background: #0056b3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.tab-button.active {
+  background: white;
+  color: #007bff;
+  border: 2px solid #007bff;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+  font-weight: 700;
+}
+
+.tab-button.active:hover {
+  background: #f8f9fa;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.3);
+}
+
+/* Responsividade removida */

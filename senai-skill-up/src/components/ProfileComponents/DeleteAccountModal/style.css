@@ -1,0 +1,32 @@
+/* Modal styles - extending global modal styles */
+.perfil-excluir-btn-cancelar {
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 24px;
+    font-size: 1em;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.perfil-excluir-btn-cancelar:hover {
+    background: #5a6268;
+}
+
+.perfil-excluir-btn-confirmar {
+    background: #d32f2f;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 24px;
+    font-size: 1em;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.perfil-excluir-btn-confirmar:hover {
+    background: #b71c1c;
+}

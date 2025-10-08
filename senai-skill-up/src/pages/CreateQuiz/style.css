@@ -1,8 +1,10 @@
+@import './responsive.css';
+
+/* Removido overflow hidden global para permitir rolagem */
 body, html {
   background: #fff !important;
   margin: 0;
   padding: 0;
-  overflow: hidden;
 }
 
 .quiz-container {
@@ -169,23 +171,113 @@ body, html {
 
 .question-thumb {
   width: 90%;
-  height: 60px;
+  min-height: 120px;
   background: #fff;
   border-radius: 8px;
   margin-bottom: 15px;
   box-shadow: 2px 2px 6px #bbb;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1em;
-  color: #bbb;
-  font-weight: 600;
+  flex-direction: column;
   cursor: pointer;
   transition: border 0.2s, color 0.2s;
+  padding: 8px;
+  overflow: hidden;
 }
+
 .question-thumb.selected {
   border: 2px solid #00c3ff;
   color: #00c3ff;
+}
+
+/* Estilos para a miniatura da pergunta */
+.mini-question-header {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.mini-question-number {
+  font-size: 0.8em;
+  color: #666;
+  font-weight: 600;
+  text-align: center;
+}
+
+.mini-question-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mini-question-text {
+  font-size: 0.7em;
+  color: #333;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.2;
+  max-height: 2.4em;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.mini-answers {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.mini-answer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.6em;
+  min-height: 16px;
+  transition: all 0.2s ease;
+}
+
+.mini-answer.neutral {
+  background-color: #f0f0f0;
+  color: #666;
+}
+
+.mini-answer.correct {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.mini-answer.incorrect {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.mini-answer-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 4px;
+}
+
+.mini-answer-indicator {
+  font-size: 0.8em;
+  font-weight: bold;
+  min-width: 12px;
+  text-align: center;
+}
+
+.mini-answer-indicator.correct {
+  color: #28a745;
+}
+
+.mini-answer-indicator.incorrect {
+  color: #dc3545;
 }
 
 .add-question {
@@ -240,23 +332,4 @@ body, html {
   z-index: 2;
 }
 
-@media (max-width: 900px) {
-  .sidebar-left, .sidebar-right {
-    display: none;
-    position: static;
-    width: 100%;
-    height: auto;
-    box-shadow: none;
-  }
-  .quiz-container {
-    padding: 0;
-  }
-  .main-content {
-    min-width: 100vw;
-    padding: 0;
-  }
-  .question-card {
-    min-width: 90vw;
-    max-width: 98vw;
-  }
-}
+/* Responsividade removida */

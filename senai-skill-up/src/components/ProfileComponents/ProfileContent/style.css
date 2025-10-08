@@ -1,0 +1,18 @@
+/* ProfileContent specific styles - if any needed */
+
+.cards-harmonicos-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem; /* Espaçamento entre os cards */
+  width: 100%;
+}
+
+.cards-harmonicos-container > * {
+  flex-grow: 1;
+}
+
+/* Força o histórico a ocupar a linha inteira */
+.perfil-historico-ranking-container {
+  flex-basis: 100%;
+}
+

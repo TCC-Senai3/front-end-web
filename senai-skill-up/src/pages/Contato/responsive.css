@@ -1,0 +1,36 @@
+/* ========================================
+   RESPONSIVIDADE - PÁGINA CONTATO
+   ======================================== */
+
+/* ========================================
+   LAYOUT PRINCIPAL
+   ======================================== */
+
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) {
+    .contact-wrapper {
+        padding: 25px 0 0 0;
+    }
+}
+
+/* Mobile Grande (576px - 768px) */
+@media (max-width: 768px) {
+    .contact-wrapper {
+        flex-direction: column;
+        padding: 20px 0 0 0;
+    }
+}
+
+/* Mobile Médio (480px - 576px) */
+@media (max-width: 576px) {
+    .contact-wrapper {
+        padding: 15px 0 0 0;
+    }
+}
+
+/* Mobile Pequeno (até 480px) */
+@media (max-width: 480px) {
+    .contact-wrapper {
+        padding: 10px 0 0 0;
+    }
+}

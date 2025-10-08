@@ -1,0 +1,165 @@
+/* Container principal */
+.criar-sala-container {
+  min-height: 100vh;
+  background: #00A6FF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 60px; /* espaço para o header */
+  box-sizing: border-box;
+}
+
+/* Conteúdo central */
+.criar-sala-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
+  padding: 20px;
+}
+
+/* Título */
+.criar-sala-title {
+  color: white;
+  font-size: 32px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+/* Card branco */
+.sala-card {
+  background: white;
+  border-radius: 15px;
+  padding: 40px;
+  width: 100%;
+  max-width: 500px;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+/* Botão fechar */
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #666;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s;
+}
+
+.close-btn:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+/* Grupos de formulário */
+.form-group {
+  margin-bottom: 25px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #333;
+  font-size: 14px;
+}
+
+/* Select */
+.form-select {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: #00A6FF;
+}
+
+.form-select option {
+  padding: 10px;
+}
+
+/* Input */
+.form-input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #00A6FF;
+}
+
+.form-input::placeholder {
+  color: #999;
+}
+
+/* Botão criar */
+.criar-btn {
+  width: 100%;
+  background: #00C851;
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 10px;
+}
+
+.criar-btn:hover {
+  background: #00A041;
+  transform: translateY(-1px);
+}
+
+.criar-btn:active {
+  transform: translateY(0);
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .criar-sala-container {
+    padding: 20px;
+    padding-top: 80px;
+  }
+  
+  .criar-sala-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .sala-card {
+    padding: 30px 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+}
