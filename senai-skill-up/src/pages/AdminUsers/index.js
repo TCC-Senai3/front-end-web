@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Header, Footer, MeioFooter } from '../../components';
+import { Header, Footer } from '../../components';
 import UserManagementTable from '../../components/UsersComponents/UserManagementTable';
 import UserEditModal from '../../components/UsersComponents/UserEditModal';
 import userService from '../../services/userService';

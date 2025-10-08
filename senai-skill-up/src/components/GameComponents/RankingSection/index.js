@@ -4,6 +4,7 @@ import image6 from "../../../assets/images/image 6.svg";
 import image7 from "../../../assets/images/image 7.svg";
 import image8 from "../../../assets/images/image 8.svg";
 import image31 from "../../../assets/images/image 31.svg";
+import image13 from "../../../assets/images/Group 13.svg";
 import { getRankingGlobal } from "../../../services/rankingService";
 import "./style.css";
 

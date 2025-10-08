@@ -10,6 +10,5 @@ export * from './alternativaService';
 export * from './salaService';
 export * from './respostaService';
 export { default as api } from './api';
-export { default as localStorageService } from './localStorageService';
 export { default as authService } from './authService';
 export * from './quizService';

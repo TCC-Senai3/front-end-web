@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import authService from '../services/authService';
-import localStorageService from '../services/localStorageService';
 
 export const useAuth = () => {
     const [userData, setUserData] = useState(null);
@@ -10,9 +9,9 @@ export const useAuth = () => {
     useEffect(() => {
         const initAuth = () => {
             // Verifica se já está autenticado
-            const currentUser = localStorageService.getCurrentUser();
+            const currentUser = authService.getCurrentUser();
             
-            if (currentUser && localStorageService.isAuthenticated()) {
+            if (currentUser && authService.isAuthenticated()) {
                 setUserData(currentUser);
                 setIsLoggedIn(true);
             } else {
