@@ -1,7 +1,6 @@
 // Header Components
 export { default as Header } from './header';
 export { default as Footer } from './Footer';
-export { default as MeioFooter } from './MeioFooter';
 
 // Form Components
 export { default as SignUpForm } from './SignUpForm';

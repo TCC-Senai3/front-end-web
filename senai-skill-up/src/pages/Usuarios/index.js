@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Header, Footer, MeioFooter } from '../../components';
+import { Header, Footer } from '../../components';
 import UserManagementTable from '../../components/UsersComponents/UserManagementTable';
 import PerfilModal from '../PerfilModal';
 import './style.css';
@@ -131,7 +131,6 @@ export default function Usuarios() {
         />
       )}
 
-      <MeioFooter />
       <Footer />
     </>
   );

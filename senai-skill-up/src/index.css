@@ -35,8 +35,6 @@ body {
 /* Estilos para elementos específicos do React */
 #root {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
 }
 
 /* Estilos para links do React Router */
@@ -58,6 +56,7 @@ button {
   overflow: visible;
   text-transform: none;
   -webkit-appearance: button;
+  appearance: button;
   cursor: pointer;
 }
 

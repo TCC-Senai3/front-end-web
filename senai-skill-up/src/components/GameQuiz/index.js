@@ -1,31 +1,55 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import gameQuizService from '../../services/gameQuizService';
 import './style.css';
 
 export default function GameQuiz() {
   const navigate = useNavigate();
-  const [timeLeft, setTimeLeft] = useState(0); // Timer parado como na imagem
+  const location = useLocation();
+  const [timeLeft, setTimeLeft] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
+  const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [quizId, setQuizId] = useState(null);
+  const [error, setError] = useState(null);
 
-  const currentQuestion = {
-    id: 1,
-    tema: 'FRONT END',
-    pergunta: 'COMO O CSS É UTILIZADO PARA ESTILIZAR UMA PÁGINA WEB E QUAIS SÃO SUAS PRINCIPAIS PROPRIEDADES',
-    alternativas: [
-      { id: 'A', texto: 'ELE É USADO PARA CRIAR SCRIPTS E FUNÇÕES.', correta: false },
-      { id: 'B', texto: 'ELE DEFINE A ESTRUTURA DA PÁGINA E SUAS INTERAÇÕES.', correta: false },
-      { id: 'C', texto: 'ELE ALTERA A APARÊNCIA VISUAL DE UMA PÁGINA, COMO CORES, FONTES E LAYOUTS.', correta: true },
-      { id: 'D', texto: 'ELE É RESPONSÁVEL PELA CRIAÇÃO DE BANCOS DE DADOS E SERVIDORES.', correta: false }
-    ]
-  };
+  // Carregar pergunta inicial
+  useEffect(() => {
+    const iniciarQuiz = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Pegar temaId da navegação (se vier de outra página)
+        const temaId = location.state?.temaId;
+        
+        if (temaId) {
+          // Iniciar novo quiz
+          const quizData = await gameQuizService.iniciarQuiz(temaId);
+          setQuizId(quizData.id);
+          setCurrentQuestion(quizData.perguntaAtual);
+        } else if (location.state?.quizId) {
+          // Continuar quiz existente
+          const quizIdExistente = location.state.quizId;
+          setQuizId(quizIdExistente);
+          const pergunta = await gameQuizService.getPerguntaAtual(quizIdExistente);
+          setCurrentQuestion(pergunta);
+        }
+      } catch (err) {
+        console.error('Erro ao carregar quiz:', err);
+        setError('Erro ao carregar quiz');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Timer parado como na imagem (0:00)
-  // useEffect removido para manter timer em 0:00
+    iniciarQuiz();
+  }, [location.state]);
 
-  // Bloquear scroll da página
+  // Bloquear scroll
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => {
@@ -33,28 +57,40 @@ export default function GameQuiz() {
     };
   }, []);
 
-  const handleAnswerSelect = (alternativa) => {
-    if (showResult) return;
+  const handleAnswerSelect = async (alternativa) => {
+    if (showResult || !quizId || !currentQuestion) return;
+    
     setSelectedAnswer(alternativa.id);
     setIsCorrect(alternativa.correta);
     setShowResult(true);
   };
 
-  const handleNextQuestion = () => {
-    // Exemplo: resultados mockados para exibição para todos os usuários
-    const resultados = [
-      { posicao: 1, nome: 'Campeão', ganho: 50 },
-      { posicao: 2, nome: 'Usuário', ganho: 30 },
-      { posicao: 3, nome: 'Usuário', ganho: 20 },
-      { posicao: 4, nome: 'Usuário', ganho: 10 },
-      { posicao: 5, nome: 'Usuário', ganho: 10 },
-      { posicao: 6, nome: 'Usuário', ganho: 10 },
-      { posicao: 7, nome: 'Usuário', ganho: 10 },
-      { posicao: 8, nome: 'Usuário', ganho: 10 },
-      { posicao: 9, nome: 'Usuário', ganho: 10 }
-    ];
+  const handleNextQuestion = async () => {
+    try {
+      if (!quizId || !currentQuestion || !selectedAnswer) return;
 
-    navigate('/fim', { state: { resultados } });
+      // Submeter resposta e obter próxima pergunta
+      const response = await gameQuizService.submeterResposta(
+        quizId,
+        currentQuestion.id,
+        selectedAnswer
+      );
+
+      if (response.proximaPergunta) {
+        // Resetar estado e carregar próxima pergunta
+        setCurrentQuestion(response.proximaPergunta);
+        setSelectedAnswer(null);
+        setShowResult(false);
+        setIsCorrect(false);
+      } else {
+        // Quiz finalizado, ir para tela de resultados
+        const resultados = await gameQuizService.finalizarQuiz(quizId);
+        navigate('/fim', { state: { resultados } });
+      }
+    } catch (err) {
+      console.error('Erro ao avançar pergunta:', err);
+      setError('Erro ao carregar próxima pergunta');
+    }
   };
 
   const handleExit = () => {
@@ -63,7 +99,14 @@ export default function GameQuiz() {
 
   const closeExitModal = () => setShowExitModal(false);
 
-  const confirmExit = () => {
+  const confirmExit = async () => {
+    if (quizId) {
+      try {
+        await gameQuizService.abandonarQuiz(quizId);
+      } catch (err) {
+        console.error('Erro ao abandonar quiz:', err);
+      }
+    }
     navigate('/game');
   };
 
@@ -73,46 +116,50 @@ export default function GameQuiz() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  return (
-    <div className="game-quiz-container">
-      <div className="quiz-paper-container">
-        <div className="quiz-main">
-          <div className="quiz-content">
-            <div className="question-card">
-              <div className="question-theme">{currentQuestion.tema}</div>
-              <div className="question-text">{currentQuestion.pergunta}</div>
+  // Renderizar estado de loading
+  if (loading) {
+    return (
+      <div className="game-quiz-container">
+        <div className="quiz-wrapper">
+          <div className="quiz-paper-container">
+            <div className="loading-message">Carregando...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-              <div className="alternatives-container">
-                {currentQuestion.alternativas.map((alternativa) => (
-                  <button
-                    key={alternativa.id}
-                    className={`alternative-btn ${
-                      selectedAnswer === alternativa.id
-                        ? (alternativa.correta ? 'correct' : 'incorrect')
-                        : ''
-                    } ${showResult && alternativa.correta ? 'show-correct' : ''}`}
-                    onClick={() => handleAnswerSelect(alternativa)}
-                    disabled={showResult}
-                  >
-                    {alternativa.texto}
-                  </button>
-                ))}
-              </div>
+  // Renderizar estado de erro
+  if (error) {
+    return (
+      <div className="game-quiz-container">
+        <div className="quiz-wrapper">
+          <div className="quiz-paper-container">
+            <div className="error-message">{error}</div>
+            <button className="next-btn" onClick={() => navigate('/game')}>
+              VOLTAR
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-              {showResult && (
-                <div className="result-section">
-                  <div className={`result-message ${isCorrect ? 'correct' : 'incorrect'}`}>
-                    {isCorrect ? '✅ RESPOSTA CORRETA!' : '❌ RESPOSTA INCORRETA!'}
-                  </div>
-                  <button className="next-btn" onClick={handleNextQuestion}>
-                    PRÓXIMA PERGUNTA
-                  </button>
-                </div>
-              )}
+  // Renderizar estado vazio (sem dados)
+  if (!currentQuestion) {
+    return (
+      <div className="game-quiz-container">
+        <div className="quiz-wrapper">
+          <div className="quiz-paper-container">
+            <div className="question-theme">-</div>
+            <div className="question-text">Nenhuma pergunta disponível</div>
+            <div className="alternatives-container">
+              <button className="alternative-btn" disabled>-</button>
+              <button className="alternative-btn" disabled>-</button>
+              <button className="alternative-btn" disabled>-</button>
+              <button className="alternative-btn" disabled>-</button>
             </div>
           </div>
-
-          {/* Timer + Sair */}
           <div className="quiz-controls">
             <div className="timer">
               <span className="timer-text">{formatTime(timeLeft)}</span>
@@ -121,7 +168,58 @@ export default function GameQuiz() {
           </div>
         </div>
       </div>
+    );
+  }
 
+  return (
+    <div className="game-quiz-container">
+      <div className="quiz-wrapper">
+        <div className="quiz-paper-container">
+          <div className="question-theme">{currentQuestion.tema || '-'}</div>
+          <div className="question-text">{currentQuestion.pergunta || 'Nenhuma pergunta disponível'}</div>
+          <div className="alternatives-container">
+            {currentQuestion.alternativas && currentQuestion.alternativas.length > 0 ? (
+              currentQuestion.alternativas.map((alternativa) => (
+                <button
+                  key={alternativa.id}
+                  className={`alternative-btn ${
+                    selectedAnswer === alternativa.id
+                      ? (alternativa.correta ? 'correct' : 'incorrect')
+                      : ''
+                  } ${showResult && alternativa.correta ? 'show-correct' : ''}`}
+                  onClick={() => handleAnswerSelect(alternativa)}
+                  disabled={showResult}
+                >
+                  {alternativa.texto || '-'}
+                </button>
+              ))
+            ) : (
+              <>
+                <button className="alternative-btn" disabled>-</button>
+                <button className="alternative-btn" disabled>-</button>
+                <button className="alternative-btn" disabled>-</button>
+                <button className="alternative-btn" disabled>-</button>
+              </>
+            )}
+          </div>
+          {showResult && (
+            <div className="result-section">
+              <div className={`result-message ${isCorrect ? 'correct' : 'incorrect'}`}>
+                {isCorrect ? '✅ RESPOSTA CORRETA!' : '❌ RESPOSTA INCORRETA!'}
+              </div>
+              <button className="next-btn" onClick={handleNextQuestion}>
+                PRÓXIMA PERGUNTA
+              </button>
+            </div>
+          )}
+        </div>
+        <div className="quiz-controls">
+          <div className="timer">
+            <span className="timer-text">{formatTime(timeLeft)}</span>
+          </div>
+          <button className="exit-btn" onClick={handleExit}>SAIR</button>
+        </div>
+      </div>
       {showExitModal && (
         <div className="modal-overlay">
           <div className="modal-card">

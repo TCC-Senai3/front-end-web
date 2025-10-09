@@ -53,19 +53,19 @@ function AppContent() {
             <ScrollToHashElement />
             <Routes>
                 <Route path="/" element={<Home />} />                 {/* ok */}
-                <Route path="/login" element={<Login />} />
+                <Route path="/login" element={<Login />} />         {/* ok */}
                 <Route path="/contato" element={<Contato />} />  {/* ok */}
                 <Route path="/SkillHelp" element={<Contato />} />   {/* ok */}
                 <Route path="/game" element={<Game />} />  {/* Falta a placa de ranking */}
-                <Route path="/jogo" element={<Jogo />} />  {/* css arrumar o estilo */}
+                <Route path="/jogo" element={<Jogo />} />  {/* css arrumar o tamanho dos  elementos */}
                 <Route path="/perfil" element={<PerfilModal isMyProfile={true} />} />{/* falta a placa de perfil */} 
-                <Route path="/suporte" element={<Suporte />} />  {/* arruma  tamanho da pagina */}
-                <Route path="/termos" element={<Termos />} />  {/* arruma  tamanho da pagina */}
+                <Route path="/suporte" element={<Suporte />} />  {/*  ok */}
+                <Route path="/termos" element={<Termos />} />  {/* ok */}
                 <Route path="/home" element={<Home />} />  {/* ok*/}    
                 <Route path="/Correto" element={<Correto />} /> {/* arruam a img*/}    
                 <Route path="/Errado" element={<Errado />} /> {/* arruam a img*/}
-                <Route path="/LoadHost" element={<LoadHost />} />
-                <Route path="/ajuda" element={<Suporte />} /> {/* arruma  tamanho da pagina */}
+                <Route path="/LoadHost" element={<LoadHost />} />  {/* css arrumar o tamanho dos  elementos */}
+                <Route path="/ajuda" element={<Suporte />} /> {/*ok*/}
                 <Route path="/pin" element={<PinPage />} /> {/* ok */}
                 <Route path="/createquiz" element={<CreateQuiz />} /> {/* css arrumar o estilo */}
                 <Route path="/criarsala" element={<CriarSala />} />{/* css arrumar o estilo */}

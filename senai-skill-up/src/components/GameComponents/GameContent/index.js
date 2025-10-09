@@ -4,7 +4,7 @@ import RankingSection from '../RankingSection';
 import QuizSection from '../QuizSection';
 import { ModalQuestionario } from '../../';
 import { getRankingGlobal } from '../../../services/rankingService';
-import localStorageService from '../../../services/localStorageService';
+import authService from '../../../services/authService';
 import "./style.css";
 
 export default function GameContent() {
@@ -54,7 +54,7 @@ export default function GameContent() {
 
     const handleQuizCompletion = async (resultado) => {
         try {
-            const currentUser = localStorageService.getCurrentUser();
+            const currentUser = authService.getCurrentUser();
             if (!currentUser) {
                 console.error('Usuário não autenticado');
                 return;
@@ -62,7 +62,7 @@ export default function GameContent() {
 
             // Salvar resultado da partida
             const partidaData = {
-                userId: currentUser.userId,
+                userId: currentUser.userId || currentUser.id,
                 temaId: questionarioSelecionado?.temaId || 'unknown',
                 pontuacao: resultado.pontuacao || 0,
                 totalPerguntas: resultado.totalPerguntas || 1,

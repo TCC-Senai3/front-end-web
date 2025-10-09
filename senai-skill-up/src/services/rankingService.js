@@ -1,5 +1,3 @@
-import localStorageService from './localStorageService';
-
 // Buscar ranking global - retorna vazio
   export const getRankingGlobal = async () => {
     try {

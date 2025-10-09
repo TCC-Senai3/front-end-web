@@ -1,5 +1,5 @@
 import React from "react";
-import { Header, Footer, MeioFooter, Intro, InformationCards, ContactSection } from '../../components';
+import { Header, Footer, Intro, InformationCards, ContactSection } from '../../components';
 import "./style.css";
 
 export default function Home() {
@@ -9,7 +9,6 @@ export default function Home() {
             <Intro />
             <InformationCards />
             <ContactSection />
-            <MeioFooter />
             <Footer />
         </>
     );

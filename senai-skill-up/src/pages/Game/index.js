@@ -1,5 +1,5 @@
 import React from "react";
-import { Header, MeioFooter, Footer, GameOptions, GameContent } from '../../components';
+import { Header, Footer, GameOptions, GameContent } from '../../components';
 import "./style.css";
 
 export default function Game() {
@@ -8,7 +8,6 @@ export default function Game() {
             <Header />
             <GameOptions />
             <GameContent />
-            <MeioFooter />
             <Footer />
         </>
     );
