@@ -6,8 +6,8 @@
    LAYOUT PRINCIPAL
    ======================================== */
 
-/* Tablet (768px - 1024px) */
-@media (max-width: 1024px) {
+/* Tablet e Mobile - Layout vertical */
+@media (max-width: 768px) {
     .container {
         min-height: 800px;
         height: 100vh;
@@ -111,8 +111,8 @@
     }
 }
 
-/* Mobile Grande (576px - 768px) */
-@media (max-width: 768px) {
+/* Ajustes adicionais para telas menores */
+@media (max-width: 650px) {
     .container {
         min-height: 700px;
     }

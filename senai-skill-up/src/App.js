@@ -53,7 +53,7 @@ function AppContent() {
             <ScrollToHashElement />
             <Routes>
                 <Route path="/" element={<Home />} />                 {/* ok */}
-                <Route path="/login" element={<Login />} />
+                <Route path="/login" element={<Login />} />         {/* ok */}
                 <Route path="/contato" element={<Contato />} />  {/* ok */}
                 <Route path="/SkillHelp" element={<Contato />} />   {/* ok */}
                 <Route path="/game" element={<Game />} />  {/* Falta a placa de ranking */}

@@ -104,7 +104,6 @@ form.sign-in-form {
 .input-field {
     max-width: 380px;
     width: 100%;
-    background-color: #f0f0f0;
     margin: 10px 0;
     height: 55px;
     border-radius: 55px;
@@ -112,12 +111,13 @@ form.sign-in-form {
     grid-template-columns: 15% 85%;
     padding: 0 0.4rem;
     position: relative;
+    border: none;
 }
 
 .input-field i {
     text-align: center;
     line-height: 55px;
-    color: #acacac;
+    color: #9e9e9e;
     transition: 0.5s;
     font-size: 1.1rem;
 }
@@ -127,14 +127,14 @@ form.sign-in-form {
     outline: none;
     border: none;
     line-height: 1;
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: #333;
+    font-weight: 400;
+    font-size: 1rem;
+    color: #333 ;
 }
 
 .input-field input::placeholder {
-    color: #aaa;
-    font-weight: 500;
+    color: #bdbdbd;
+    font-weight: 400;
 }
 
 .social-text {

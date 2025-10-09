@@ -122,7 +122,7 @@ export default function Login() {
                             <i className="fas fa-user"></i>
                             <input 
                                 type="text" 
-                                placeholder="Nome completo (mínimo 3 caracteres)" 
+                                placeholder="Nome de usuário" 
                                 value={cadastroNome}
                                 onChange={(e) => setCadastroNome(e.target.value)}
                                 required
@@ -133,7 +133,7 @@ export default function Login() {
                             <i className="fas fa-envelope"></i>
                             <input 
                                 type="email" 
-                                placeholder="Email (@gmail, @outlook, @hotmail, @senai)" 
+                                placeholder="Email" 
                                 value={cadastroEmail}
                                 onChange={(e) => setCadastroEmail(e.target.value)}
                                 required
@@ -154,7 +154,7 @@ export default function Login() {
             <div className="panels-container">
                 <div className="panel left-panel">
                     <div className="content">
-                        <h3>Já tem uma conta?</h3>
+                        <h3>Não está cadastrado?</h3>
                         <button className="btn transparent" id="sign-up-btn" onClick={handleSignUpClick}>
                             CADASTRE-SE
                         </button>
@@ -163,7 +163,7 @@ export default function Login() {
                 </div>
                 <div className="panel right-panel">
                     <div className="content">
-                        <h3>Não está cadastrado?</h3>
+                        <h3>Já tem uma conta?</h3>
                         <button className="btn transparent" id="sign-in-btn" onClick={handleSignInClick}>
                             LOGIN
                         </button>
