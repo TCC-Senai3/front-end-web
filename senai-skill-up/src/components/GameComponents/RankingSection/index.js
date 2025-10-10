@@ -4,7 +4,7 @@ import image6 from "../../../assets/images/image 6.svg";
 import image7 from "../../../assets/images/image 7.svg";
 import image8 from "../../../assets/images/image 8.svg";
 import image31 from "../../../assets/images/image 31.svg";
-import image13 from "../../../assets/images/Group 13.svg";
+import rankingSlogan from "../../../assets/images/Group 13.svg";
 import { getRankingGlobal } from "../../../services/rankingService";
 import "./style.css";
 
@@ -64,7 +64,7 @@ export default function RankingSection() {
 
     return (
         <div className="ranking-container">
-            <img src={require("../../../assets/images/Group 13.svg")} alt="Ranking" className="ranking-slogan" />
+            <img src={rankingSlogan} alt="Ranking" className="ranking-slogan" />
             <div className="ranking-pesquisa-container">
                 <input 
                     placeholder="Pesquisar..." 

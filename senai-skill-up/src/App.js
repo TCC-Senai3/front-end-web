@@ -22,6 +22,7 @@ import AdminUsers from './pages/AdminUsers';
 import ConnectionError from './pages/ConnectionError';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import DevRoutes from './pages/DevRoutes';
 
 import './assets/font/imports.css';
 
@@ -58,7 +59,7 @@ function AppContent() {
                 <Route path="/SkillHelp" element={<Contato />} />   {/* ok */}
                 <Route path="/game" element={<Game />} />  {/* Falta a placa de ranking */}
                 <Route path="/jogo" element={<Jogo />} />  {/* css arrumar o tamanho dos  elementos */}
-                <Route path="/perfil" element={<PerfilModal isMyProfile={true} />} />{/* falta a placa de perfil */} 
+                <Route path="/perfil" element={<PerfilModal isMyProfile={true} />} />{/* ok */} 
                 <Route path="/suporte" element={<Suporte />} />  {/*  ok */}
                 <Route path="/termos" element={<Termos />} />  {/* ok */}
                 <Route path="/home" element={<Home />} />  {/* ok*/}    
@@ -76,6 +77,7 @@ function AppContent() {
                 <Route path="/connection-error" element={<ConnectionError />} /> {/* ok */}
                 <Route path="/ForgotPassword" element={<ForgotPassword />} /> {/* css arrumar o estilo */}
                 <Route path="/ResetPassword" element={<ResetPassword />} />{/* css arrumar o estilo */}
+                <Route path="/dev" element={<DevRoutes />} /> {/* Painel de desenvolvimento */}
 
             </Routes>
         </>

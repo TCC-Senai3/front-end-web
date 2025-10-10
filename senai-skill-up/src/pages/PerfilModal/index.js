@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import Header from '../../components/header';
 import './style.css';
+import editIcon from '../../assets/images/Vector.png';
+import trophyIcon from '../../assets/images/trophy 1.svg';
+import pointsIcon from '../../assets/images/image 33.png';
 
 export default function PerfilModal({ isMyProfile = true }) {
   const [user, setUser] = useState({
@@ -38,9 +41,6 @@ export default function PerfilModal({ isMyProfile = true }) {
       <Header />
       <div className="perfil-modal-overlay">
         <div className="perfil-modal-container">
-          {/* Faixa no topo */}
-          <img src={require("../../assets/images/placa.svg").default} alt="Perfil" className="perfil-slogan" />
-          
           {/* Botão de fechar */}
           <div className="perfil-close-btn" onClick={() => window.history.back()}>
             ×
@@ -49,7 +49,7 @@ export default function PerfilModal({ isMyProfile = true }) {
           {/* Ícone de edição - só aparece no meu perfil */}
           {isMyProfile && (
             <div className="perfil-edit-icon" onClick={() => setIsEditing(!isEditing)}>
-              ✏️
+              <img src={editIcon} alt="Editar" />
             </div>
           )}
 
@@ -75,7 +75,9 @@ export default function PerfilModal({ isMyProfile = true }) {
           {/* Grid de estatísticas 2x2 */}
           <div className="perfil-stats-grid">
             <div className="perfil-stat-card">
-              <div className="perfil-stat-icon">🏆</div>
+              <div className="perfil-stat-icon">
+                <img src={trophyIcon} alt="Troféu" />
+              </div>
               <div className="perfil-stat-content">
                 <span className="perfil-stat-label">POSIÇÃO NO RANKING</span>
                 <span className="perfil-stat-value">{user.position}</span>
@@ -83,7 +85,9 @@ export default function PerfilModal({ isMyProfile = true }) {
             </div>
 
             <div className="perfil-stat-card">
-              <div className="perfil-stat-icon">🏅</div>
+              <div className="perfil-stat-icon">
+                <img src={pointsIcon} alt="Pontos" />
+              </div>
               <div className="perfil-stat-content">
                 <span className="perfil-stat-label">PONTOS</span>
                 <span className="perfil-stat-value">{user.points}</span>
