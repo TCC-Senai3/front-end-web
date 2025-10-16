@@ -7,10 +7,10 @@ export const getFormularios = async () => {
 };
 
 // Criar novo formulário (requer autenticação)
-export const createFormulario = async (titulo) => {
+export const createFormulario = async (titulo, descricao = '') => {
   const token = sessionStorage.getItem('token');
   const response = await api.post('/formularios',
-    { titulo },
+    { titulo, descricao },
     { headers: { Authorization: `Bearer ${token}` } }
   );
   return response.data;

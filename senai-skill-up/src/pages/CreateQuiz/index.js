@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './style.css';
 import Header from '../../components/header';
 import { createFormulario } from '../../services/formularioService';
 import { createPergunta } from '../../services/perguntaService';
 import { createAlternativa } from '../../services/alternativaService';
 
-import verifiedIcon from '../../assets/images/verified 1.png';
-import cancelIcon from '../../assets/images/cancel 1.png';
+import verifiedIcon from '../../assets/images/verified.svg';
 
-function RespostaInput({ value, onChange, isCorrect, isFalse, onSelectCorrect, onSelectFalse }) {
+function RespostaInput({ value, onChange, isCorrect, onSelectCorrect }) {
   return (
     <div className="answer-item">
       <input
@@ -21,21 +20,24 @@ function RespostaInput({ value, onChange, isCorrect, isFalse, onSelectCorrect, o
       <span className={`icon correct${isCorrect ? ' selected' : ''}`} onClick={onSelectCorrect}>
         <img src={verifiedIcon} alt="Correta" />
       </span>
-      <span className={`icon wrong${isFalse ? ' selected' : ''}`} onClick={onSelectFalse}>
-        <img src={cancelIcon} alt="Falsa" />
-      </span>
     </div>
   );
 }
 
-function MiniCard({ selected, onClick, index, pergunta }) {
+function MiniCard({ selected, onClick, index, pergunta, onDelete }) {
   return (
-    <div className={`question-thumb${selected ? ' selected' : ''}`} onClick={onClick}>
-      <div className="mini-question-header">
-        <span className="mini-question-number">Pergunta {index + 1}</span>
-      </div>
-      
-      <div className="mini-question-content">
+    <div className={`question-thumb${selected ? ' selected' : ''}`}>
+      <button 
+        className="delete-question-btn" 
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete(index);
+        }}
+        title="Deletar pergunta"
+      >
+        ×
+      </button>
+      <div className="mini-question-content" onClick={onClick}>
         <div className="mini-question-text">
           {pergunta.pergunta || "Pergunta sem texto"}
         </div>
@@ -65,7 +67,6 @@ function MiniCard({ selected, onClick, index, pergunta }) {
 
 export default function CreateQuiz() {
   const [titulo, setTitulo] = useState('');
-  const [materia, setMateria] = useState('');
   const [descricao, setDescricao] = useState('');
   const [perguntas, setPerguntas] = useState([
     {
@@ -109,6 +110,10 @@ export default function CreateQuiz() {
   };
 
   const handleAddPergunta = () => {
+    if (perguntas.length >= 6) {
+      alert('Máximo de 6 perguntas por questionário.');
+      return;
+    }
     setPerguntas([
       ...perguntas,
       {
@@ -128,26 +133,58 @@ export default function CreateQuiz() {
     setPerguntaAtual(idx);
   };
 
+  const handleDeletePergunta = (idx) => {
+    if (perguntas.length === 1) {
+      alert('Você precisa ter pelo menos uma pergunta.');
+      return;
+    }
+    
+    const confirmar = window.confirm('Tem certeza que deseja deletar esta pergunta?');
+    if (!confirmar) return;
+    
+    const novasPerguntas = perguntas.filter((_, i) => i !== idx);
+    setPerguntas(novasPerguntas);
+    
+    // Ajustar a pergunta atual se necessário
+    if (perguntaAtual >= novasPerguntas.length) {
+      setPerguntaAtual(novasPerguntas.length - 1);
+    } else if (perguntaAtual === idx && idx > 0) {
+      setPerguntaAtual(idx - 1);
+    }
+  };
+
   const handleFinalizarQuiz = async () => {
     // Validações básicas
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+      alert('❌ Você precisa estar logado para criar um questionário');
+      return;
+    }
+
     if (!titulo.trim()) {
-      alert('Por favor, insira um título para o questionário');
+      alert('❌ Por favor, insira um título para o questionário');
+      return;
+    }
+
+    if (titulo.length < 3) {
+      alert('❌ O título deve ter pelo menos 3 caracteres');
       return;
     }
 
     if (perguntas.length === 0 || !perguntas[0].pergunta.trim()) {
-      alert('Por favor, adicione pelo menos uma pergunta');
+      alert('❌ Por favor, adicione pelo menos uma pergunta');
       return;
     }
 
     // Verifica se todas as perguntas têm pelo menos uma resposta correta
     const perguntasInvalidas = perguntas.filter(p => {
       const temRespostaCorreta = p.respostas.some(r => r.correta);
-      return !p.pergunta.trim() || !temRespostaCorreta;
+      const respostasPreenchidas = p.respostas.filter(r => r.texto.trim()).length;
+      return !p.pergunta.trim() || !temRespostaCorreta || respostasPreenchidas < 2;
     });
 
     if (perguntasInvalidas.length > 0) {
-      alert('Todas as perguntas devem ter texto e pelo menos uma resposta marcada como correta');
+      alert('❌ Todas as perguntas devem ter:\n- Texto da pergunta\n- Pelo menos 2 alternativas preenchidas\n- Uma resposta marcada como correta');
       return;
     }
 
@@ -158,7 +195,7 @@ export default function CreateQuiz() {
 
       // 1. Criar o formulário
       console.log('1️⃣ Criando formulário:', titulo);
-      const formulario = await createFormulario(titulo);
+      const formulario = await createFormulario(titulo, descricao);
       const idFormulario = formulario.idFormulario;
       console.log('✅ Formulário criado com ID:', idFormulario);
 
@@ -168,10 +205,10 @@ export default function CreateQuiz() {
 
         console.log(`2️⃣ Criando pergunta ${i + 1}:`, perguntaData.pergunta);
 
-        // Criar a pergunta (sem tema por enquanto - usar idTema: 1 como padrão)
+        // Criar a pergunta com tema padrão
         const novaPergunta = await createPergunta({
           textoPergunta: perguntaData.pergunta,
-          tema: { idTema: 1 }, // Tema padrão por enquanto
+          tema: { idTema: 1 },
           idFormulario: idFormulario
         });
 
@@ -197,12 +234,13 @@ export default function CreateQuiz() {
       }
 
       console.log('🎉 Questionário criado com sucesso!');
-      alert(`Questionário "${titulo}" criado com sucesso!\n\n` +
-            `Total de perguntas: ${perguntas.length}`);
+      alert(`✅ Questionário criado com sucesso!\n\n` +
+            `Título: "${titulo}"\n` +
+            `Total de perguntas: ${perguntas.length}\n` +
+            `ID do formulário: ${idFormulario}`);
 
       // Limpar formulário
       setTitulo('');
-      setMateria('');
       setDescricao('');
       setPerguntas([{
         pergunta: '',
@@ -218,13 +256,22 @@ export default function CreateQuiz() {
     } catch (error) {
       console.error('❌ Erro ao criar questionário:', error);
 
-      let mensagemErro = 'Erro ao criar questionário. ';
-      if (error.response?.data) {
+      let mensagemErro = '❌ Erro ao criar questionário\n\n';
+      
+      if (error.response?.status === 401) {
+        mensagemErro += 'Sua sessão expirou. Por favor, faça login novamente.';
+      } else if (error.response?.status === 403) {
+        mensagemErro += 'Você não tem permissão para criar questionários.';
+      } else if (error.response?.status === 400) {
+        mensagemErro += 'Dados inválidos. Verifique as informações e tente novamente.';
+      } else if (error.response?.data) {
         mensagemErro += typeof error.response.data === 'string'
           ? error.response.data
           : JSON.stringify(error.response.data);
-      } else {
+      } else if (error.message) {
         mensagemErro += error.message;
+      } else {
+        mensagemErro += 'Erro desconhecido. Tente novamente.';
       }
 
       alert(mensagemErro);
@@ -245,20 +292,13 @@ export default function CreateQuiz() {
             value={titulo}
             onChange={e => setTitulo(e.target.value)}
           />
-          
-          <input
-            type="text"
-            placeholder="Matéria "
-            className="quiz-materia"
-            value={materia}
-            onChange={e => setMateria(e.target.value)}
-          />
 
           <textarea
             placeholder="INSERIR DESCRICAO"
             className="quiz-description"
             value={descricao}
             onChange={e => setDescricao(e.target.value)}
+            maxLength={40}
           />
         </div>
         <div className="main-content">
@@ -279,20 +319,21 @@ export default function CreateQuiz() {
                   value={resposta.texto}
                   onChange={e => handleRespostaChange(idx, e.target.value)}
                   isCorrect={resposta.correta}
-                  isFalse={resposta.falsa}
                   onSelectCorrect={() => handleSelectResposta(idx, 'correta')}
-                  onSelectFalse={() => handleSelectResposta(idx, 'falsa')}
                 />
               ))}
-              <button 
-                className="finalize-quiz-btn" 
-                onClick={handleFinalizarQuiz}
-                disabled={loading}
-                style={{ opacity: loading ? 0.6 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}
-              >
-                {loading ? '⏳ Criando questionário...' : '✅ Finalizar Questionário'}
-              </button>
             </div>
+            <button 
+              className="finalize-quiz-btn" 
+              onClick={handleFinalizarQuiz}
+              disabled={loading}
+              style={{ 
+                opacity: loading ? 0.6 : 1, 
+                cursor: loading ? 'not-allowed' : 'pointer' 
+              }}
+            >
+              {loading ? 'Criando questionário...' : 'Finalizar Questionário'}
+            </button>
           </div>
         </div>
         <div className="sidebar-right">
@@ -303,9 +344,12 @@ export default function CreateQuiz() {
               onClick={() => handleSelectPergunta(idx)}
               index={idx}
               pergunta={pergunta}
+              onDelete={handleDeletePergunta}
             />
           ))}
-          <div className="add-question" onClick={handleAddPergunta}>+</div>
+          {perguntas.length < 6 && (
+            <div className="add-question" onClick={handleAddPergunta}>+</div>
+          )}
         </div>
       </div>
     </>

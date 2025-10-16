@@ -1,7 +1,7 @@
 import React from "react";
 import "./style.css";
 import Header from "../../components/header";
-import verifiedIcon from "../../assets/images/verified 1.png";
+import verifiedIcon from "../../assets/images/verified.svg";
 
 export default function correto() {
   return (

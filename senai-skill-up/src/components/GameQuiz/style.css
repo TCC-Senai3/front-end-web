@@ -17,114 +17,180 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 40px;
+  gap: 100px;
+  position: relative;
 }
 
-/* Controles (Timer + Sair) - Ao lado do card */
+/* Controles (Timer + Sair) - Ao lado da folha */
 .quiz-controls {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 10px;
+  align-items: flex-end;
+  gap: 12px;
   align-self: flex-start;
-  margin-top: 180px;
+  margin-top: 80px;
 }
 
 .timer {
-  padding: 5px 10px;
-  border-radius: 5px;
+  padding: 0;
+  background: transparent;
 }
 
 .timer-text {
-  color: #000000;
-  font-size: 25px;
-  font-weight: bold;
+  color: #ffffff;
+  font-size: 48px;
+  font-weight: 900;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .exit-btn {
   background: #FF0000;
   color: white;
   border: none;
-  padding: 6px 24px;
-  border-radius: 6px;
-  font-weight: bold;
-  font-size: 12px;
+  padding: 12px 40px;
+  border-radius: 8px;
+  font-weight: 900;
+  font-size: 16px;
   cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  transition: transform 0.1s;
 }
 
 .exit-btn:hover {
-  background: #b30000;
+  background: #cc0000;
+  transform: translateY(-2px);
 }
 
-/* Card branco */
+.exit-btn:active {
+  transform: translateY(0);
+}
+
+/* Card branco - efeito de página */
 .quiz-paper-container {
-  width: 440px;
+  width: 520px;
   max-width: 90vw;
-  background: #ffffff;
-  border-radius: 14px;
-  padding: 28px 26px;
+  min-height: 500px;
+  background: #f8f8f8;
+  border-radius: 20px;
+  padding: 50px 40px 100px 40px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   text-align: left;
-  box-shadow: none;
+  box-shadow: 
+    0 10px 30px rgba(0,0,0,0.2),
+    0 3px 8px rgba(0,0,0,0.1),
+    inset 0 1px 0 rgba(255,255,255,0.8);
+  position: relative;
+  background-image: 
+    linear-gradient(to bottom, #ffffff 0%, #f5f5f5 100%);
+}
+
+/* Efeito de borda/margem da página */
+.quiz-paper-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 20px;
+  padding: 2px;
+  background: linear-gradient(145deg, rgba(255,255,255,0.5), rgba(0,0,0,0.05));
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 .question-theme {
-  font-size: 20px;
-  font-weight: 800;
-  color: #222;
-  margin-bottom: 14px;
-  letter-spacing: 0.6px;
+  font-size: 28px;
+  font-weight: 900;
+  color: #1a1a1a;
+  margin-bottom: 28px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
 .question-text {
-  font-size: 14px;
-  font-weight: 800;
-  color: #222;
-  margin-bottom: 18px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #2c2c2c;
+  margin-bottom: 32px;
   text-transform: uppercase;
-  line-height: 1.4;
-  letter-spacing: 0.4px;
+  line-height: 1.6;
+  letter-spacing: 0.3px;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.03);
 }
 
 /* Alternativas */
 .alternatives-container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
 }
 
 .alternative-btn {
-  background: #1E90FF;
+  background: linear-gradient(135deg, #00BFFF 0%, #0099CC 100%);
   color: white;
   border: none;
-  padding: 10px 12px;
+  padding: 16px 18px;
   border-radius: 6px;
-  font-size: 11px;
-  font-weight: bold;
+  font-size: 11.5px;
+  font-weight: 800;
   text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.2s;
   width: 100%;
-  line-height: 1.35;
+  line-height: 1.5;
+  letter-spacing: 0.4px;
+  text-align: left;
+  box-shadow: 0 3px 8px rgba(0,191,255,0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.alternative-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.alternative-btn:hover::before {
+  left: 100%;
 }
 
 .alternative-btn:hover:not(:disabled) {
-  background: #187bcd;
+  background: linear-gradient(135deg, #0099CC 0%, #007799 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(0,191,255,0.4);
 }
 
 .alternative-btn.correct {
-  background: #27ae60;
+  background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+  box-shadow: 0 3px 8px rgba(39,174,96,0.4);
 }
 
 .alternative-btn.incorrect {
-  background: #e74c3c;
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  box-shadow: 0 3px 8px rgba(231,76,60,0.4);
 }
 
 .alternative-btn.show-correct {
-  background: #27ae60;
+  background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+  box-shadow: 0 3px 8px rgba(39,174,96,0.4);
 }
 
 /* Estados de loading e erro */
@@ -139,6 +205,67 @@
 
 .error-message {
   color: #e74c3c;
+}
+
+/* Estado vazio / não encontrado */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 12px;
+}
+
+.empty-title {
+  color: #e74c3c;
+  font-weight: 900;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+.empty-desc {
+  color: #6c757d;
+  font-weight: 600;
+  font-size: 12px;
+  text-align: center;
+}
+
+.empty-actions {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.empty-actions .next-btn {
+  background: linear-gradient(180deg, #FF4D4F 0%, #E63636 100%);
+  color: #fff;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 6px;
+  font-weight: 900;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  min-width: 260px;
+  box-shadow: 0 8px 0 #B82020;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.2s ease;
+}
+
+.empty-actions .next-btn:hover {
+  filter: brightness(0.98);
+  transform: translateY(-1px);
+  box-shadow: 0 9px 0 #B82020;
+}
+
+.empty-actions .next-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 6px 0 #B82020;
 }
 
 /* Resultado */
@@ -163,18 +290,29 @@
 }
 
 .next-btn {
-  background: #27ae60;
-  color: white;
+  background: linear-gradient(180deg, #00FF5A 0%, #00E152 100%);
+  color: #fff;
   border: none;
-  padding: 10px 20px;
-  border-radius: 25px;
-  font-weight: bold;
+  padding: 12px 28px;
+  border-radius: 12px;
+  font-weight: 900;
   font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   cursor: pointer;
+  box-shadow: 0 8px 0 #00b946;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.2s ease;
 }
 
 .next-btn:hover {
-  background: #229954;
+  filter: brightness(0.98);
+  transform: translateY(-1px);
+  box-shadow: 0 9px 0 #00b946;
+}
+
+.next-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 6px 0 #00b946;
 }
 
 /* Modal de saída */

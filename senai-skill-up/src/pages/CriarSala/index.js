@@ -1,26 +1,70 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/header';
+import temaService from '../../services/temaService';
+import salaService from '../../services/salaService';
 import './style.css';
 
 export default function CriarSala() {
   const navigate = useNavigate();
   const [questionario, setQuestionario] = useState('');
-  const [materia, setMateria] = useState('');
+  const [temas, setTemas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [criandoSala, setCriandoSala] = useState(false);
 
-  const handleCriar = () => {
-    if (!questionario || !materia) {
-      alert('Por favor, preencha todos os campos');
+  // Carregar temas ao montar o componente
+  useEffect(() => {
+    const carregarTemas = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await temaService.getTemas();
+        setTemas(data);
+      } catch (err) {
+        console.error('Erro ao carregar temas:', err);
+        setError('Erro ao carregar questionários');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    carregarTemas();
+  }, []);
+
+  const handleCriar = async () => {
+    if (!questionario) {
+      alert('Por favor, selecione um questionário');
       return;
     }
     
-    // Gera um código de 6 dígitos como na imagem
-    const codigo = String(Math.floor(100000 + Math.random() * 900000));
-    
-    console.log('Criando sala:', { questionario, materia, codigo });
-    
-    // Redireciona para a sala (lobby) com o código
-    navigate('/sala', { state: { codigo } });
+    try {
+      setCriandoSala(true);
+      
+      // Criar sala via API
+      const salaData = {
+        idTema: questionario,
+        // Adicione outros campos necessários conforme a API
+      };
+      
+      const sala = await salaService.createSala(salaData);
+      
+      console.log('Sala criada:', sala);
+      
+      // Redireciona para a sala (lobby) com os dados da sala criada
+      navigate('/sala', { 
+        state: { 
+          codigo: sala.codigo || sala.id,
+          idSala: sala.id,
+          questionario: sala.idTema
+        } 
+      });
+    } catch (err) {
+      console.error('Erro ao criar sala:', err);
+      alert('Erro ao criar sala. Tente novamente.');
+    } finally {
+      setCriandoSala(false);
+    }
   };
 
   const handleFechar = () => {
@@ -38,33 +82,30 @@ export default function CriarSala() {
             <button className="close-btn" onClick={handleFechar}>×</button>
             
             <div className="form-group">
-              <label>Selecione o Questionario</label>
               <select 
                 value={questionario} 
                 onChange={(e) => setQuestionario(e.target.value)}
                 className="form-select"
+                disabled={loading || criandoSala}
               >
-                <option value="">Selecione um questionário</option>
-                <option value="frontend">Front End</option>
-                <option value="backend">Back End</option>
-                <option value="database">Banco de Dados</option>
-                <option value="mobile">Mobile</option>
+                <option value="">
+                  {loading ? 'Carregando...' : 'Selecione o Questionario'}
+                </option>
+                {!loading && !error && temas.map((tema) => (
+                  <option key={tema.id} value={tema.id}>
+                    {tema.nomeTema || tema.nome}
+                  </option>
+                ))}
+                {error && <option value="" disabled>{error}</option>}
               </select>
             </div>
 
-            <div className="form-group">
-              <label>Materia</label>
-              <input 
-                type="text" 
-                value={materia} 
-                onChange={(e) => setMateria(e.target.value)}
-                placeholder="Digite a matéria"
-                className="form-input"
-              />
-            </div>
-
-            <button className="criar-btn" onClick={handleCriar}>
-              CRIAR
+            <button 
+              className="criar-btn" 
+              onClick={handleCriar}
+              disabled={loading || criandoSala || !questionario}
+            >
+              {criandoSala ? 'CRIANDO...' : 'CRIAR'}
             </button>
           </div>
         </div>

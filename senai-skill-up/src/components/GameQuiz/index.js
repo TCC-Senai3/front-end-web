@@ -6,7 +6,7 @@ import './style.css';
 export default function GameQuiz() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [timeLeft, setTimeLeft] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(120); // 2 minutos para mock
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -15,6 +15,7 @@ export default function GameQuiz() {
   const [loading, setLoading] = useState(true);
   const [quizId, setQuizId] = useState(null);
   const [error, setError] = useState(null);
+  
 
   // Carregar pergunta inicial
   useEffect(() => {
@@ -25,6 +26,12 @@ export default function GameQuiz() {
         
         // Pegar temaId da navegação (se vier de outra página)
         const temaId = location.state?.temaId;
+        
+        if (!temaId && !location.state?.quizId) {
+          setError('Quiz não encontrado');
+          setLoading(false);
+          return;
+        }
         
         if (temaId) {
           // Iniciar novo quiz
@@ -40,7 +47,7 @@ export default function GameQuiz() {
         }
       } catch (err) {
         console.error('Erro ao carregar quiz:', err);
-        setError('Erro ao carregar quiz');
+        setError('Erro ao conectar com backend');
       } finally {
         setLoading(false);
       }
@@ -68,7 +75,6 @@ export default function GameQuiz() {
   const handleNextQuestion = async () => {
     try {
       if (!quizId || !currentQuestion || !selectedAnswer) return;
-
       // Submeter resposta e obter próxima pergunta
       const response = await gameQuizService.submeterResposta(
         quizId,
@@ -85,7 +91,7 @@ export default function GameQuiz() {
       } else {
         // Quiz finalizado, ir para tela de resultados
         const resultados = await gameQuizService.finalizarQuiz(quizId);
-        navigate('/fim', { state: { resultados } });
+        navigate('/fim', { state: resultados });
       }
     } catch (err) {
       console.error('Erro ao avançar pergunta:', err);
@@ -135,10 +141,13 @@ export default function GameQuiz() {
       <div className="game-quiz-container">
         <div className="quiz-wrapper">
           <div className="quiz-paper-container">
-            <div className="error-message">{error}</div>
-            <button className="next-btn" onClick={() => navigate('/game')}>
-              VOLTAR
-            </button>
+            <div className="empty-state">
+              <div className="empty-title">{error}</div>
+              <div className="empty-desc">Verifique o tema selecionado ou tente novamente mais tarde.</div>
+              <div className="empty-actions">
+                <button className="next-btn" onClick={() => navigate('/game')}>VOLTAR</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -151,13 +160,12 @@ export default function GameQuiz() {
       <div className="game-quiz-container">
         <div className="quiz-wrapper">
           <div className="quiz-paper-container">
-            <div className="question-theme">-</div>
-            <div className="question-text">Nenhuma pergunta disponível</div>
-            <div className="alternatives-container">
-              <button className="alternative-btn" disabled>-</button>
-              <button className="alternative-btn" disabled>-</button>
-              <button className="alternative-btn" disabled>-</button>
-              <button className="alternative-btn" disabled>-</button>
+            <div className="empty-state">
+              <div className="empty-title">Quiz não encontrado</div>
+              <div className="empty-desc">Não conseguimos carregar as perguntas deste quiz.</div>
+              <div className="empty-actions">
+                <button className="next-btn" onClick={() => navigate('/game')}>VOLTAR</button>
+              </div>
             </div>
           </div>
           <div className="quiz-controls">

@@ -71,6 +71,19 @@
 .col-ganho { text-align: right; font-weight: 900; color: #bdf8bd; }
 
 .fim-actions { display: flex; justify-content: center; margin: 16px 0 8px; }
-.btn-proximo { background: #43c6ff; color: #043c54; border: none; font-weight: 900; padding: 10px 28px; border-radius: 8px; box-shadow: 0 4px 0 rgba(0,0,0,.25); cursor: pointer; }
+.btn-proximo { 
+  background: #22D1EC; 
+  color: #ffffff; 
+  border: none; 
+  font-weight: 900; 
+  padding: 20px 80px; 
+  box-shadow: 0 8px 0 #1FBDD5; 
+  cursor: pointer;
+  font-size: 32px;
+  letter-spacing: 2px;
+  transition: transform 0.1s;
+}
+.btn-proximo:hover { transform: translateY(-2px); }
+.btn-proximo:active { transform: translateY(2px); box-shadow: 0 4px 0 #1FBDD5; }
 
 

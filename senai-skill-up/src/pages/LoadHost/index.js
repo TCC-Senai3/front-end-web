@@ -19,7 +19,7 @@ export default function LoadHost() {
     <div className="loadhost-bg">
       <Header />
       <div className="loadhost-center">
-        <img src={require('../../assets/images/Gameboy.svg').default} alt="Gameboy" style={{ width: 120, height: 120, marginBottom: 16 }} />
+        <img src={require('../../assets/images/Gameboy.svg').default} alt="Gameboy" className="loadhost-icon" />
         <div className="loadhost-title">
           Aguardando o host da Sala
         </div>
