@@ -9,7 +9,8 @@ export default function UserManagementTable({
   onEditUser,
   onDeleteUser,
   loading,
-  showSearch = true
+  showSearch = true,
+  variant
 }) {
   const getStatusColor = (status) => {
     switch (status) {
@@ -39,6 +40,77 @@ export default function UserManagementTable({
       <div className="loading-container">
         <div className="loading-spinner"></div>
         <p>Carregando usuários...</p>
+      </div>
+    );
+  }
+
+  // Variant: ranking (PONTOS, NOME, POSIÇÃO, STATUS + botão de perfil)
+  if (variant === 'ranking') {
+    return (
+      <div className="user-management-container ranking">
+        {showSearch && (
+          <div className="search-container">
+            <div className="search-input-wrapper">
+              <input
+                type="text"
+                placeholder="Buscar usuários..."
+                value={searchTerm}
+                onChange={(e) => onSearch(e.target.value)}
+                className="search-input"
+              />
+              <div className="search-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke="#6c757d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="table-header ranking-header">
+          <div className="chip">PONTOS</div>
+          <div className="chip">NOME</div>
+          <div className="chip">POSIÇÃO</div>
+          <div className="chip">STATUS</div>
+        </div>
+
+        <div className="users-list">
+          {users.length === 0 ? (
+            <div className="no-users">
+              <p>Nenhum usuário encontrado</p>
+            </div>
+          ) : (
+            users.map((user, index) => (
+              <div key={user.id ?? index} className="user-row ranking-row">
+                <div className="user-cell pontos-cell">
+                  <span className="user-pontos">{user.pontos}</span>
+                </div>
+                <div className="user-cell nome-cell">
+                  <span className="user-name">{user.nome}</span>
+                </div>
+                <div className="user-cell posicao-cell">
+                  <div className="status-dot" style={{ backgroundColor: getStatusColor('online'), opacity: 0 }}></div>
+                  <span className="user-posicao">{user.posicao ?? index + 1}</span>
+                </div>
+                <div className="user-cell status-cell">
+                  <div className="status-indicator">
+                    <div 
+                      className="status-dot" 
+                      style={{ backgroundColor: getStatusColor(user.status) }}
+                    ></div>
+                  </div>
+                </div>
+                <div className="user-cell actions-cell ranking-actions">
+                  {onViewProfile && (
+                    <button className="view-profile-btn" onClick={() => onViewProfile(user)}>
+                      VISUALIZAR PERFIL
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
     );
   }
@@ -95,11 +167,10 @@ export default function UserManagementTable({
                     className="status-dot" 
                     style={{ backgroundColor: getStatusColor(user.status) }}
                   ></div>
-                  <span className="status-text">{user.status === 'online' ? 'Online' : 'Offline'}</span>
                 </div>
               </div>
               <div className="user-cell">
-                <span className={`permission Badge ${getPermissionClass(user.permissoes || user.tipoUsuario)}`}>
+                <span className={`permission badge ${getPermissionClass(user.permissoes || user.tipoUsuario)}`}>
                   {user.permissoes || user.tipoUsuario}
                 </span>
               </div>

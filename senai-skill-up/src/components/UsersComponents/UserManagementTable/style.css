@@ -4,6 +4,10 @@
   margin-top: 0;
 }
 
+.user-management-container.ranking {
+  padding-top: 8px;
+}
+
 /* Barra de busca */
 .search-container {
   margin-bottom: 24px;
@@ -55,6 +59,28 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
+.ranking-header {
+  display: flex;
+  gap: 12px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0 4px 12px 4px;
+}
+
+.chip {
+  background: white;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  color: #2c3e50;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 8px 14px;
+  border-radius: 14px;
+}
+
 .table-header:has(.header-cell:nth-child(4):last-child) {
   grid-template-columns: 2fr 2fr 1fr 1fr;
 }
@@ -77,14 +103,19 @@
   display: grid;
   grid-template-columns: 2fr 2fr 1fr 1fr 1fr;
   gap: 20px;
-  padding: 20px 24px;
+  padding: 22px 28px;
   align-items: center;
   transition: all 0.3s ease;
   background: white;
-  border-radius: 12px;
+  border-radius: 18px;
   margin-bottom: 16px;
   border: 1px solid #e9ecef;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.ranking-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr 1fr auto;
 }
 
 .user-row:has(.user-cell:nth-child(4):last-child) {
@@ -127,18 +158,43 @@
 }
 
 .status-dot {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background-color: #28a745;
-  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
+  box-shadow: 0 0 0 4px rgba(40, 167, 69, 0.18);
+}
+
+.status-text { display: none; }
+
+.view-profile-btn {
+  background: #3498db;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.view-profile-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(52, 152, 219, 0.35);
+}
+
+.ranking-actions {
+  display: flex;
+  justify-content: flex-end;
 }
 
 /* Permissões */
 .permission.badge {
   display: inline-block;
-  padding: 6px 16px;
-  border-radius: 20px;
+  padding: 6px 14px;
+  border-radius: 8px;
   color: white;
   font-size: 12px;
   font-weight: 700;

@@ -10,7 +10,7 @@ import CriarSala from './pages/CriarSala';
 import Sala from './pages/Sala';
 import FimDeJogo from './pages/FimDeJogo';
 import FimRecompensas from './pages/FimRecompensas';
-import PerfilModal from './pages/PerfilModal';
+import { PerfilModal } from './components';
 import Suporte from './pages/Suporte';
 import Termos from './pages/Termos';
 import PinPage from './pages/PinPage';

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Header from '../../components/header';
+import Header from '../header';
 import './style.css';
 import editIcon from '../../assets/images/Vector.png';
 import trophyIcon from '../../assets/images/trophy 1.svg';
@@ -41,19 +41,14 @@ export default function PerfilModal({ isMyProfile = true }) {
       <Header />
       <div className="perfil-modal-overlay">
         <div className="perfil-modal-container">
-          {/* Botão de fechar */}
           <div className="perfil-close-btn" onClick={() => window.history.back()}>
             ×
           </div>
-          
-          {/* Ícone de edição - só aparece no meu perfil */}
           {isMyProfile && (
             <div className="perfil-edit-icon" onClick={() => setIsEditing(!isEditing)}>
               <img src={editIcon} alt="Editar" />
             </div>
           )}
-
-          {/* Avatar centralizado */}
           <div className="perfil-avatar-section">
             <div className="perfil-avatar">
               <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`} alt={user.name} />
@@ -72,7 +67,6 @@ export default function PerfilModal({ isMyProfile = true }) {
             )}
           </div>
 
-          {/* Grid de estatísticas 2x2 */}
           <div className="perfil-stats-grid">
             <div className="perfil-stat-card">
               <div className="perfil-stat-icon">
@@ -119,7 +113,6 @@ export default function PerfilModal({ isMyProfile = true }) {
             </div>
           </div>
 
-          {/* Botões de ação - só aparecem no meu perfil */}
           {isMyProfile && isEditing && (
             <div className="perfil-actions">
               <button className="perfil-save-btn" onClick={handleSave}>Salvar</button>

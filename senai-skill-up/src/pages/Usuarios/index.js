@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Header, Footer } from '../../components';
+import { Header, Footer, PerfilModal } from '../../components';
 import UserManagementTable from '../../components/UsersComponents/UserManagementTable';
-import PerfilModal from '../PerfilModal';
 import './style.css';
 
 export default function Usuarios() {
@@ -119,6 +118,7 @@ export default function Usuarios() {
             onViewProfile={handleViewProfile}
             loading={false}
             showSearch={true}
+            variant="ranking"
           />
         </div>
       </div>

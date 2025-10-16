@@ -50,6 +50,7 @@ export { default as ProfileStatus } from './ProfileComponents/ProfileStatus';
 export { default as ProfileRanking } from './ProfileComponents/ProfileRanking';
 export { default as ProfileHistory } from './ProfileComponents/ProfileHistory';
 export { default as DeleteAccountModal } from './ProfileComponents/DeleteAccountModal';
+export { default as PerfilModal } from './PerfilModal';
 
 // Security Components
 export { default as ProtectedRoute } from './ProtectedRoute';
