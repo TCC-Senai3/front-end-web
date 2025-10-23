@@ -1,8 +1,8 @@
 .game-content-wrapper {
     display: flex;
     justify-content: center;
-    margin: 60px auto 0 auto;
-    gap: 30px;
+    margin: 30px auto 0 auto;
+    gap: 15px;
     box-sizing: border-box;
 }
 
@@ -20,8 +20,8 @@
     
     /* Container principal dos tabs */
     .mobile-tabs-container {
-        width: 100%;
-        max-width: 400px;
+        width: 55%;
+        max-width: auto;
         margin: 0 auto;
         padding: 0 15px;
         position: relative;

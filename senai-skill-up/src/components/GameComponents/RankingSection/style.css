@@ -1,9 +1,9 @@
 .ranking-container {
     background: #D8E6FB;
     border-radius: 12px;
-    padding: 42px 15px 24px 15px; /* espaço extra no topo para a faixa - igual ao quiz */
-    margin-right: 32px;
-    width: 300px;
+    padding: 30px 12px 20px 12px;
+    margin-right: 20px;
+    width: 280px;
     position: relative;
     min-height: 520px; /* mesma altura do quiz */
     height: 520px; /* altura fixa igual ao quiz */
@@ -27,7 +27,7 @@
 .ranking-pesquisa-container {
     display: flex;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     background: #fff;
     border-radius: 8px;
     padding: 8px 10px;
@@ -60,6 +60,7 @@
     background: #D8E6FB;
     word-wrap: break-word;
     word-break: break-word;
+    margin-top: 12px;
 }
 
 .ranking-lista::-webkit-scrollbar {
@@ -68,16 +69,14 @@
 
 .ranking-item {
     display: flex;
-    min-height: 58px;
+    min-height: 48px;
     width: 100%;
     position: relative;
-    padding-right: 50px; /* Espaço para os pontos */
+    padding: 6px 70px 6px 8px;
     align-items: center;
-    justify-content: space-between;
     background: #fff;
     border-radius: 8px;
-    padding: 8px 10px;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
     box-sizing: border-box;
     transition: box-shadow 0.2s, background 0.2s, transform 0.2s;
     cursor: pointer;
@@ -99,7 +98,7 @@
     justify-content: center;
     flex-shrink: 0;
     line-height: 1;
-    margin-right: 10px;
+    margin-right: 8px;
 }
 
 .ranking-pos-icon {
@@ -109,14 +108,14 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    margin-right: 10px;
+    margin-right: 8px;
 }
 
 .ranking-avatar {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    margin-right: 10px;
+    margin-right: 8px;
     flex-shrink: 0;
 }
 
@@ -133,15 +132,21 @@
     word-break: break-word;
 }
 
-.ranking-pontos {
+.ranking-points-container {
     position: absolute;
     right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.ranking-pontos {
     font-weight: bold;
-    color: #2C6ECB;
+    color: #000000; /* Cor preta */
     font-size: 14px;
-    background: #e6f0ff;
-    padding: 2px 8px;
-    border-radius: 10px;
+    white-space: nowrap;
 }
 
 .ranking-medal-icon {

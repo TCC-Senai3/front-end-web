@@ -98,8 +98,10 @@ export default function RankingSection() {
                                 className="ranking-avatar" 
                             />
                             <span className="ranking-nome">{user.nome}</span>
-                            <img src={image31} alt="Medalha" className="ranking-medal-icon" />
-                            <span className="ranking-pontos">{user.pontos}</span>
+                            <div className="ranking-points-container">
+                                <img src={image31} alt="Medalha" className="ranking-medal-icon" />
+                                <span className="ranking-pontos">{user.pontos || (1000 - idx * 10)}</span>
+                            </div>
                         </div>
                     ))
                 ) : (

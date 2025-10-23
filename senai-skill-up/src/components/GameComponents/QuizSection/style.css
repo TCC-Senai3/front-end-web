@@ -1,7 +1,7 @@
 .questionarios-container {
     background: #d6e6fa;
     border-radius: 12px;
-    padding: 42px 24px 24px 24px;
+    padding: 30px 20px 20px 20px;
     width: 600px;
     position: relative;
     min-height: 520px;
@@ -25,9 +25,9 @@
     margin-bottom: 20px;
     background: #fff;
     border-radius: 8px;
-    padding: 12px 25px 12px 15px; /* Aumentei o padding direito para 25px */
+    padding: 8px 15px 8px 12px;
     box-shadow: 0 1px 4px #0001;
-    gap: 20px; /* Adiciona espaço entre os itens flex */
+    gap: 12px;
 }
 
 .questionarios-pesquisa-input {
@@ -52,7 +52,7 @@
 .questionarios-lista {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 8px;
     max-height: 480px;
     overflow-y: auto;
     overflow-x: visible;
@@ -106,10 +106,10 @@
     align-items: flex-start;
     background: #fff;
     border-radius: 12px;
-    padding: 15px;
+    padding: 8px 10px;
     box-shadow: 0 2px 10px #0001;
     width: 100%;
-    min-height: 60px;
+    min-height: 44px;
     transition: box-shadow 0.2s, background 0.2s, transform 0.2s;
     cursor: pointer;
     box-sizing: border-box;
@@ -155,30 +155,32 @@
 /* Estilo do botão JOGAR que aparece no hover */
 .questionarios-item-btn {
     position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
+    right: 10px;
+    bottom: 6px;
     background: #4CAF50;
     color: white;
     border: none;
-    padding: 6px 15px;
-    border-radius: 20px;
+    padding: 4px 10px;
+    border-radius: 15px;
     font-weight: 600;
-    font-size: 0.9em;
+    font-size: 0.8em;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     cursor: pointer;
+    white-space: nowrap;
+    min-width: 50px;
 }
 
 .questionarios-item {
     position: relative;
-    padding-right: 100px; /* Espaço para o botão */
+    padding-right: 60px; /* Reduzido de 70px para 60px */
 }
 
 .questionarios-item:hover .questionarios-item-titulo,
 .questionarios-item:hover .questionarios-item-desc {
-    max-width: calc(100% - 100px); /* Ajusta o tamanho para o botão */
+    max-width: calc(100% - 65px); /* Reduzido de 80px para 65px */
+    padding-right: 3px; /* Reduzido o espaço à direita */
 }
 
 .questionarios-item:hover .questionarios-item-btn {
