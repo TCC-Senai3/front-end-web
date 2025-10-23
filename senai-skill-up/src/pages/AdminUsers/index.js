@@ -16,65 +16,6 @@ export default function AdminUsers() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Dados mockados dos usuários (para desenvolvimento)
-  const mockUsers = [
-    {
-      id: 1,
-      nome: 'SENAISK....',
-      email: 'admin@senai.com',
-      status: 'online',
-      permissoes: 'ADM',
-      tipoUsuario: 'ADMINISTRADOR',
-      dataCriacao: '2024-01-15',
-      ultimoAcesso: '2024-12-19',
-      pontos: 15420,
-      nivel: 'Diamante',
-      jogosJogados: 127,
-      precisao: 94
-    },
-    {
-      id: 2,
-      nome: 'USERADM',
-      email: 'useradm@senai.com',
-      status: 'online',
-      permissoes: 'ADM',
-      tipoUsuario: 'ADMINISTRADOR',
-      dataCriacao: '2024-02-10',
-      ultimoAcesso: '2024-12-19',
-      pontos: 12850,
-      nivel: 'Ouro',
-      jogosJogados: 98,
-      precisao: 89
-    },
-    {
-      id: 3,
-      nome: 'SENAISK....',
-      email: 'skillup@senai.com',
-      status: 'offline',
-      permissoes: 'CRIADOR',
-      tipoUsuario: 'CRIADOR',
-      dataCriacao: '2024-03-05',
-      ultimoAcesso: '2024-12-18',
-      pontos: 11200,
-      nivel: 'Ouro',
-      jogosJogados: 85,
-      precisao: 87
-    },
-    {
-      id: 4,
-      nome: 'USERADM',
-      email: 'user2@senai.com',
-      status: 'offline',
-      permissoes: 'USER',
-      tipoUsuario: 'USUARIO',
-      dataCriacao: '2024-04-20',
-      ultimoAcesso: '2024-12-17',
-      pontos: 9850,
-      nivel: 'Prata',
-      jogosJogados: 72,
-      precisao: 82
-    }
-  ];
 
   // Carregar usuários ao montar o componente
   useEffect(() => {
@@ -99,15 +40,14 @@ export default function AdminUsers() {
   const loadUsers = async () => {
     try {
       setLoading(true);
-      // Tentar carregar da API primeiro
       const apiUsers = await userService.getAllUsers();
       setUsers(apiUsers);
       setFilteredUsers(apiUsers);
     } catch (error) {
-      console.error('Erro ao carregar usuários da API, usando dados mockados:', error);
-      // Em caso de erro, usar dados mockados
-      setUsers(mockUsers);
-      setFilteredUsers(mockUsers);
+      console.error('Erro ao carregar usuários da API:', error);
+      // Set empty arrays instead of mock data
+      setUsers([]);
+      setFilteredUsers([]);
     } finally {
       setLoading(false);
     }

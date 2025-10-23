@@ -85,3 +85,49 @@
         height: 40px;
     }
 }
+@media (max-width: 768px) {
+    .game-content-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* Estilo para a imagem do quiz */
+    .questionarios-container img {
+        margin-top: -16px !important;  /* Ajuste este valor para mover a imagem para cima/baixo */
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Garante que os botões fiquem acima */
+    .questionarios-container {
+        order: 2 !important;
+        width: 100%;
+        margin-top: 120px !important;
+        position: relative !important;
+        z-index: 2 !important;
+    }
+
+    /* Estilo para a imagem do ranking */
+    .ranking-slogan {
+        margin-top: -16px !important;  /* Ajuste este valor para mover a imagem para cima/baixo */
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Força o ranking a ir para baixo */
+    .ranking-container {
+        order: 3 !important;
+        width: 100%;
+        margin-top: 150px !important;
+        z-index: 1 !important;
+        position: relative !important;
+    }
+
+    /* Espaçamento extra entre botões e ranking */
+    .game-spacing {
+        height: 70px !important;
+    }
+}

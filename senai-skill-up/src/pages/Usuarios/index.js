@@ -1,25 +1,44 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Header, Footer } from '../../components';
 import UsersRankingTable from '../../components/UsersComponents/UsersRankingTable';
 import PerfilModal from '../PerfilModal';
-import mockUsers from '../../data/mockUsers';
+import userService from '../../services/userService';
 import './style.css';
 
 export default function Usuarios() {
+  const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Carregar usuários ao montar o componente
+  useEffect(() => {
+    const loadUsers = async () => {
+      try {
+        const apiUsers = await userService.getAllUsers();
+        setUsers(apiUsers);
+      } catch (error) {
+        console.error('Erro ao carregar usuários:', error);
+        setUsers([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUsers();
+  }, []);
 
   // Filtra os usuários com base no termo de busca
   const filteredUsers = useMemo(() => {
-    if (!searchTerm.trim()) return mockUsers;
+    if (!searchTerm.trim()) return users;
     
     const term = searchTerm.toLowerCase();
-    return mockUsers.filter(user => 
-      user.nome.toLowerCase().includes(term) || 
-      user.email.toLowerCase().includes(term) ||
-      user.nivel.toLowerCase().includes(term)
+    return users.filter(user => 
+      user.nome?.toLowerCase().includes(term) || 
+      user.email?.toLowerCase().includes(term) ||
+      user.nivel?.toLowerCase().includes(term)
     );
-  }, [searchTerm]);
+  }, [searchTerm, users]);
 
   const handleSearch = (term) => {
     setSearchTerm(term);
@@ -66,7 +85,7 @@ export default function Usuarios() {
             searchTerm={searchTerm}
             onSearch={handleSearch}
             onViewProfile={handleViewProfile}
-            loading={false}
+            loading={loading}
           />
         </div>
       </div>

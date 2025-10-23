@@ -23,12 +23,11 @@
 .questionarios-pesquisa-container {
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     background: #fff;
     border-radius: 8px;
-    padding: 8px 15px 8px 12px;
-    box-shadow: 0 1px 4px #0001;
-    gap: 12px;
+    padding: 8px 10px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
 .questionarios-pesquisa-input {
@@ -38,16 +37,14 @@
     font-size: 16px;
     background: transparent;
     padding: 0;
-    height: 24px;
 }
 
 .questionarios-pesquisa-icon {
-    font-size: 20px;
     color: #888;
-    width: 20px;
-    height: 20px;
-    margin-left: 20px;  /* Adicionado para afastar o ícone do input */
-    margin-right: 5px;  /* Espaço da borda direita */
+    margin-left: 8px;
+    width: 24px;
+    height: 24px;
+    font-size: 20px;
 }
 
 .questionarios-lista {
