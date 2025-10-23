@@ -14,13 +14,18 @@ export default function RankingSection() {
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
 
-    // Carrega ranking do localStorage
+    // Carrega ranking do backend
     useEffect(() => {
         const loadRanking = async () => {
             try {
                 setLoading(true);
                 const response = await getRankingGlobal();
-                setRanking(response.data || []);
+                if (response.success) {
+                    setRanking(response.data || []);
+                } else {
+                    console.error('Erro ao carregar ranking:', response.message);
+                    setRanking([]);
+                }
             } catch (error) {
                 console.error('Erro ao carregar ranking:', error);
                 setRanking([]);
@@ -30,14 +35,6 @@ export default function RankingSection() {
         };
 
         loadRanking();
-
-        // Atualiza ranking quando localStorage muda
-        const handleStorageChange = () => {
-            loadRanking();
-        };
-
-        window.addEventListener('storage', handleStorageChange);
-        return () => window.removeEventListener('storage', handleStorageChange);
     }, []);
 
     // Filtra usuários com base na pesquisa

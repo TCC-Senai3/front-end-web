@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import SearchIcon from "../../../assets/images/search 1.svg";
 import "./style.css";
-import { mockQuestionarios, mockTemas, filtrarQuestionarios, simulateApiDelay } from "../../../data/mockQuizData";
+import { getTemas, getPerguntasByTema } from "../../../services/quizService";
 import Loader from "../../common/Loader";
 
 export default function QuizSection({ onQuizSelect }) {
@@ -14,17 +14,20 @@ export default function QuizSection({ onQuizSelect }) {
         const loadQuestionarios = async () => {
             try {
                 setLoading(true);
-                await simulateApiDelay(1200); // Simula delay da API
                 
-                // Usa os dados mock dos questionários
-                const questionariosComPerguntas = mockQuestionarios.map(quiz => ({
-                    id: quiz.id,
-                    titulo: quiz.titulo,
-                    descricao: quiz.descricao,
-                    materia: quiz.materia,
-                    dificuldade: quiz.dificuldade,
-                    totalPerguntas: quiz.totalPerguntas,
-                    tempoLimite: quiz.tempoLimite,
+                // Buscar temas do backend
+                const temasResponse = await getTemas();
+                const temas = temasResponse.data || [];
+                
+                // Converter temas em questionários
+                const questionariosComPerguntas = temas.map(tema => ({
+                    id: tema.id,
+                    titulo: tema.nome,
+                    descricao: tema.descricao,
+                    materia: tema.nome,
+                    dificuldade: tema.dificuldade || 'Médio',
+                    totalPerguntas: tema.totalPerguntas || 0,
+                    tempoLimite: tema.tempoLimite || 15,
                     perguntas: [] // Será carregado quando o quiz for selecionado
                 }));
 

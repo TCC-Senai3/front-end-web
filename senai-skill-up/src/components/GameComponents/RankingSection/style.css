@@ -1,16 +1,14 @@
 .ranking-container {
     background: #D8E6FB;
     border-radius: 12px;
-    padding: 30px 12px 20px 12px;
-    margin-right: 20px;
     width: 280px;
-    position: relative;
-    min-height: 520px; /* mesma altura do quiz */
-    height: 520px; /* altura fixa igual ao quiz */
+    min-height: 400px;
+    max-height: 520px;
     box-sizing: border-box;
-    overflow: visible; /* permite que a placa apareça fora do container */
+    overflow: visible;
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 /* Faixa colada ao container (como jogue-agora-slogan) */
@@ -162,16 +160,27 @@
         width: 100%;
         max-width: 100%;
         margin: 0;
-        padding: 35px 15px 15px 15px;
+        padding: 30px 15px 15px 15px; /* Padding superior aumentado para os botões */
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: flex-start;
+        margin-top: -30px; /* Margem negativa para aproximar dos botões */
+        position: relative;
+        z-index: 1; /* Z-index baixo para ficar atrás dos botões */
     }
     
     .ranking-slogan {
         width: 280px;
-        top: -30px;
+        top: -15px; /* Posicionado acima do container */
         z-index: 1;
+    }
+    
+    .ranking-lista {
+        margin-top: 0px; /* Removido completamente o espaçamento */
+    }
+    
+    .ranking-pesquisa-container {
+        margin-bottom: 0px; /* Removido completamente o espaçamento */
     }
 }

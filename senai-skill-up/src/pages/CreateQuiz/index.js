@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './style.css';
 import Header from '../../components/header';
+import ProtectedRoute from '../../components/ProtectedRoute';
+import { usePermissions } from '../../hooks/usePermissions';
 import { createFormulario } from '../../services/formularioService';
 import { createPergunta } from '../../services/perguntaService';
 import { createAlternativa } from '../../services/alternativaService';
@@ -66,6 +68,7 @@ function MiniCard({ selected, onClick, index, pergunta, onDelete }) {
 }
 
 export default function CreateQuiz() {
+  const { canCreateQuiz, userData, isLoggedIn, loading: authLoading } = usePermissions();
   const [titulo, setTitulo] = useState('');
   const [descricao, setDescricao] = useState('');
   const [perguntas, setPerguntas] = useState([
@@ -155,9 +158,13 @@ export default function CreateQuiz() {
 
   const handleFinalizarQuiz = async () => {
     // Validações básicas
-    const token = sessionStorage.getItem('token');
-    if (!token) {
+    if (!isLoggedIn) {
       alert('❌ Você precisa estar logado para criar um questionário');
+      return;
+    }
+
+    if (!canCreateQuiz) {
+      alert('❌ Você não tem permissão para criar questionários');
       return;
     }
 
@@ -280,10 +287,43 @@ export default function CreateQuiz() {
     }
   };
 
+  // Se ainda está carregando a autenticação, mostrar loading
+  if (authLoading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        fontSize: '18px'
+      }}>
+        Verificando permissões...
+      </div>
+    );
+  }
+
+  // Se não está logado ou não tem permissão, não renderizar nada
+  if (!isLoggedIn || !canCreateQuiz) {
+    return null;
+  }
+
   return (
-    <>
+    <ProtectedRoute requiredRole="CREATOR">
       <Header />
       <div className="quiz-container">
+        <div style={{ 
+          position: 'absolute', 
+          top: '10px', 
+          right: '10px', 
+          background: '#e8f5e8', 
+          padding: '8px 12px', 
+          borderRadius: '6px',
+          fontSize: '12px',
+          zIndex: 1000
+        }}>
+          <strong>👤 {userData?.nome || 'N/A'}</strong> | 
+          <strong> Tipo:</strong> {userData?.tipoUsuario || 'N/A'}
+        </div>
         <div className="sidebar-left">
           <input
             type="text"
@@ -352,6 +392,6 @@ export default function CreateQuiz() {
           )}
         </div>
       </div>
-    </>
+    </ProtectedRoute>
   );
 }

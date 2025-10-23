@@ -6,6 +6,37 @@
    LAYOUT PRINCIPAL
    ======================================== */
 
+/* Estilos específicos para a seção de ranking */
+.ranking-container {
+    transition: all 0.3s ease;
+}
+
+/* Mobile - Sobrescrever estilos para aproximar dos botões */
+@media (max-width: 768px) {
+    .ranking-container {
+        margin-top: -30px !important; /* Forçar margem negativa */
+        padding-top: 30px !important; /* Forçar padding superior */
+        z-index: 1 !important; /* Forçar z-index baixo */
+        position: relative !important; /* Forçar posicionamento relativo */
+    }
+    
+    /* Garantir que o ranking funcione igual ao quiz */
+    .questionarios-container {
+        margin-top: -30px !important;
+        padding-top: 30px !important;
+        z-index: 1 !important;
+        position: relative !important;
+    }
+}
+
+/* Estilos para telas maiores */
+@media (min-width: 1025px) {
+    .ranking-container {
+        margin: 0 98px 0 0;
+        padding: 20px 10px 15px 10px;
+    }
+}
+
 /* Tablet (768px - 1024px) */
 @media (max-width: 1024px) {
     .game-content-wrapper {

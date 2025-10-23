@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Header, Footer } from '../../components';
 import UserManagementTable from '../../components/UsersComponents/UserManagementTable';
 import UserEditModal from '../../components/UsersComponents/UserEditModal';
+import ProtectedRoute from '../../components/ProtectedRoute';
+import { usePermissions } from '../../hooks/usePermissions';
 import userService from '../../services/userService';
 import './style.css';
 
 export default function AdminUsers() {
+  const { canManageUsers, userData, isLoggedIn, loading: authLoading } = usePermissions();
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -75,8 +78,10 @@ export default function AdminUsers() {
 
   // Carregar usuários ao montar o componente
   useEffect(() => {
-    loadUsers();
-  }, []);
+    if (isLoggedIn && canManageUsers) {
+      loadUsers();
+    }
+  }, [isLoggedIn, canManageUsers]);
 
   // Filtrar usuários baseado no termo de busca
   useEffect(() => {
@@ -180,11 +185,36 @@ export default function AdminUsers() {
   };
 
 
+  // Se ainda está carregando a autenticação, mostrar loading
+  if (authLoading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        fontSize: '18px'
+      }}>
+        Verificando permissões...
+      </div>
+    );
+  }
+
+  // Se não está logado ou não tem permissão, não renderizar nada
+  if (!isLoggedIn || !canManageUsers) {
+    return null;
+  }
+
   return (
-    <>
+    <ProtectedRoute requiredRole="ADMIN">
       <Header />
       <div className="admin-users-container">
         <div className="admin-users-content">
+          <div style={{ marginBottom: '20px', padding: '10px', background: '#e3f2fd', borderRadius: '8px' }}>
+            <strong>👤 Usuário logado:</strong> {userData?.nome || 'N/A'} | 
+            <strong> Tipo:</strong> {userData?.tipoUsuario || 'N/A'} | 
+            <strong> Permissões:</strong> {userData?.permissoes || 'N/A'}
+          </div>
           <UserManagementTable
             users={filteredUsers}
             searchTerm={searchTerm}
@@ -204,8 +234,6 @@ export default function AdminUsers() {
           onClose={handleCloseModal}
         />
       )}
-
-      
-    </>
+    </ProtectedRoute>
   );
 }

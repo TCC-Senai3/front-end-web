@@ -47,13 +47,9 @@ export default function GameContent() {
 
         loadRankingData();
 
-        // Atualizar quando localStorage mudar
-        const handleStorageChange = () => {
-            loadRankingData();
-        };
-
-        window.addEventListener('storage', handleStorageChange);
-        return () => window.removeEventListener('storage', handleStorageChange);
+        // Recarregar dados periodicamente (opcional)
+        const interval = setInterval(loadRankingData, 30000); // A cada 30 segundos
+        return () => clearInterval(interval);
     }, [navigate]);
 
     const handleQuizSelect = (questionario) => {

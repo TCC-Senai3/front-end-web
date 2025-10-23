@@ -2,84 +2,90 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 80vh;
   padding: 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
 
 .unauthorized-content {
-  background: white;
-  border-radius: 16px;
-  padding: 48px 32px;
   text-align: center;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   max-width: 500px;
   width: 100%;
 }
 
 .unauthorized-icon {
-  font-size: 64px;
-  margin-bottom: 24px;
+  font-size: 4rem;
+  margin-bottom: 20px;
 }
 
 .unauthorized-content h1 {
-  color: #1f2937;
-  font-size: 32px;
-  font-weight: 700;
+  color: #e74c3c;
   margin-bottom: 16px;
+  font-size: 2rem;
 }
 
 .unauthorized-content p {
-  color: #6b7280;
-  font-size: 16px;
+  color: #666;
+  margin-bottom: 12px;
   line-height: 1.6;
-  margin-bottom: 16px;
 }
 
 .unauthorized-actions {
+  margin-top: 30px;
   display: flex;
-  gap: 16px;
+  gap: 15px;
   justify-content: center;
-  margin-top: 32px;
+  flex-wrap: wrap;
 }
 
-.btn-home,
-.btn-users {
+.btn-primary, .btn-secondary {
   padding: 12px 24px;
-  border-radius: 8px;
-  text-decoration: none;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
   font-weight: 600;
+  cursor: pointer;
   transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  text-decoration: none;
+  display: inline-block;
 }
 
-.btn-home {
-  background: #0090FF;
+.btn-primary {
+  background: #3498db;
   color: white;
 }
 
-.btn-home:hover {
-  background: #0070CC;
+.btn-primary:hover {
+  background: #2980b9;
   transform: translateY(-2px);
 }
 
-.btn-users {
-  background: #6b7280;
+.btn-secondary {
+  background: #95a5a6;
   color: white;
 }
 
-.btn-users:hover {
-  background: #4b5563;
+.btn-secondary:hover {
+  background: #7f8c8d;
   transform: translateY(-2px);
 }
 
 @media (max-width: 768px) {
-  .unauthorized-actions {
-    flex-direction: column;
+  .unauthorized-content {
+    padding: 30px 20px;
   }
   
-  .unauthorized-content {
-    padding: 32px 24px;
+  .unauthorized-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .btn-primary, .btn-secondary {
+    width: 100%;
+    max-width: 200px;
   }
 }
