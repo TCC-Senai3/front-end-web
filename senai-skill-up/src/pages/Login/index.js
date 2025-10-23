@@ -97,10 +97,12 @@ export default function Login() {
                                 />
                             </div>
                             <PasswordField 
-                                placeholder="Senha"
+                                placeholder="Senha (mínimo 6 caracteres)"
                                 value={loginSenha}
                                 onChange={(e) => setLoginSenha(e.target.value)}
                                 required
+                                minLength={6}
+                                title="A senha deve ter no mínimo 6 caracteres"
                             />
                             <button 
                                 type="button" 

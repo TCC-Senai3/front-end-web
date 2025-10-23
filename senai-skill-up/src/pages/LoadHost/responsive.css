@@ -2,139 +2,82 @@
    RESPONSIVIDADE - PÁGINA LOAD HOST
    ======================================== */
 
-@media (max-width: 768px) {
-    /* Container principal */
-    .loadhost-bg {
-        min-height: 100vh;
-        width: 100vw;
-        padding: 0;
-    }
-
-    .loadhost-center {
-        padding: 20px;
-        min-height: calc(100vh - 80px);
-        gap: 20px;
-        justify-content: center;
-    }
-
-    /* Ícone responsivo */
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) {
     .loadhost-icon {
-        width: 200px;
-        height: 200px;
-        margin-bottom: 20px;
+        width: 300px;
+        height: 300px;
     }
-
-    /* Título responsivo */
-    .loadhost-title {
-        font-size: 18px;
-        margin-bottom: 20px;
-        padding: 0 20px;
-        line-height: 1.4;
-    }
-
-    /* Formulário responsivo */
+    
     .loadhost-form {
-        width: 100%;
-        max-width: 350px;
-        min-width: auto;
-        padding: 25px 20px;
-        margin: 0 20px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        border-radius: 12px;
+        max-width: 380px;
+        padding: 28px 24px;
     }
-
-    /* Input responsivo */
-    .loadhost-input {
-        font-size: 16px;
-        padding: 16px 14px;
-        border-radius: 8px;
-        border: 2px solid #ddd;
-        background: #f8f9fa;
-        color: #666;
-    }
-
-    /* Botão responsivo */
-    .loadhost-btn {
-        font-size: 16px;
-        padding: 16px 0;
-        border-radius: 8px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .loadhost-btn:hover {
-        background: #d32f2f;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 15px rgba(229,57,53,0.3);
+    
+    .loadhost-title {
+        font-size: 22px;
+        margin-bottom: 25px;
     }
 }
 
-@media (max-width: 480px) {
+/* Mobile Grande (480px - 768px) */
+@media (max-width: 768px) {
     .loadhost-center {
         padding: 15px;
-        gap: 15px;
+        gap: 20px;
     }
 
-    /* Ícone ainda menor */
     .loadhost-icon {
-        width: 150px;
-        height: 150px;
-        margin-bottom: 15px;
+        width: 200px;
+        height: 200px;
     }
 
-    /* Título menor */
     .loadhost-title {
-        font-size: 16px;
-        margin-bottom: 15px;
-        padding: 0 15px;
+        font-size: 20px;
+        margin-bottom: 20px;
     }
 
-    /* Formulário compacto */
     .loadhost-form {
-        max-width: 300px;
-        padding: 20px 15px;
-        margin: 0 15px;
+        max-width: 320px;
+        padding: 24px 20px;
     }
 
-    /* Input compacto */
     .loadhost-input {
         font-size: 15px;
-        padding: 14px 12px;
+        padding: 14px 16px;
     }
 
-    /* Botão compacto */
     .loadhost-btn {
         font-size: 15px;
         padding: 14px 0;
     }
 }
 
-@media (max-width: 360px) {
+/* Mobile Pequeno (até 480px) */
+@media (max-width: 480px) {
     .loadhost-center {
-        padding: 10px;
+        padding: 12px;
+        gap: 18px;
     }
 
     .loadhost-icon {
-        width: 120px;
-        height: 120px;
+        width: 160px;
+        height: 160px;
     }
 
     .loadhost-title {
-        font-size: 14px;
+        font-size: 18px;
+        margin-bottom: 18px;
     }
 
     .loadhost-form {
-        max-width: 280px;
-        padding: 15px 10px;
-        margin: 0 10px;
+        max-width: 300px;
+        padding: 20px 16px;
     }
 
     .loadhost-input {
         font-size: 14px;
-        padding: 12px 10px;
+        padding: 12px 14px;
     }
 
     .loadhost-btn {
@@ -142,3 +85,38 @@
         padding: 12px 0;
     }
 }
+
+/* Mobile Muito Pequeno (até 360px) */
+@media (max-width: 360px) {
+    .loadhost-center {
+        padding: 8px;
+        gap: 15px;
+    }
+
+    .loadhost-icon {
+        width: 140px;
+        height: 140px;
+    }
+
+    .loadhost-title {
+        font-size: 16px;
+        margin-bottom: 15px;
+    }
+
+    .loadhost-form {
+        max-width: 280px;
+        padding: 16px 12px;
+    }
+
+    .loadhost-input {
+        font-size: 13px;
+        padding: 10px 12px;
+    }
+
+    .loadhost-btn {
+        font-size: 13px;
+        padding: 10px 0;
+    }
+}
+
+

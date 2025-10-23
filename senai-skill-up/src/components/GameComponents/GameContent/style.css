@@ -10,4 +10,90 @@
     height: 80px;
 }
 
-/* Responsividade removida */
+/* ========== RESPONSIVIDADE MOBILE ========== */
+
+/* Mobile - Tabs para Ranking e Quiz */
+@media (max-width: 768px) {
+    .game-content-wrapper {
+        display: none;
+    }
+    
+    /* Container principal dos tabs */
+    .mobile-tabs-container {
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 0 15px;
+        position: relative;
+    }
+    
+    /* Botões de tab */
+    .tabs-buttons {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 0px;
+        justify-content: center;
+        position: relative;
+        z-index: 100;
+        transform: translateY(-20px);
+    }
+    
+    .tab-button {
+        background: #e0e0e0;
+        color: #666;
+        border: none;
+        border-radius: 25px;
+        padding: 12px 24px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        flex: 1;
+        max-width: 150px;
+        position: relative;
+        z-index: 101;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .tab-button.active {
+        background: #0090FF;
+        color: white;
+        transform: scale(1.05);
+    }
+    
+    .tab-button:hover:not(.active) {
+        background: #d0d0d0;
+        color: #333;
+    }
+    
+    /* Conteúdo das tabs */
+    .tabs-content {
+        overflow: visible;
+        border-radius: 12px;
+        min-height: 500px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .slides-container {
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+        width: 200%;
+        justify-content: flex-start;
+    }
+    
+    .mobile-slide {
+        width: 100%;
+        flex-shrink: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: visible;
+        padding: 0 10px;
+        box-sizing: border-box;
+    }
+}

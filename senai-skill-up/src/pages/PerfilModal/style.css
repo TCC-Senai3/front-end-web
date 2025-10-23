@@ -110,6 +110,31 @@
   transform: scale(1.1);
 }
 
+/* Responsividade para telas menores */
+@media (max-width: 768px) {
+  .perfil-edit-icon {
+    bottom: 15px;
+    right: 15px;
+  }
+  
+  .perfil-edit-icon img {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .perfil-edit-icon {
+    bottom: -60px;
+    right: 10px;
+  }
+  
+  .perfil-edit-icon img {
+    width: 24px;
+    height: 24px;
+  }
+}
+
 /* Seção do avatar */
 .perfil-avatar-section {
   text-align: center;
@@ -307,23 +332,188 @@
 }
 
 /* Responsividade */
-@media (max-width: 600px) {
-  .perfil-modal-container {
-    margin: 10px;
-    max-width: calc(100% - 20px);
+.sala-container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #00A6FF 0%, #22C0EC 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 80px 20px;
+}
+
+.sala-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 900px;
+}
+
+.sala-codigo {
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 38px;
+  text-align: center;
+  margin-bottom: 35px;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.25);
+}
+
+.sala-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fff;
+  padding: 35px 45px;
+  gap: 15px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  margin-bottom: 60px;
+  border-radius: 10px;
+}
+
+.btn {
+  padding: 15px 25px;
+  border-radius: 8px;
+  font-weight: 900;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.15s ease;
+  min-width: 140px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+  line-height: 1.3;
+}
+
+.btn-danger {
+  background: linear-gradient(180deg, #FF3131 0%, #E02020 100%);
+  box-shadow: 0 6px 0 #B81818;
+}
+
+.btn-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 0 #B81818;
+}
+
+.btn-warning {
+  background: linear-gradient(180deg, #FFB800 0%, #FF9500 100%);
+  box-shadow: 0 6px 0 #D67700;
+}
+
+.btn-warning:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 0 #D67700;
+}
+
+.sala-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 65px 45px;
+  justify-items: center;
+  width: 100%;
+}
+
+.sala-mensagem {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+  padding: 40px;
+}
+
+.sala-user {
+  width: 300px;
+  height: 100px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  padding-bottom: 16px;
+}
+
+.sala-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: url('../../assets/images/user-profile 1.png') center/cover no-repeat, #d9d9d9;
+  position: absolute;
+  top: -35px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.nome {
+  font-size: 14px;
+  font-weight: 700;
+  color: #2c2c2c;
+}
+
+@media (max-width: 768px) {
+  .sala-codigo {
+    font-size: 28px;
+    margin-bottom: 25px;
+    color: #fff;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
   }
-  
-  .perfil-stats-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
+
+  .sala-actions {
+    position: relative;
+    background: #fff;
+    padding: 20px 15px;
+    min-height: 100px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto 40px;
+    box-sizing: border-box;
   }
-  
-  .perfil-avatar {
-    width: 80px;
-    height: 80px;
+
+  .btn {
+    flex: 1;
+    min-width: 120px;
+    padding: 12px 8px;
+    font-size: 13px;
+    font-weight: 900;
+    text-transform: uppercase;
+    border-radius: 8px;
+    line-height: 1.2;
+    white-space: nowrap;
   }
-  
-  .perfil-name {
-    font-size: 20px;
+
+  .btn br {
+    display: block;
+  }
+
+  .sala-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 55px 30px;
+  }
+
+  .sala-user {
+    width: 180px;
+    height: 120px;
+    padding: 15px;
+  }
+
+  .sala-avatar {
+    width: 95px;
+    height: 95px;
   }
 }

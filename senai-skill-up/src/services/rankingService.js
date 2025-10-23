@@ -1,9 +1,12 @@
-// Buscar ranking global - retorna vazio
+import { mockRanking, simulateApiDelay } from '../data/mockQuizData';
+
+// Buscar ranking global - retorna dados mock
   export const getRankingGlobal = async () => {
     try {
+      await simulateApiDelay(800); // Simula delay da API
       return {
         success: true,
-        data: []
+        data: mockRanking
       };
     } catch (error) {
       console.error('Erro ao buscar ranking global:', error);
@@ -105,12 +108,14 @@
     }
   };
 
-  // Buscar top usuários - retorna vazio
+  // Buscar top usuários - retorna dados mock
   export const getTopRanking = async (limit = 10) => {
     try {
+      await simulateApiDelay(600);
+      const topRanking = mockRanking.slice(0, limit);
       return {
         success: true,
-        data: []
+        data: topRanking
       };
     } catch (error) {
       console.error('Erro ao buscar top ranking:', error);

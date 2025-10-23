@@ -281,13 +281,7 @@ export default function Header() {
                     <div className="mobile-menu" onClick={(e) => e.stopPropagation()}>
                         {/* Header do Menu Mobile */}
                         <div className="mobile-menu-header">
-                            <button 
-                                className="mobile-menu-close"
-                                onClick={toggleMobileMenu}
-                                aria-label="Fechar menu"
-                            >
-                                ✕
-                            </button>
+                            <span className="mobile-menu-title">MENU</span>
                         </div>
 
                         {/* Perfil do Usuário no Menu Mobile */}

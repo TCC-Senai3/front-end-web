@@ -1,28 +1,54 @@
 .password-field-container {
     position: relative;
     display: flex;
-    align-items: center;
     max-width: 380px;
     width: 100%;
-    background-color: #f0f0f0;
-    margin: 10px 0;
-    height: 55px;
-    border-radius: 55px;
-    padding: 0 0.4rem;
-    position: relative;
+    margin: 10px 0 5px;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.password-field-container .input-wrapper {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    max-width: 380px !important;
+    width: 100% !important;
+    background-color: #f0f0f0 !important;
+    margin: 0 !important;
+    height: 55px !important;
+    border-radius: 55px !important;
+    padding: 0 0.4rem !important;
+    box-sizing: border-box !important;
 }
 
 .password-field-container input {
-    background: none;
-    outline: none;
-    border: none;
-    line-height: 1;
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: #333;
-    flex: 1;
-    padding-left: 10px;
-    padding-right: 60px;
+    background: none !important;
+    outline: none !important;
+    border: none !important;
+    line-height: 1 !important;
+    font-weight: 600 !important;
+    font-size: 1.1rem !important;
+    color: #333 !important;
+    flex: 1 !important;
+    padding-left: 10px !important;
+    padding-right: 60px !important;
+    height: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    box-sizing: border-box !important;
+}
+
+/* Estilo para campo inválido */
+.password-field-container input.invalid {
+    color: #ff4444;
+}
+
+.password-field-container input.invalid::placeholder {
+    color: #ff9999;
 }
 
 .password-field-container input::placeholder {
@@ -30,13 +56,12 @@
     font-weight: 500;
 }
 
-.password-field-container i {
-    text-align: center;
-    line-height: 55px;
+.password-field-container i.fas {
+    position: absolute;
+    left: 15px;
     color: #acacac;
-    transition: 0.5s;
     font-size: 1.1rem;
-    min-width: 50px;
+    z-index: 1;
 }
 
 .password-toggle {
@@ -79,4 +104,36 @@
     color: #4CAF50;
 }
 
-/* Responsividade removida */
+/* Mensagem de dica de senha */
+.password-hint {
+    position: relative !important;
+    color: #ff4444 !important;
+    font-size: 0.7rem !important;
+    font-weight: 500 !important;
+    padding: 2px 30px 0 !important;
+    text-align: right !important;
+    animation: fadeIn 0.3s ease !important;
+    height: 16px !important;
+    margin: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    display: block !important;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Estilo para quando o campo está inválido */
+.input-wrapper.invalid {
+    border: 2px solid #ff4444;
+    background-color: #fff5f5;
+}
+
+/* Melhorias na acessibilidade */
+.password-field-container:focus-within {
+    border-color: #5995fd;
+    background-color: #fff;
+    box-shadow: 0 0 0 2px rgba(89, 149, 253, 0.2);
+}

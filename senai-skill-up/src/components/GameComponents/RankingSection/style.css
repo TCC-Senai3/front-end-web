@@ -18,7 +18,7 @@
     position: absolute;
     top: -28px; /* valor negativo para colar na borda - igual ao quiz */
     left: 18px;
-    z-index: 2;
+    z-index: 1;
     pointer-events: none;
     width: 250px;
     height: auto;
@@ -54,9 +54,12 @@
     flex: 1;
     max-height: 400px; /* ajustado para caber no container */
     overflow-y: auto;
+    overflow-x: visible;
     scrollbar-width: none;
     -ms-overflow-style: none;
     background: #D8E6FB;
+    word-wrap: break-word;
+    word-break: break-word;
 }
 
 .ranking-lista::-webkit-scrollbar {
@@ -65,8 +68,10 @@
 
 .ranking-item {
     display: flex;
-    height: 58px;
+    min-height: 58px;
     width: 100%;
+    position: relative;
+    padding-right: 50px; /* Espaço para os pontos */
     align-items: center;
     justify-content: space-between;
     background: #fff;
@@ -76,6 +81,7 @@
     box-sizing: border-box;
     transition: box-shadow 0.2s, background 0.2s, transform 0.2s;
     cursor: pointer;
+    overflow: visible;
 }
 
 .ranking-item:hover {
@@ -118,18 +124,24 @@
     flex: 1;
     font-family: 'Poppins', sans-serif;
     font-size: 15px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
     min-width: 0;
-    line-height: 1;
+    line-height: 1.2;
+    word-wrap: break-word;
+    word-break: break-word;
 }
 
 .ranking-pontos {
+    position: absolute;
+    right: 12px;
     font-weight: bold;
-    font-size: 15px;
-    line-height: 1;
-    flex-shrink: 0;
+    color: #2C6ECB;
+    font-size: 14px;
+    background: #e6f0ff;
+    padding: 2px 8px;
+    border-radius: 10px;
 }
 
 .ranking-medal-icon {
@@ -137,4 +149,24 @@
     height: 25px;
     margin-right: 5px;
     flex-shrink: 0;
+}
+
+/* Ajustes para responsividade mobile */
+@media (max-width: 768px) {
+    .ranking-container {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 35px 15px 15px 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+    }
+    
+    .ranking-slogan {
+        width: 280px;
+        top: -30px;
+        z-index: 1;
+    }
 }

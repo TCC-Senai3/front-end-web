@@ -20,7 +20,15 @@ export default function Sala() {
       // setUsuarios(data);
       
       // Dados de exemplo - remover quando conectar ao backend
-      setUsuarios([]);
+      const usuariosExemplo = [
+        { id: 1, nome: 'João Silva', avatar: null },
+        { id: 2, nome: 'Maria Santos', avatar: null },
+        { id: 3, nome: 'Pedro Costa', avatar: null },
+        { id: 4, nome: 'Ana Oliveira', avatar: null },
+        { id: 5, nome: 'Carlos Lima', avatar: null },
+        { id: 6, nome: 'Julia Ferreira', avatar: null }
+      ];
+      setUsuarios(usuariosExemplo);
     } catch (error) {
       console.error('Erro ao buscar usuários:', error);
     } finally {

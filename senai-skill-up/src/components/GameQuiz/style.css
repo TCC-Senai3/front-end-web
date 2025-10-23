@@ -149,7 +149,7 @@
 }
 
 .alternative-btn {
-  background: linear-gradient(135deg, #00BFFF 0%, #0099CC 100%);
+  background-color: #00B7FF;
   color: white;
   border: none;
   padding: 16px 18px;
@@ -163,45 +163,24 @@
   line-height: 1.5;
   letter-spacing: 0.4px;
   text-align: left;
-  box-shadow: 0 3px 8px rgba(0,191,255,0.3);
-  position: relative;
-  overflow: hidden;
-}
-
-.alternative-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  transition: left 0.5s;
-}
-
-.alternative-btn:hover::before {
-  left: 100%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .alternative-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #0099CC 0%, #007799 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 5px 12px rgba(0,191,255,0.4);
+  background-color: #0099CC;
+  transform: translateY(-1px);
 }
 
 .alternative-btn.correct {
-  background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
-  box-shadow: 0 3px 8px rgba(39,174,96,0.4);
+  background-color: #27ae60;
 }
 
 .alternative-btn.incorrect {
-  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-  box-shadow: 0 3px 8px rgba(231,76,60,0.4);
+  background-color: #e74c3c;
 }
 
 .alternative-btn.show-correct {
-  background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
-  box-shadow: 0 3px 8px rgba(39,174,96,0.4);
+  background-color: #27ae60;
 }
 
 /* Estados de loading e erro */
@@ -439,8 +418,12 @@
 @media screen and (max-width: 768px) {
   .game-quiz-container {
     height: 100vh;
-    overflow: hidden;
+    overflow: hidden !important;
     padding: 0;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
   }
 
   /* Ocultar controles laterais em mobile */
@@ -714,10 +697,11 @@
   }
 
   body .game-quiz-container .quiz-wrapper {
-    position: relative !important;
+    position: fixed !important;
     width: 100vw !important;
     height: 100vh !important;
     display: block !important;
+    overflow: hidden !important;
   }
 
   body .game-quiz-container .quiz-controls {
@@ -726,13 +710,17 @@
     right: 20px !important;
     z-index: 10 !important;
     display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 15px;
   }
 
   /* Estilo do timer no mobile */
   body .game-quiz-container .quiz-controls .timer {
-    display: block !important;
+    display: inline-block !important;
     font-size: 16px !important;
     padding: 8px 15px !important;
-    margin-bottom: 10px !important;
+    margin: 0 !important;
+    white-space: nowrap;
   }
 }

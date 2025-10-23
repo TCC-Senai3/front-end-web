@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import SearchIcon from "../../../assets/images/search 1.svg";
 import "./style.css";
-import quizService from "../../../services/quizService";
+import { mockQuestionarios, mockTemas, filtrarQuestionarios, simulateApiDelay } from "../../../data/mockQuizData";
 import Loader from "../../common/Loader";
 
 export default function QuizSection({ onQuizSelect }) {
@@ -14,36 +14,19 @@ export default function QuizSection({ onQuizSelect }) {
         const loadQuestionarios = async () => {
             try {
                 setLoading(true);
-                // Busca os temas disponíveis
-                const temas = await quizService.getTemas();
+                await simulateApiDelay(1200); // Simula delay da API
                 
-                // Para cada tema, busca as perguntas relacionadas
-                const questionariosComPerguntas = await Promise.all(
-                    temas.map(async (tema) => {
-                        try {
-                            const perguntas = await quizService.getPerguntasByTema(tema.id);
-                            return {
-                                id: tema.id,
-                                titulo: `Quiz de ${tema.nome}`,
-                                descricao: tema.descricao || `Teste seus conhecimentos sobre ${tema.nome}`,
-                                perguntas: perguntas.map(p => ({
-                                    id: p.id,
-                                    pergunta: p.enunciado,
-                                    alternativas: p.alternativas || []
-                                }))
-                            };
-                        } catch (error) {
-                            console.error(`Erro ao carregar perguntas do tema ${tema.nome}:`, error);
-                            return {
-                                id: tema.id,
-                                titulo: `Quiz de ${tema.nome}`,
-                                descricao: tema.descricao || `Teste seus conhecimentos sobre ${tema.nome}`,
-                                perguntas: [],
-                                error: 'Erro ao carregar perguntas'
-                            };
-                        }
-                    })
-                );
+                // Usa os dados mock dos questionários
+                const questionariosComPerguntas = mockQuestionarios.map(quiz => ({
+                    id: quiz.id,
+                    titulo: quiz.titulo,
+                    descricao: quiz.descricao,
+                    materia: quiz.materia,
+                    dificuldade: quiz.dificuldade,
+                    totalPerguntas: quiz.totalPerguntas,
+                    tempoLimite: quiz.tempoLimite,
+                    perguntas: [] // Será carregado quando o quiz for selecionado
+                }));
 
                 setQuestionarios(questionariosComPerguntas);
                 setError(null);

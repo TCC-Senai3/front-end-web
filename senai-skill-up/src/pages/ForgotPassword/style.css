@@ -81,14 +81,14 @@
 
 .forgot-password-form .input-field input {
   width: 100%;
-  padding: 24px 30px;
-  border: 3px solid #3498db;
-  border-radius: 25px;
-  font-size: 20px;
+  padding: 12px 15px; /* Tamanho base menor */
+  border: 2px solid #3498db;
+  border-radius: 20px;
+  font-size: 16px; /* Tamanho de fonte base menor */
   font-weight: 500;
   color: #333;
   background: white;
-  transition: border-color 0.3s ease;
+  transition: all 0.3s ease;
   box-sizing: border-box;
   z-index: 1;
   position: relative;
@@ -168,7 +168,8 @@
   font-weight: 500;
 }
 .email-input {
-  width: 350px;
+  width: 100%;
+  max-width: 350px;
   padding: 22px 16px;
   border: 2px solid #000000ff;
   border-radius: 50px;
@@ -178,6 +179,7 @@
   background: transparent;
   box-sizing: border-box;
   margin-bottom: 15px;
+  transition: all 0.3s ease;
 }
 .form-title {
   font-size: 18px;
