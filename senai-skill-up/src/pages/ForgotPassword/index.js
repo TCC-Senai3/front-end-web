@@ -1,32 +1,34 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+// A navegação não é mais necessária nesta tela
+// import { useNavigate } from 'react-router-dom';
 import Header from '../../components/header';
 import './style.css';
 import group51 from '../../assets/images/Group 51.png';
+import authService from '../../services/authService'; // Verifique se o caminho está correto
 
 export default function ForgotPassword() {
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState('');
-    const navigate = useNavigate();
+    // const navigate = useNavigate(); // Não precisamos mais disso aqui
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
         setMessage('');
 
-        try {
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            setMessage('Email de recuperação enviado com sucesso!');
-            
-            setTimeout(() => {
-                navigate('/ResetPassword', { state: { email: email } });
-            }, 2000);
-        } catch (error) {
-            setMessage('Erro ao enviar email. Tente novamente.');
-        } finally {
-            setIsLoading(false);
+        // 1. Chama a API real para solicitar o envio do e-mail
+        const response = await authService.resetPassword(email);
+
+        // 2. Com base na resposta da API, mostra a mensagem apropriada
+        if (response.success) {
+            setMessage(response.message + " Por favor, verifique sua caixa de entrada.");
+        } else {
+            setMessage(response.message);
         }
+        
+        // 3. Finaliza o carregamento
+        setIsLoading(false);
     };
 
     return (

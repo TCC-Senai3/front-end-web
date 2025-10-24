@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const API_CONFIG = {
-  BASE_URL: 'http://localhost:3000', // Atualize com a URL do seu backend
+  BASE_URL: 'http://localhost:8080', // Atualize com a URL do seu backend
   TIMEOUT: 10000,
   RETRY_ATTEMPTS: 3,
   RETRY_DELAY: 1000,
@@ -20,8 +20,10 @@ const api = axios.create({
 // Interceptor para requisições
 api.interceptors.request.use(
   (config) => {
-    // Adicionar token de autenticação se existir
-    const token = localStorage.getItem('token');
+    // CORREÇÃO APLICADA AQUI:
+    // Buscar o token do 'sessionStorage' com a chave 'authToken'
+    const token = sessionStorage.getItem('authToken');
+    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -32,29 +34,28 @@ api.interceptors.request.use(
   }
 );
 
-// Interceptor para respostas
+// Interceptor para respostas (SEU CÓDIGO AQUI JÁ ESTÁ MUITO BOM)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Tratamento de erros global
     if (error.response) {
-      // Erros 4xx/5xx
       console.error('Erro na resposta da API:', error.response.status, error.response.data);
       
-      // Tratamento para token expirado
+      // Tratamento para token expirado ou inválido (Unauthorized)
       if (error.response.status === 401) {
-        // Redirecionar para login ou renovar token
-        console.warn('Sessão expirada. Redirecionando para login...');
-        // Remover token inválido
-        localStorage.removeItem('token');
-        // Redirecionar para a página de login
-        window.location.href = '/login';
+        console.warn('Sessão expirada ou inválida. Redirecionando para login...');
+        
+        // Limpa o storage
+        sessionStorage.removeItem('authToken'); // Use sessionStorage aqui também
+        
+        // Redireciona para a página de login para evitar loops
+        if (window.location.pathname !== '/login') {
+            window.location.href = '/login';
+        }
       }
     } else if (error.request) {
-      // A requisição foi feita mas não houve resposta
       console.error('Sem resposta do servidor:', error.request);
     } else {
-      // Erro ao configurar a requisição
       console.error('Erro ao configurar requisição:', error.message);
     }
     

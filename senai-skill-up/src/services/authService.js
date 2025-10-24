@@ -3,104 +3,82 @@ import api from './api';
 
 // Classe para gerenciar autenticação
 class AuthService {
-  // Realizar login
+
+  /**
+   * Realiza o login enviando os dados no corpo (body) da requisição.
+   * Deixa o axios lançar um erro em caso de falha (ex: 401 Unauthorized).
+   */
   async login(email, senha) {
-    try {
-      const response = await api.post('/usuarios/login', { email, senha });
-      return {
-        success: true,
-        data: response.data
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message || 'Erro no login'
-      };
-    }
+    const response = await api.post('/usuarios/login', { email, senha });
+    return response.data; // Retorna diretamente os dados em caso de sucesso
   }
 
-  // Realizar cadastro
+  /**
+   * Realiza o cadastro de um novo usuário.
+   */
   async register(userData) {
-    try {
-      const response = await api.post('/usuarios/cadastro', userData);
-      return {
-        success: true,
-        data: response.data
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message || 'Erro no cadastro'
-      };
-    }
+    const response = await api.post('/usuarios/cadastro', userData);
+    return response.data;
   }
 
-  // Verificar autenticação
-  isAuthenticated() {
-    return !!sessionStorage.getItem('authToken');
+  /**
+   * Solicita a redefinição de senha, enviando o email como query param.
+   */
+  async resetPassword(email) {
+    await api.post('/senha/esqueceu', null, { params: { email } });
+    // Para este método, podemos retornar uma mensagem de sucesso, pois não há dados para retornar.
+    return { success: true, message: 'Se um e-mail cadastrado for encontrado, um link de recuperação será enviado.' };
   }
 
-  // Obter usuário atual
-  getCurrentUser() {
-    const userData = sessionStorage.getItem('currentUser');
-    return userData ? JSON.parse(userData) : null;
+  /**
+   * Confirma a redefinição de senha, enviando o token e a nova senha como query params.
+   */
+  async confirmPasswordReset(token, newPassword) {
+    await api.post('/senha/reset', null, { params: { token, newPassword } });
+    return { success: true, message: 'Senha redefinida com sucesso!' };
+  }
+  
+  /**
+   * Busca os dados do perfil do usuário logado.
+   */
+  async getUserProfile() {
+    const response = await api.get(`/usuarios/me`);
+    return response.data;
   }
 
-  // Obter dados do usuário
-  async getUserProfile() { 
-    try {
-        
-        const response = await api.get(`/usuarios/me`);
-        return {
-            success: true,
-            data: response.data
-        };
-    } catch (error) {
-        return {
-            success: false,
-            message: error.message || 'Erro ao buscar perfil'
-        };
-    }
-}
-
-  // Atualizar perfil
+  /**
+   * Atualiza o perfil de um usuário.
+   */
   async updateProfile(userId, userData) {
-    try {
-      const response = await api.put(`/usuarios/${userId}`, userData);
-      return {
-        success: true,
-        data: response.data
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message || 'Erro ao atualizar perfil'
-      };
-    }
+    const response = await api.put(`/usuarios/${userId}`, userData);
+    return response.data;
   }
 
-  // Fazer logout
+  // --- MÉTODOS DE GERENCIAMENTO LOCAL (NÃO FAZEM CHAMADA À API) ---
+
+  /**
+   * Faz o logout do usuário, limpando os dados da sessão.
+   */
   logout() {
     sessionStorage.removeItem('authToken');
     sessionStorage.removeItem('currentUser');
   }
 
-  // Reset password
-  async resetPassword(email) {
-    try {
-      await api.post('/auth/reset-password', { email });
-      return {
-        success: true,
-        message: 'Email enviado com sucesso'
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message || 'Erro ao enviar email'
-      };
-    }
+  /**
+   * Verifica se o usuário está autenticado localmente.
+   */
+  isAuthenticated() {
+    return !!sessionStorage.getItem('authToken');
+  }
+
+  /**
+   * Obtém os dados do usuário atual salvos na sessão.
+   */
+  getCurrentUser() {
+    const userData = sessionStorage.getItem('currentUser');
+    return userData ? JSON.parse(userData) : null;
   }
 }
 
 const authService = new AuthService();
-export default authService; // Substitui o conteúdo existente
+export default authService;
