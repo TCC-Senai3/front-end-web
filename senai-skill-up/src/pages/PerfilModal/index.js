@@ -4,6 +4,9 @@ import './style.css';
 import editIcon from '../../assets/images/Vector.png';
 import trophyIcon from '../../assets/images/trophy 1.svg';
 import pointsIcon from '../../assets/images/image 33.png';
+import bodeIcon from '../../assets/images/bode.svg';
+import canetaIcon from '../../assets/images/Caneta bic.svg';
+import patoIcon from '../../assets/images/Pato.svg';
 
 export default function PerfilModal({ isMyProfile = true, onClose, user: propUser, isOpen = true }) {
   const [user, setUser] = useState(propUser || {
@@ -12,18 +15,24 @@ export default function PerfilModal({ isMyProfile = true, onClose, user: propUse
     status: 'online',
     position: 1,
     points: 1000,
-    level: 'Diamante',
-    gamesPlayed: 999,
-    accuracy: 92,
     memberSince: '2024',
     tag: '#123',
-    bio: 'texto limitado a uma quantidade de caracteres'
+    bio: 'texto limitado a uma quantidade de caracteres',
+    avatar: null
   });
+  
+  const avatarOptions = [
+    { id: 1, src: bodeIcon, alt: 'Bode' },
+    { id: 2, src: canetaIcon, alt: 'Caneta' },
+    { id: 3, src: patoIcon, alt: 'Pato' }
+  ];
 
   const [isEditing, setIsEditing] = useState(false);
+  const [showAvatarOptions, setShowAvatarOptions] = useState(false);
   const [form, setForm] = useState({
     name: user.name,
-    bio: user.bio
+    bio: user.bio,
+    avatar: user.avatar
   });
 
   const handleChange = (e) => {
@@ -34,6 +43,18 @@ export default function PerfilModal({ isMyProfile = true, onClose, user: propUse
   const handleSave = () => {
     setUser({ ...user, ...form });
     setIsEditing(false);
+    setShowAvatarOptions(false);
+  };
+
+  const handleAvatarSelect = (avatarSrc) => {
+    setForm(prev => ({ ...prev, avatar: avatarSrc }));
+    setShowAvatarOptions(false);
+  };
+
+  const handleAvatarClick = () => {
+    if (isEditing) {
+      setShowAvatarOptions(!showAvatarOptions);
+    }
   };
 
   if (!isOpen) return null;
@@ -56,9 +77,33 @@ export default function PerfilModal({ isMyProfile = true, onClose, user: propUse
 
           {/* Avatar centralizado */}
           <div className="perfil-avatar-section">
-            <div className="perfil-avatar">
-              <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`} alt={user.name} />
-              <div className="perfil-status-indicator"></div>
+            <div className="perfil-avatar-container">
+              <div 
+                className={`perfil-avatar ${isEditing ? 'editable' : ''}`}
+                onClick={handleAvatarClick}
+              >
+                {form.avatar ? (
+                  <img src={form.avatar} alt={user.name} />
+                ) : (
+                  <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`} alt={user.name} />
+                )}
+                <div className="perfil-status-indicator"></div>
+                {isEditing && <div className="avatar-edit-overlay">Mudar</div>}
+              </div>
+              
+              {showAvatarOptions && (
+                <div className="avatar-options">
+                  {avatarOptions.map((avatar) => (
+                    <div 
+                      key={avatar.id} 
+                      className="avatar-option"
+                      onClick={() => handleAvatarSelect(avatar.src)}
+                    >
+                      <img src={avatar.src} alt={avatar.alt} />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             {isEditing ? (
               <input

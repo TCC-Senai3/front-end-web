@@ -52,8 +52,6 @@ export default function Usuarios() {
       email: user.email,
       points: user.pontos,
       position: user.rank,
-      gamesPlayed: user.jogosJogados,
-      accuracy: user.precisao,
       memberSince: user.dataCriacao,
       achievements: [
         { icon: '🏆', name: 'Primeiro Quiz Completado' },
