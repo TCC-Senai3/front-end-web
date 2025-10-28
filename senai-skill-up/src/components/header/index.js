@@ -1,20 +1,24 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./style.css";
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth'; // Caminho está correto
 
 export default function Header() {
     const navigate = useNavigate();
-    const { userData, isLoggedIn, logout } = useAuth();
-    
-    
+
+    // ****** CORREÇÃO AQUI ******
+    // Pegar 'user' em vez de 'userData'
+    const { user, isLoggedIn, logout } = useAuth();
+
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const settingsDropdownRef = useRef(null);
-    
     const [isUserProfileOpen, setIsUserProfileOpen] = useState(false);
     const userProfileDropdownRef = useRef(null);
-    
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    // Todas as suas funções (toggleMobileMenu, toggleSettings, handleSettingsClick, etc.)
+    // permanecem EXATAMENTE IGUAIS. Não precisam de alteração.
+    // ... (suas funções aqui) ...
 
     const toggleMobileMenu = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -25,39 +29,31 @@ export default function Header() {
     const toggleSettings = () => {
         setIsSettingsOpen(!isSettingsOpen);
         setIsUserProfileOpen(false);
-        setIsMobileMenuOpen(false); // Fecha o menu mobile
+        setIsMobileMenuOpen(false);
     };
 
     const toggleUserProfile = () => {
         setIsUserProfileOpen(!isUserProfileOpen);
         setIsSettingsOpen(false);
-        setIsMobileMenuOpen(false); // Fecha o menu mobile
+        setIsMobileMenuOpen(false);
     };
 
     const handleSettingsClick = (option) => {
-        console.log(`Opção selecionada: ${option}`);
         setIsSettingsOpen(false);
         setIsMobileMenuOpen(false);
-        
-        switch(option) {
-            case 'TERMOS':
-                navigate('/termos');
-                break;
-            case 'CONTATO':
-                navigate('/contato');
-                break;            
-                case 'SAIR':
-                // Implementar logout
+
+        switch (option) {
+            case 'TERMOS': navigate('/termos'); break;
+            case 'CONTATO': navigate('/contato'); break;
+            case 'SAIR':
                 logout();
                 navigate('/login');
                 break;
-            default:
-                break;
+            default: break;
         }
     };
 
     const handleUserProfileClick = (option) => {
-        console.log(`Opção do perfil selecionada: ${option}`);
         setIsUserProfileOpen(false);
         setIsMobileMenuOpen(false);
 
@@ -67,23 +63,15 @@ export default function Header() {
             return;
         }
 
-        switch(option) {
-            case 'MINHA CONTA':
-                navigate('/perfil');
-                break;
-            case 'USUÁRIOS':
-                navigate('/usuarios');
-                break;
-            case 'ADMIN USUÁRIOS':
-                navigate('/admin/usuarios');
-                break;
+        switch (option) {
+            case 'MINHA CONTA': navigate('/perfil'); break;
+            case 'USUÁRIOS': navigate('/usuarios'); break;
+            case 'ADMIN USUÁRIOS': navigate('/admin/usuarios'); break;
             case 'SAIR':
-                // Implementar logout
                 logout();
                 navigate('/login');
                 break;
-            default:
-                break;
+            default: break;
         }
     };
 
@@ -96,31 +84,21 @@ export default function Header() {
             return;
         }
 
-        switch(option) {
-            case 'INICIO':
-                navigate('/');
-                break;
-            case 'TERMOS':
-                navigate('/termos');
-                break;
-            case 'CONTATO':
-                navigate('/contato');
-                break;
-            case 'MINHA CONTA':
-                navigate('/perfil');
-                break;
-            case 'USUÁRIOS':
-                navigate('/usuarios');
-                break;
+        switch (option) {
+            case 'INICIO': navigate('/'); break;
+            case 'TERMOS': navigate('/termos'); break;
+            case 'CONTATO': navigate('/contato'); break;
+            case 'MINHA CONTA': navigate('/perfil'); break;
+            case 'USUÁRIOS': navigate('/usuarios'); break;
             case 'SAIR':
                 logout();
                 navigate('/login');
                 break;
-            default:
-                break;
+            default: break;
         }
     };
 
+    // UseEffects para fechar dropdowns (sem alterações)
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (settingsDropdownRef.current && !settingsDropdownRef.current.contains(event.target)) {
@@ -130,11 +108,9 @@ export default function Header() {
                 setIsUserProfileOpen(false);
             }
         };
-
         if (isSettingsOpen || isUserProfileOpen) {
             document.addEventListener('mousedown', handleClickOutside);
         }
-
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
@@ -146,15 +122,14 @@ export default function Header() {
                 setIsMobileMenuOpen(false);
             }
         };
-
         if (isMobileMenuOpen) {
             document.addEventListener('keydown', handleEscapeKey);
         }
-
         return () => {
             document.removeEventListener('keydown', handleEscapeKey);
         };
     }, [isMobileMenuOpen]);
+
 
     return (
         <header>
@@ -165,12 +140,13 @@ export default function Header() {
                     </Link>
                 </div>
 
-                {/* Botão Hamburger para Mobile */}
-                <button 
+                {/* Botão Hamburger (sem alterações) */}
+                <button
                     className="hamburger-btn"
                     onClick={toggleMobileMenu}
                     aria-label="Menu"
                 >
+                    {/* ... spans do hamburger ... */}
                     <span className={`hamburger-line ${isMobileMenuOpen ? 'active' : ''}`}></span>
                     <span className={`hamburger-line ${isMobileMenuOpen ? 'active' : ''}`}></span>
                     <span className={`hamburger-line ${isMobileMenuOpen ? 'active' : ''}`}></span>
@@ -181,93 +157,59 @@ export default function Header() {
                         <Link to="/" className="nav-link">INICIO</Link>
                     </div>
 
-
                     {/* Perfil do Usuário */}
                     <div className="user-profile" ref={userProfileDropdownRef} onClick={toggleUserProfile}>
-                        <img 
-                            src={require("../../assets/images/user-profile 1.png")} 
-                            alt="Avatar" 
-                            className="avatar" 
+                        <img
+                            src={require("../../assets/images/user-profile 1.png")}
+                            alt="Avatar"
+                            className="avatar"
                         />
-                        <span className="username">{userData?.nome || 'USUARIO'}</span>
-                        
+                        {/* ****** CORREÇÃO AQUI ****** */}
+                        {/* Usar 'user' em vez de 'userData' */}
+                        <span className="username">{user?.nome || 'USUARIO'}</span>
+
                         {/* Dropdown Menu do Perfil */}
                         {isUserProfileOpen && (
                             <div className="user-profile-dropdown">
+                                {/* ... (conteúdo do dropdown, sem alterações, mas a condição abaixo agora usa 'user') ... */}
                                 <div className="user-dropdown-arrow"></div>
                                 <div className="user-dropdown-content">
-                                    <div 
-                                        className="user-dropdown-item" 
-                                        onClick={() => handleUserProfileClick('MINHA CONTA')}
-                                    >
-                                        MINHA CONTA
-                                    </div>
-                                    <div 
-                                        className="user-dropdown-item" 
-                                        onClick={() => handleUserProfileClick('USUÁRIOS')}
-                                    >
-                                        USUÁRIOS
-                                    </div>
-                                    {/* Opção de administrador - apenas para usuários ADM */}
-                                    {(userData?.permissoes === 'ADM' || userData?.tipoUsuario === 'ADM') && (
-                                        <div 
-                                            className="user-dropdown-item admin-item" 
-                                            onClick={() => handleUserProfileClick('ADMIN USUÁRIOS')}
-                                        >
-                                            ADMIN USUÁRIOS
-                                        </div>
+                                    <div className="user-dropdown-item" onClick={() => handleUserProfileClick('MINHA CONTA')}>MINHA CONTA</div>
+                                    <div className="user-dropdown-item" onClick={() => handleUserProfileClick('USUÁRIOS')}>USUÁRIOS</div>
+                                    {/* ****** CORREÇÃO AQUI (se aplicável) ****** */}
+                                    {/* Usar 'user' para verificar permissões */}
+                                    {(user?.permissoes === 'ADM' || user?.tipoUsuario === 'ADM') && (
+                                        <div className="user-dropdown-item admin-item" onClick={() => handleUserProfileClick('ADMIN USUÁRIOS')}>ADMIN USUÁRIOS</div>
                                     )}
-                                    <div 
-                                        className="user-dropdown-item" 
-                                        onClick={() => handleUserProfileClick('SAIR')}
-                                    >
-                                        SAIR
-                                    </div>
+                                    <div className="user-dropdown-item" onClick={() => handleUserProfileClick('SAIR')}>SAIR</div>
                                 </div>
                             </div>
                         )}
                     </div>
 
-                    {/* TESTE: Sempre mostrar para debug */}
+                    {/* Seção de Pontos */}
                     <div className="points-section">
-                        <img 
-                            src={require("../../assets/images/image 33.png")} 
-                            alt="Medalha" 
-                            className="medal-icon" 
+                        <img
+                            src={require("../../assets/images/image 33.png")}
+                            alt="Medalha"
+                            className="medal-icon"
                         />
-                        <span className="points-number">{userData ? userData.pontuacao : '0'}</span>
+                        {/* ****** CORREÇÃO AQUI ****** */}
+                        {/* Usar 'user' em vez de 'userData' */}
+                        <span className="points-number">{user ? user.pontuacao : '0'}</span>
                     </div>
 
+                    {/* Seção de Configurações (sem alterações na lógica de dados) */}
                     <div className="settings-section" ref={settingsDropdownRef} onClick={toggleSettings}>
-                        <img 
-                            src={require("../../assets/images/settings 1.png")} 
-                            alt="Configurações" 
-                            className="settings-icon"
-                        />
-                        
-                        {/* Dropdown Menu */}
+                        {/* ... (ícone e dropdown de configurações) ... */}
+                        <img src={require("../../assets/images/settings 1.png")} alt="Configurações" className="settings-icon" />
                         {isSettingsOpen && (
                             <div className="settings-dropdown">
                                 <div className="dropdown-arrow"></div>
                                 <div className="dropdown-content">
-                                    <div 
-                                        className="dropdown-item" 
-                                        onClick={() => handleSettingsClick('TERMOS')}
-                                    >
-                                        TERMOS
-                                    </div>
-                                    <div 
-                                        className="dropdown-item" 
-                                        onClick={() => handleSettingsClick('CONTATO')}
-                                    >
-                                        CONTATO
-                                    </div>
-                                    <div 
-                                        className="dropdown-item" 
-                                        onClick={() => handleSettingsClick('SAIR')}
-                                    >
-                                        SAIR
-                                    </div>
+                                    <div className="dropdown-item" onClick={() => handleSettingsClick('TERMOS')}>TERMOS</div>
+                                    <div className="dropdown-item" onClick={() => handleSettingsClick('CONTATO')}>CONTATO</div>
+                                    <div className="dropdown-item" onClick={() => handleSettingsClick('SAIR')}>SAIR</div>
                                 </div>
                             </div>
                         )}
@@ -275,75 +217,42 @@ export default function Header() {
                 </div>
             </div>
 
-            {/* Menu Mobile Overlay */}
+            {/* Menu Mobile Overlay (sem alterações na lógica de dados, mas a condição abaixo usa 'user') */}
             {isMobileMenuOpen && (
                 <div className="mobile-menu-overlay" onClick={toggleMobileMenu}>
                     <div className="mobile-menu" onClick={(e) => e.stopPropagation()}>
-                        {/* Header do Menu Mobile */}
+                        {/* ... (Header do menu mobile) ... */}
                         <div className="mobile-menu-header">
                             <span className="mobile-menu-title">MENU</span>
                         </div>
 
-                        {/* Perfil do Usuário no Menu Mobile */}
+                        {/* Perfil no Menu Mobile */}
                         <div className="mobile-user-profile">
                             <div className="mobile-user-info">
-                                <img 
-                                    src={require("../../assets/images/user-profile 1.png")} 
-                                    alt="Avatar" 
-                                    className="mobile-avatar" 
-                                />
+                                <img src={require("../../assets/images/user-profile 1.png")} alt="Avatar" className="mobile-avatar" />
                                 <div className="mobile-user-details">
-                                    <span className="mobile-username">{userData ? userData.nome : 'USUARIO'}</span>
+                                    {/* ****** CORREÇÃO AQUI ****** */}
+                                    {/* Usar 'user' */}
+                                    <span className="mobile-username">{user ? user.nome : 'USUARIO'}</span>
                                     <div className="mobile-points">
-                                        <img 
-                                            src={require("../../assets/images/image 33.png")} 
-                                            alt="Medalha" 
-                                            className="mobile-medal" 
-                                        />
-                                        <span className="mobile-points-number">{userData ? userData.pontuacao : '0'}</span>
+                                        <img src={require("../../assets/images/image 33.png")} alt="Medalha" className="mobile-medal" />
+                                        {/* ****** CORREÇÃO AQUI ****** */}
+                                        {/* Usar 'user' */}
+                                        <span className="mobile-points-number">{user ? user.pontuacao : '0'}</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Opções do Menu Mobile */}
+                        {/* Opções do Menu Mobile (sem alterações na lógica de dados) */}
                         <div className="mobile-menu-options">
-                            <div 
-                                className="mobile-menu-item"
-                                onClick={() => handleMobileMenuClick('INICIO')}
-                            >
-                                INICIO
-                            </div>
-                            <div 
-                                className="mobile-menu-item"
-                                onClick={() => handleMobileMenuClick('TERMOS')}
-                            >
-                                TERMOS
-                            </div>
-                            <div 
-                                className="mobile-menu-item"
-                                onClick={() => handleMobileMenuClick('CONTATO')}
-                            >
-                                CONTATO
-                            </div>
-                            <div 
-                                className="mobile-menu-item"
-                                onClick={() => handleMobileMenuClick('MINHA CONTA')}
-                            >
-                                MINHA CONTA
-                            </div>
-                            <div 
-                                className="mobile-menu-item"
-                                onClick={() => handleMobileMenuClick('USUÁRIOS')}
-                            >
-                                USUÁRIOS
-                            </div>
-                            <div 
-                                className="mobile-menu-item mobile-menu-item-logout"
-                                onClick={() => handleMobileMenuClick('SAIR')}
-                            >
-                                SAIR
-                            </div>
+                            {/* ... (itens do menu mobile) ... */}
+                            <div className="mobile-menu-item" onClick={() => handleMobileMenuClick('INICIO')}>INICIO</div>
+                            <div className="mobile-menu-item" onClick={() => handleMobileMenuClick('TERMOS')}>TERMOS</div>
+                            <div className="mobile-menu-item" onClick={() => handleMobileMenuClick('CONTATO')}>CONTATO</div>
+                            <div className="mobile-menu-item" onClick={() => handleMobileMenuClick('MINHA CONTA')}>MINHA CONTA</div>
+                            <div className="mobile-menu-item" onClick={() => handleMobileMenuClick('USUÁRIOS')}>USUÁRIOS</div>
+                            <div className="mobile-menu-item mobile-menu-item-logout" onClick={() => handleMobileMenuClick('SAIR')}>SAIR</div>
                         </div>
                     </div>
                 </div>

@@ -6,43 +6,44 @@ export const getSalas = async () => {
   return response.data;
 };
 
-// Buscar sala por ID
+// Buscar sala por ID (Numérico) - Mantemos esta função caso seja usada em outro lugar
 export const getSalaById = async (id) => {
   const response = await api.get(`/salas/${id}`);
   return response.data;
 };
 
-// --- CORREÇÃO AQUI ---
-// Criar nova sala (requer autenticação - token adicionado pelo api.js)
+// Criar nova sala
 export const createSala = async (salaData) => {
-  // const token = sessionStorage.getItem('token'); // REMOVIDO
+  const response = await api.post("/salas", salaData);
+  return response.data;
+};
+
+// --- CORREÇÃO APLICADA AQUI ---
+// Entrar em uma sala (requer autenticação)
+// Agora recebe o CODIGO (String) da sala, não o ID (Number)
+export const entrarNaSala = async (codigoSala, idUsuario) => {
   const response = await api.post(
-    "/salas",
-    salaData /*, { headers: ... } REMOVIDO */
+    // Usa o CODIGO (String) na URL, como o backend espera
+    `/salas/${codigoSala}/entrar/${idUsuario}`
   );
   return response.data;
 };
 // --- FIM DA CORREÇÃO ---
 
-// Entrar em uma sala (requer autenticação - token adicionado pelo api.js)
-export const entrarNaSala = async (idSala, idUsuario) => {
-  // const token = sessionStorage.getItem('token'); // REMOVIDO
-  const response = await api.post(
-    `/salas/${idSala}/entrar/${idUsuario}` /*, {}, { headers: ... } REMOVIDO */
-  );
+// Busca sala pelo código PIN (String) - ATENÇÃO AO CAMINHO DA API
+// Seu controller usa /salas/codigo/{codigo}, então ajustei aqui.
+export const getSalaByPin = async (pin) => {
+  // Verifique se o caminho no backend é realmente /salas/codigo/{codigo}
+  // Se for /salas/pin/{pin}, volte para `/salas/pin/${pin}`
+  const response = await api.get(`/salas/codigo/${pin}`);
   return response.data;
 };
 
-// Busca sala pelo código PIN (requer autenticação)
-export const getSalaByPin = async (pin) => {
-  const response = await api.get(`/salas/pin/${pin}`);
-  return response.data;
-};
 
 export default {
   getSalas,
   getSalaById,
   createSala,
-  entrarNaSala,
-  getSalaByPin, // Exporta a nova função
+  entrarNaSala, // Exporta a função corrigida
+  getSalaByPin,
 };

@@ -1,61 +1,92 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '../../components/header';
+import salaService from '../../services/salaService';
+// 1. CAMINHO DE IMPORTAÇÃO CORRIGIDO
+import { useAuth } from '../../hooks/useAuth';
 import './style.css';
 
 export default function Sala() {
   const location = useLocation();
   const navigate = useNavigate();
-  const codigo = location.state?.codigo || '000000';
+  const { user } = useAuth(); // Pega o usuário logado
+
+  const codigo = location.state?.codigo || null;
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // Função para buscar usuários da sala do backend
-  const fetchUsuarios = async () => {
-    try {
-      setLoading(true);
-      // TODO: Substituir pela URL real da API
-      // const response = await fetch(`/api/salas/${codigo}/usuarios`);
-      // const data = await response.json();
-      // setUsuarios(data);
-      
-      // Dados de exemplo - remover quando conectar ao backend
-      const usuariosExemplo = [
-        { id: 1, nome: 'João Silva', avatar: null },
-        { id: 2, nome: 'Maria Santos', avatar: null },
-        { id: 3, nome: 'Pedro Costa', avatar: null },
-        { id: 4, nome: 'Ana Oliveira', avatar: null },
-        { id: 5, nome: 'Carlos Lima', avatar: null },
-        { id: 6, nome: 'Julia Ferreira', avatar: null }
-      ];
-      setUsuarios(usuariosExemplo);
-    } catch (error) {
-      console.error('Erro ao buscar usuários:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [salaInfo, setSalaInfo] = useState(null);
+  const [isDonoDaSala, setIsDonoDaSala] = useState(false);
 
   useEffect(() => {
-    fetchUsuarios();
+    // Se não tiver um código ou um usuário, volta ao menu
+    if (!codigo || !user || !user.id) {
+      navigate('/game');
+      return;
+    }
+
+    const fetchSalaData = async () => {
+      try {
+        // Não seta loading=true aqui para o refresh ser mais suave
+        const sala = await salaService.getSalaByPin(codigo);
+
+        setSalaInfo(sala);
+
+        // Verifica se o usuário logado é o criador
+        if (sala.idUsuario === user.id) {
+          setIsDonoDaSala(true);
+        }
+
+        // Define a lista de participantes
+        if (sala && Array.isArray(sala.participantes)) {
+          setUsuarios(sala.participantes);
+        } else if (sala && Array.isArray(sala.idParticipantes)) {
+          setUsuarios(sala.idParticipantes);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar dados da sala:', error);
+        navigate('/game');
+      } finally {
+        setLoading(false); // Seta o loading como falso só na primeira vez
+      }
+    };
+
+    fetchSalaData(); // Busca na primeira vez
+
+    // Atualiza a lista de usuários a cada 5 segundos (Polling)
+    const interval = setInterval(() => {
+      fetchSalaData();
+    }, 5000);
+
+    // Limpa o intervalo quando o componente é desmontado
+    return () => clearInterval(interval);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [codigo]);
+  }, [codigo, navigate, user]); // Depende do 'user' para garantir que ele foi carregado
 
   const handleDesmanchar = async () => {
     try {
-      // TODO: Chamar API para desmanchar sala
-      // await fetch(`/api/salas/${codigo}`, { method: 'DELETE' });
-      navigate('/game');
+      if (salaInfo && isDonoDaSala && window.confirm("Tem certeza?")) {
+        // TODO: Adicionar salaService.deleteSala(salaInfo.idSala)
+        console.log("Desmanchando sala (simulação)...");
+        navigate('/game');
+      } else if (!isDonoDaSala) {
+        // Lógica para SAIR da sala (se não for o dono)
+        // TODO: Adicionar salaService.sairDaSala(salaInfo.idSala, user.id)
+        console.log("Saindo da sala (simulação)...");
+        navigate('/game');
+      }
     } catch (error) {
-      console.error('Erro ao desmanchar sala:', error);
+      console.error('Erro ao desmanchar/sair da sala:', error);
     }
   };
 
   const handleIniciar = async () => {
     try {
-      // TODO: Chamar API para iniciar jogo
-      // await fetch(`/api/salas/${codigo}/iniciar`, { method: 'POST' });
-      navigate('/jogo');
+      if (salaInfo && isDonoDaSala) {
+        // TODO: Adicionar salaService.iniciarSala(salaInfo.idSala)
+        console.log("Iniciando jogo (simulação)...");
+        navigate('/jogo');
+      }
     } catch (error) {
       console.error('Erro ao iniciar jogo:', error);
     }
@@ -70,28 +101,37 @@ export default function Sala() {
 
           <div className="sala-actions">
             <button className="btn btn-danger" onClick={handleDesmanchar}>
-              DESMANCHAR<br />SALA
+              {isDonoDaSala ? "DESMANCHAR\nSALA" : "SAIR DA\nSALA"}
             </button>
-            <button className="btn btn-warning" onClick={handleIniciar}>
-              INICIAR
-            </button>
+
+            {isDonoDaSala && (
+              <button className="btn btn-warning" onClick={handleIniciar}>
+                INICIAR
+              </button>
+            )}
           </div>
 
           <div className="sala-grid">
             {loading ? (
               <div className="sala-mensagem">Carregando...</div>
             ) : usuarios.length === 0 ? (
-              <div className="sala-mensagem">Nenhum usuário na sala</div>
+              <div className="sala-mensagem">Aguardando jogadores...</div>
             ) : (
               usuarios.map((usuario) => (
                 <div key={usuario.id} className="sala-user">
-                  <div 
-                    className="sala-avatar" 
-                    style={{ 
+                  <div
+                    className="sala-avatar"
+                    style={{
                       backgroundImage: usuario.avatar ? `url(${usuario.avatar})` : undefined 
                     }}
                   />
-                  <div className="nome">{usuario.nome || 'Usuário'}</div>
+                  {/* Destaca o nome do próprio usuário */}
+                  <div
+                    className="nome"
+                    style={{ fontWeight: user && usuario.id === user.id ? 'bold' : 'normal' }}
+                  >
+                    {usuario.nome || 'Usuário'}
+                  </div>
                 </div>
               ))
             )}

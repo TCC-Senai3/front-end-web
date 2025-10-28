@@ -1,8 +1,12 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
+// 1. IMPORTAR O AuthProvider
+import { AuthProvider } from './hooks/useAuth'; // <-- Caminho correto
+
+// Seus imports de páginas
 import Login from './pages/Login';
 import Home from './pages/Home';
-import Contato from './pages/Contato'; 
+import Contato from './pages/Contato';
 import Game from './pages/Game';
 import Jogo from './pages/Jogo';
 import CreateQuiz from './pages/CreateQuiz';
@@ -14,8 +18,8 @@ import PerfilModal from './pages/PerfilModal';
 import Suporte from './pages/Suporte';
 import Termos from './pages/Termos';
 import PinPage from './pages/PinPage';
-import Correto from'./components/correto';
-import Errado from'./components/errado';
+import Correto from './components/correto';
+import Errado from './components/errado';
 import LoadHost from './pages/LoadHost';
 import Usuarios from './pages/Usuarios';
 import AdminUsers from './pages/AdminUsers';
@@ -28,15 +32,14 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 import './assets/font/imports.css';
 
+// Componente ScrollToHashElement (sem alterações)
 function ScrollToHashElement() {
     const location = useLocation();
-    
+
     useEffect(() => {
         if (location.hash) {
             const elementId = location.hash.substring(1);
-            
             const element = document.getElementById(elementId);
-            
             if (element) {
                 setTimeout(() => {
                     element.scrollIntoView({ behavior: 'smooth' });
@@ -46,20 +49,22 @@ function ScrollToHashElement() {
             window.scrollTo(0, 0);
         }
     }, [location]);
-    
+
     return null;
 }
 
+// Componente AppContent (agora com a lista de rotas COMPLETA)
 function AppContent() {
     return (
         <>
             <ScrollToHashElement />
             <Routes>
+                {/* ****** CORREÇÃO AQUI: LISTA COMPLETA DE VOLTA ****** */}
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/contato" element={<Contato />} />
                 <Route path="/SkillHelp" element={<Contato />} />
-                <Route path="/game" element={<Game />} />
+                <Route path="/game" element={<Game />} /> {/* <-- A ROTA QUE FALTAVA */}
                 <Route path="/jogo" element={<Jogo />} />
                 <Route path="/perfil" element={<PerfilModal isMyProfile={true} />} />
                 <Route path="/suporte" element={<Suporte />} />
@@ -94,10 +99,13 @@ function AppContent() {
     );
 }
 
+// Componente App Principal (Estrutura correta com AuthProvider)
 export default function App() {
     return (
         <Router>
-            <AppContent />
+            <AuthProvider>
+                <AppContent />
+            </AuthProvider>
         </Router>
     );
 }

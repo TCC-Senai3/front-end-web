@@ -1,116 +1,106 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Header from '../../components/header';
-import temaService from '../../services/temaService';
-import salaService from '../../services/salaService';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import slogan from '../../assets/images/slogan com brilhos.svg';
 import './style.css';
+import Header from '../../components/header';
+import salaService from "../../services/salaService";
+import { useAuth } from '../../hooks/useAuth';
 
-export default function CriarSala() {
+export default function PinPage() {
   const navigate = useNavigate();
-  const [questionario, setQuestionario] = useState('');
-  const [temas, setTemas] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { user } = useAuth(); // Pega o usuário logado
+
+  const [pin, setPin] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [criandoSala, setCriandoSala] = useState(false);
 
-  // Carregar temas ao montar o componente
   useEffect(() => {
-    const carregarTemas = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await temaService.getTemas();
-        setTemas(data);
-      } catch (err) {
-        console.error('Erro ao carregar temas:', err);
-        setError('Erro ao carregar questionários');
-      } finally {
-        setLoading(false);
-      }
+    document.body.classList.add('pinpage-body');
+    document.documentElement.classList.add('pinpage-html');
+    return () => {
+      document.body.classList.remove('pinpage-body');
+      document.documentElement.classList.remove('pinpage-html');
     };
-
-    carregarTemas();
   }, []);
 
-  const handleCriar = async () => {
-    if (!questionario) {
-      alert('Por favor, selecione um questionário');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!pin || pin.length < 6) {
+      setError("PIN inválido. Deve ter 6 dígitos.");
       return;
     }
-    
-    try {
-      setCriandoSala(true);
-      
-      // Criar sala via API
-      const salaData = {
-        idTema: questionario,
-        // Adicione outros campos necessários conforme a API
-      };
-      
-      const sala = await salaService.createSala(salaData);
-      
-      console.log('Sala criada:', sala);
-      
-      // Redireciona para a sala (lobby) com os dados da sala criada
-      navigate('/sala', { 
-        state: { 
-          codigo: sala.codigo || sala.id,
-          idSala: sala.id,
-          questionario: sala.idTema
-        } 
-      });
-    } catch (err) {
-      console.error('Erro ao criar sala:', err);
-      alert('Erro ao criar sala. Tente novamente.');
-    } finally {
-      setCriandoSala(false);
-    }
-  };
 
-  const handleFechar = () => {
-    navigate('/game');
+    // Validação do usuário
+    if (!user || !user.id) {
+      alert("Erro: Usuário não autenticado. Faça login novamente.");
+      navigate('/login');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const idUsuarioLogado = user.id; // ID dinâmico
+
+      // Busca a sala pelo PIN digitado (que é o 'codigoSala')
+      const sala = await salaService.getSalaByPin(pin);
+      // Validação mais robusta da resposta
+      if (!sala || !sala.idSala || !sala.codigoSala) {
+        throw new Error("Sala não encontrada com este PIN ou resposta da API inválida.");
+      }
+
+      // Pega o CÓDIGO retornado pela API para usar na próxima chamada
+      const pinDaSala = sala.codigoSala;
+      // const idDaSala = sala.idSala; // Não precisamos mais do ID numérico aqui
+
+      // ****** CORREÇÃO APLICADA AQUI ******
+      // Passamos o CÓDIGO ('pinDaSala') para a função entrarNaSala
+      await salaService.entrarNaSala(pinDaSala, idUsuarioLogado);
+
+      navigate('/sala', { state: { codigo: pinDaSala } }); // Navega usando o código
+
+    } catch (err) {
+      console.error("Erro ao entrar na sala:", err);
+      // Tratamento de erro mais específico
+      if (err.message.includes("Sala não encontrada")) {
+        setError("PIN não encontrado.");
+      } else if (err.response && err.response.status === 403) {
+        setError("Você não tem permissão para entrar nesta sala.");
+      } else {
+        const apiErrorMessage = err.response?.data?.message || err.response?.data || err.message;
+        setError(`Falha ao entrar na sala: ${apiErrorMessage || 'Tente novamente.'}`);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <>
+    <div className="pinpage-bg">
       <Header />
-      <div className="criar-sala-container">
-        <div className="criar-sala-content">
-          <h1 className="criar-sala-title">CRIAR SALA</h1>
-          
-          <div className="sala-card">
-            <button className="close-btn" onClick={handleFechar}>×</button>
-            
-            <div className="form-group">
-              <label className="form-label">Título do questionário</label>
-              <select 
-                value={questionario} 
-                onChange={(e) => setQuestionario(e.target.value)}
-                className="form-select"
-                disabled={loading || criandoSala}
-              >
-                <option value="">
-                  {loading ? 'Carregando...' : 'Selecione o Questionário'}
-                </option>
-                {!loading && !error && temas.map((tema) => (
-                  <option key={tema.id} value={tema.id}>
-                    {tema.nomeTema || tema.nome}
-                  </option>
-                ))}
-                {error && <option value="" disabled>{error}</option>}
-              </select>
-            </div>
-
-            <button 
-              className="criar-btn" 
-              onClick={handleCriar}
-              disabled={loading || criandoSala}
-            >
-              {criandoSala ? 'CRIANDO...' : 'CRIAR'}
-            </button>
-          </div>
-        </div>
+      <div className="pinpage-center">
+        <img src={slogan} alt="SENAI SKILL UP" className="pinpage-logo" />
+        <form className="pinpage-form" onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="PIN do jogo"
+            className="pinpage-input"
+            value={pin}
+            onChange={(e) => setPin(e.target.value.toUpperCase())}
+            maxLength={6}
+            disabled={loading}
+          />
+          <button
+            type="submit"
+            className="pinpage-btn"
+            disabled={loading}
+          >
+            {loading ? "ENTRANDO..." : "ENTRAR"}
+          </button>
+          {error && <p style={{ color: 'white', marginTop: '10px' }}>{error}</p>}
+        </form>
       </div>
-    </>
+    </div>
   );
 }
