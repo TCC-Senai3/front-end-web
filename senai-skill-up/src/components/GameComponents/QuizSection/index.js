@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import SearchIcon from "../../../assets/images/search 1.svg";
 import "./style.css";
-import { getTemas, getPerguntasByTema } from "../../../services/quizService";
+// Importa a função correta
+import { getFormularios } from "../../../services/quizService"; 
 import Loader from "../../common/Loader";
 
 export default function QuizSection({ onQuizSelect }) {
@@ -10,41 +11,61 @@ export default function QuizSection({ onQuizSelect }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const loadQuestionarios = async () => {
-            try {
-                setLoading(true);
-                
-                // Buscar temas do backend
-                const temasResponse = await getTemas();
-                const temas = temasResponse.data || [];
-                
-                // Converter temas em questionários
-                const questionariosComPerguntas = temas.map(tema => ({
-                    id: tema.id,
-                    titulo: tema.nome,
-                    descricao: tema.descricao,
-                    materia: tema.nome,
-                    dificuldade: tema.dificuldade || 'Médio',
-                    totalPerguntas: tema.totalPerguntas || 0,
-                    tempoLimite: tema.tempoLimite || 15,
-                    perguntas: [] // Será carregado quando o quiz for selecionado
-                }));
+    // Esta função agora busca 'formularios'
+    const loadFormularios = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            
+            // Chama a nova função
+            const formulariosResponse = await getFormularios();
 
-                setQuestionarios(questionariosComPerguntas);
-                setError(null);
-            } catch (err) {
-                console.error('Erro ao carregar questionários:', err);
-                setError('Não foi possível carregar os questionários. Tente novamente mais tarde.');
-                setQuestionarios([]);
-            } finally {
-                setLoading(false);
+            // Valida a resposta
+            if (!formulariosResponse.success || !Array.isArray(formulariosResponse.data)) {
+                console.error('Falha ao buscar formulários:', formulariosResponse.message);
+                throw new Error('Não foi possível carregar os questionários.');
             }
-        };
 
-        loadQuestionarios();
-    }, []);
+            const formularios = formulariosResponse.data;
 
+            // Mapeia os dados de 'formulario' para 'questionario'
+            // JSON esperado: { idFormulario, titulo, perguntas: [...] }
+            const questionariosMapeados = formularios.map(form => {
+                const perguntas = form.perguntas || [];
+                return {
+                    id: form.idFormulario,
+                    titulo: form.titulo,
+                    // Criamos uma descrição padrão
+                    descricao: `Um quiz baseado no ${form.titulo}.`, 
+                    materia: form.titulo,
+                    dificuldade: 'Média', 
+                    tempoLimite: 15, 
+                    perguntas: perguntas,
+                    totalPerguntas: perguntas.length,
+                    error: false 
+                };
+            });
+
+            // Filtramos quizzes que podem ter vindo sem perguntas
+            const quizzesValidos = questionariosMapeados.filter(q => q.totalPerguntas > 0);
+            setQuestionarios(quizzesValidos);
+            
+        } catch (err) {
+            console.error('Erro ao carregar questionários (formulários):', err);
+            setError(err.message || 'Não foi possível carregar os questionários. Tente novamente mais tarde.');
+            setQuestionarios([]);
+        } finally {
+            setLoading(false);
+        }
+    }, []); // Array de dependências do useCallback
+
+    // O useEffect chama a função de carregar
+    useEffect(() => {
+        loadFormularios();
+    }, [loadFormularios]);
+
+    
+    // O filtro continua funcionando
     const filteredQuestions = questionarios.filter(q =>
         q.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
         q.descricao.toLowerCase().includes(searchTerm.toLowerCase())
@@ -74,9 +95,10 @@ export default function QuizSection({ onQuizSelect }) {
                 ) : error ? (
                     <div className="error-message">
                         <p>{error}</p>
+                        {/* O botão de retry agora chama a função correta */}
                         <button 
                             className="retry-button"
-                            onClick={() => window.location.reload()}
+                            onClick={loadFormularios} 
                         >
                             Tentar novamente
                         </button>
@@ -87,14 +109,14 @@ export default function QuizSection({ onQuizSelect }) {
                             key={q.id} 
                             className={`questionarios-item ${q.error ? 'error' : ''}`}
                         >
+                            {/* Recomendação: Adicionar uma imagem de placeholder */}
                             <div className="questionarios-item-img"></div>
                             <div>
                                 <div className="questionarios-item-titulo">
                                     {q.titulo}
-                                    {q.error && <span className="error-badge">Erro</span>}
                                 </div>
                                 <div className="questionarios-item-desc">
-                                    {q.error ? 'Não foi possível carregar as perguntas deste questionário.' : q.descricao}
+                                    {q.descricao}
                                 </div>
                                 <button 
                                     className="questionarios-item-btn" 
@@ -104,6 +126,7 @@ export default function QuizSection({ onQuizSelect }) {
                                             onQuizSelect(q);
                                         }
                                     }}
+                                    // A lógica do botão agora funciona
                                     disabled={q.error || q.perguntas.length === 0}
                                 >
                                     {q.error ? 'Indisponível' : q.perguntas.length === 0 ? 'Sem perguntas' : 'JOGAR'}
@@ -113,7 +136,7 @@ export default function QuizSection({ onQuizSelect }) {
                     ))
                 ) : (
                     <div className="questionarios-empty">
-                        <p>Nenhum questionário encontrado.</p>
+                        <p>{searchTerm ? 'Nenhum questionário encontrado.' : 'Nenhum questionário disponível no momento.'}</p>
                         {searchTerm && (
                             <button 
                                 className="clear-search"

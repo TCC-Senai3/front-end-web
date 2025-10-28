@@ -3,7 +3,7 @@ import api from './api';
 // Buscar ranking global
 export const getRankingGlobal = async () => {
   try {
-    const response = await api.get('/ranking/global');
+    const response = await api.get('/ranking/geral');
     return {
       success: true,
       data: response.data
@@ -105,7 +105,7 @@ export const getEstatisticasUsuario = async (userId) => {
 // Buscar top usuários
 export const getTopRanking = async (limit = 10) => {
   try {
-    const response = await api.get('/ranking/top', { params: { limit } });
+    const response = await api.get('/ranking/geral', { params: { limit } });
     return {
       success: true,
       data: response.data

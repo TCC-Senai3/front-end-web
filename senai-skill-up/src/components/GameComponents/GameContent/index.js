@@ -54,7 +54,7 @@ export default function GameContent() {
 
     const handleQuizSelect = (questionario) => {
         // Navegar para a página do jogo/quiz com o tema selecionado
-        navigate('/jogo', { state: { temaId: questionario?.id } });
+        navigate('/jogo', { state: { quizSelecionado: questionario } });
     };
 
     const nextSlide = () => {

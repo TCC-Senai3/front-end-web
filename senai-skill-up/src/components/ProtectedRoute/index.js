@@ -1,98 +1,44 @@
 import React from 'react';
-import { usePermissions } from '../../hooks/usePermissions';
-import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { usePermissions } from '../../hooks/usePermissions'; // Importa o hook corrigido
 
-// Componente para proteger rotas baseado em permissões
-const ProtectedRoute = ({ 
-  children, 
-  requiredPermission = null, 
-  requiredRole = null,
-  fallbackPath = '/login',
-  showUnauthorized = true 
-}) => {
-  const { 
-    isLoggedIn, 
-    loading, 
-    hasPermission, 
-    userData,
-    isAdmin,
-    canCreateQuiz,
-    canManageUsers,
-    canAccessAdmin
-  } = usePermissions();
-  
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!loading) {
-      // Se não estiver logado, redirecionar para login
-      if (!isLoggedIn) {
-        navigate(fallbackPath);
-        return;
-      }
-
-      // Verificar permissões específicas
-      if (requiredPermission && !hasPermission(requiredPermission)) {
-        if (showUnauthorized) {
-          alert('❌ Você não tem permissão para acessar esta página.');
-        }
-        navigate('/unauthorized');
-        return;
-      }
-
-      // Verificar roles específicas
-      if (requiredRole) {
-        let hasRequiredRole = false;
-        
-        switch (requiredRole) {
-          case 'ADMIN':
-            hasRequiredRole = isAdmin;
-            break;
-          case 'CREATOR':
-            hasRequiredRole = canCreateQuiz;
-            break;
-          case 'USER_MANAGER':
-            hasRequiredRole = canManageUsers;
-            break;
-          default:
-            hasRequiredRole = userData?.tipoUsuario === requiredRole || 
-                             userData?.role === requiredRole;
-        }
-
-        if (!hasRequiredRole) {
-          if (showUnauthorized) {
-            alert('❌ Você não tem permissão para acessar esta página.');
-          }
-          navigate('/unauthorized');
-          return;
-        }
-      }
-    }
-  }, [isLoggedIn, loading, requiredPermission, requiredRole, navigate, fallbackPath, showUnauthorized]);
-
-  // Mostrar loading enquanto verifica permissões
-  if (loading) {
-    return (
-      <div style={{ 
+// Crie ou importe seu componente de Loader
+const Loader = () => (
+    <div style={{ 
         display: 'flex', 
         justifyContent: 'center', 
         alignItems: 'center', 
         height: '100vh',
         fontSize: '18px'
-      }}>
-        Verificando permissões...
-      </div>
-    );
-  }
+    }}>
+        Carregando...
+    </div>
+);
 
-  // Se não estiver logado, não renderizar nada (será redirecionado)
-  if (!isLoggedIn) {
-    return null;
-  }
+export default function ProtectedRoute({ children, requiredRole }) {
+  // Pega os dados do hook de permissões
+  const { isLoggedIn, loading, hasPermission } = usePermissions();
+  const location = useLocation();
 
-  // Renderizar o conteúdo protegido
-  return children;
-};
+  // 1. Se o hook 'useAuth' ainda está carregando, mostra o loader
+  if (loading) {
+    return <Loader />;
+  }
 
-export default ProtectedRoute;
+  // 2. Se não estiver logado, redireciona para o login
+  if (!isLoggedIn) {
+    // Salva a página que o usuário tentou acessar
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // 3. Se estiver logado, mas não tiver a 'requiredRole'
+  // A função 'hasPermission' agora está correta
+  if (requiredRole && !hasPermission(requiredRole)) {
+    // Redireciona para a página de "Não Autorizado"
+    console.warn(`ProtectedRoute: Acesso negado. Rota [${location.pathname}] requer [${requiredRole}]`);
+    return <Navigate to="/unauthorized" replace />; 
+  }
+
+  // 4. Se passou em tudo (logado e com permissão), renderiza a página
+  return children;
+}

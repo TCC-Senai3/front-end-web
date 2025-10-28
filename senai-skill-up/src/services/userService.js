@@ -5,7 +5,7 @@ class UserService {
   // Buscar todos os usuários
   async getAllUsers() {
     try {
-      const response = await api.get('/users');
+      const response = await api.get('/usuarios');
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar usuários:', error);
@@ -16,7 +16,7 @@ class UserService {
   // Buscar usuário por ID
   async getUserById(userId) {
     try {
-      const response = await api.get(`/users/${userId}`);
+      const response = await api.get(`/usuario/${userId}`);
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar usuário:', error);

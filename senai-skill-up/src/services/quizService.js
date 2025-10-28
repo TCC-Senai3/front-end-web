@@ -1,210 +1,258 @@
-// Serviço de quiz preparado para backend Java
-import api from './api';
+
+
+import api from "./api"; 
 
 class QuizService {
   // Buscar todos os temas
   async getTemas() {
     try {
-      const response = await api.get('/temas', {
+      const response = await api.get("/temas", {
         useCache: true,
-        cacheTTL: 600000 // 10 minutos
+        cacheTTL: 600000, // 10 minutos
       });
-      return response.data;
+      return { success: true, data: response.data };
     } catch (error) {
-      console.error('Erro ao buscar temas:', error);
-      throw error;
+      console.error("Erro ao buscar temas:", error);
+      return {
+        success: false,
+        message: error.message || "Erro ao buscar temas",
+      };
     }
-  }
+  } 
 
-  // Buscar tema por ID
+  async getFormularios() {
+    try {
+      const response = await api.get("/formularios");
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error("Erro ao buscar formulários:", error);
+      return {
+        success: false,
+        message: error.message || "Erro ao buscar formulários",
+      };
+    }
+  } // Buscar tema por ID
+
   async getTemaById(temaId) {
     try {
       const response = await api.get(`/temas/${temaId}`);
-      return response.data;
+      return { success: true, data: response.data };
     } catch (error) {
-      console.error('Erro ao buscar tema:', error);
-      throw error;
+      console.error("Erro ao buscar tema:", error);
+      return {
+        success: false,
+        message: error.message || "Erro ao buscar tema",
+      };
     }
-  }
+  } // Criar novo tema
 
-  // Criar novo tema
   async createTema(temaData) {
     try {
-      const response = await api.post('/temas', temaData);
-      return response.data;
+      const response = await api.post("/temas", temaData);
+      return { success: true, data: response.data };
     } catch (error) {
-      console.error('Erro ao criar tema:', error);
-      throw error;
+      console.error("Erro ao criar tema:", error);
+      return { success: false, message: error.message || "Erro ao criar tema" };
     }
-  }
+  } // Atualizar tema
 
-  // Atualizar tema
   async updateTema(temaId, temaData) {
     try {
       const response = await api.put(`/temas/${temaId}`, temaData);
-      return response.data;
+      return { success: true, data: response.data };
     } catch (error) {
-      console.error('Erro ao atualizar tema:', error);
-      throw error;
+      console.error("Erro ao atualizar tema:", error);
+      return {
+        success: false,
+        message: error.message || "Erro ao atualizar tema",
+      };
     }
-  }
+  } // Deletar tema
 
-  // Deletar tema
   async deleteTema(temaId) {
     try {
       await api.delete(`/temas/${temaId}`);
-      return true;
+      return { success: true }; // Sucesso sem retorno de dados
     } catch (error) {
-      console.error('Erro ao deletar tema:', error);
-      throw error;
+      console.error("Erro ao deletar tema:", error);
+      return {
+        success: false,
+        message: error.message || "Erro ao deletar tema",
+      };
     }
-  }
+  } // Buscar todas as perguntas
 
-  // Buscar todas as perguntas
   async getPerguntas(params = {}) {
     try {
-      const response = await api.get('/perguntas', {
+      const response = await api.get("/perguntas", {
         params,
         useCache: true,
-        cacheTTL: 300000 // 5 minutos
+        cacheTTL: 300000, // 5 minutos
       });
-      return response.data;
+      return { success: true, data: response.data };
     } catch (error) {
-      console.error('Erro ao buscar perguntas:', error);
-      throw error;
+      console.error("Erro ao buscar perguntas:", error);
+      return {
+        success: false,
+        message: error.message || "Erro ao buscar perguntas",
+      };
     }
-  }
+  } // Buscar perguntas por tema
 
-  // Buscar perguntas por tema
   async getPerguntasByTema(temaId, params = {}) {
     try {
       const response = await api.get(`/perguntas/tema/${temaId}`, {
         params,
         useCache: true,
-        cacheTTL: 300000 // 5 minutos
+        cacheTTL: 300000, // 5 minutos
       });
-      return response.data;
+      return { success: true, data: response.data };
     } catch (error) {
-      console.error('Erro ao buscar perguntas:', error);
-      throw error;
+      console.error("Erro ao buscar perguntas:", error);
+      return {
+        success: false,
+        message: error.message || "Erro ao buscar perguntas",
+      };
     }
-  }
+  } // Buscar pergunta por ID
 
-  // Buscar pergunta por ID
   async getPerguntaById(perguntaId) {
     try {
       const response = await api.get(`/perguntas/${perguntaId}`);
-      return response.data;
+      return { success: true, data: response.data };
     } catch (error) {
-      console.error('Erro ao buscar pergunta:', error);
-      throw error;
+      console.error("Erro ao buscar pergunta:", error);
+      return {
+        success: false,
+        message: error.message || "Erro ao buscar pergunta",
+      };
     }
-  }
+  } // Criar nova pergunta
 
-  // Criar nova pergunta
   async createPergunta(perguntaData) {
     try {
-      const response = await api.post('/perguntas', perguntaData);
-      return response.data;
+      const response = await api.post("/perguntas", perguntaData);
+      return { success: true, data: response.data };
     } catch (error) {
-      console.error('Erro ao criar pergunta:', error);
-      throw error;
+      console.error("Erro ao criar pergunta:", error);
+      return {
+        success: false,
+        message: error.message || "Erro ao criar pergunta",
+      };
     }
-  }
+  } // Atualizar pergunta
 
-  // Atualizar pergunta
   async updatePergunta(perguntaId, perguntaData) {
     try {
       const response = await api.put(`/perguntas/${perguntaId}`, perguntaData);
-      return response.data;
+      return { success: true, data: response.data };
     } catch (error) {
-      console.error('Erro ao atualizar pergunta:', error);
-      throw error;
+      console.error("Erro ao atualizar pergunta:", error);
+      return {
+        success: false,
+        message: error.message || "Erro ao atualizar pergunta",
+      };
     }
-  }
+  } // Deletar pergunta
 
-  // Deletar pergunta
   async deletePergunta(perguntaId) {
     try {
       await api.delete(`/perguntas/${perguntaId}`);
-      return true;
+      return { success: true };
     } catch (error) {
-      console.error('Erro ao deletar pergunta:', error);
-      throw error;
+      console.error("Erro ao deletar pergunta:", error);
+      return {
+        success: false,
+        message: error.message || "Erro ao deletar pergunta",
+      };
     }
-  }
+  } // Buscar alternativas de uma pergunta
 
-  // Buscar alternativas de uma pergunta
   async getAlternativas(perguntaId) {
     try {
       const response = await api.get(`/perguntas/${perguntaId}/alternativas`);
-      return response.data;
+      return { success: true, data: response.data };
     } catch (error) {
-      console.error('Erro ao buscar alternativas:', error);
-      throw error;
+      console.error("Erro ao buscar alternativas:", error);
+      return {
+        success: false,
+        message: error.message || "Erro ao buscar alternativas",
+      };
     }
-  }
+  } // Submeter resposta do usuário
 
-  // Submeter resposta do usuário
   async submitResposta(respostaData) {
     try {
-      const response = await api.post('/respostas', respostaData);
-      return response.data;
+      const response = await api.post("/respostas", respostaData);
+      return { success: true, data: response.data };
     } catch (error) {
-      console.error('Erro ao submeter resposta:', error);
-      throw error;
+      console.error("Erro ao submeter resposta:", error);
+      return {
+        success: false,
+        message: error.message || "Erro ao submeter resposta",
+      };
     }
-  }
+  } // Buscar histórico de respostas do usuário
 
-  // Buscar histórico de respostas do usuário
   async getHistoricoUsuario(userId, params = {}) {
     try {
       const response = await api.get(`/usuarios/${userId}/historico`, {
         params,
         useCache: true,
-        cacheTTL: 60000 // 1 minuto
+        cacheTTL: 60000, // 1 minuto
       });
-      return response.data;
+      return { success: true, data: response.data };
     } catch (error) {
-      console.error('Erro ao buscar histórico:', error);
-      throw error;
+      console.error("Erro ao buscar histórico:", error);
+      return {
+        success: false,
+        message: error.message || "Erro ao buscar histórico",
+      };
     }
-  }
+  } // Obter estatísticas do usuário por tema
 
-  // Obter estatísticas do usuário por tema
   async getEstatisticasUsuarioTema(userId, temaId) {
     try {
-      const response = await api.get(`/usuarios/${userId}/tema/${temaId}/stats`);
-      return response.data;
+      const response = await api.get(
+        `/usuarios/${userId}/tema/${temaId}/stats`
+      );
+      return { success: true, data: response.data };
     } catch (error) {
-      console.error('Erro ao buscar estatísticas:', error);
-      throw error;
+      console.error("Erro ao buscar estatísticas:", error);
+      return {
+        success: false,
+        message: error.message || "Erro ao buscar estatísticas",
+      };
     }
-  }
+  } // Buscar perguntas aleatórias por tema
 
-  // Buscar perguntas aleatórias por tema
   async getPerguntasAleatorias(temaId, quantidade = 10) {
     try {
       const response = await api.get(`/perguntas/tema/${temaId}/random`, {
-        params: { quantidade }
+        params: { quantidade },
       });
-      return response.data;
+      return { success: true, data: response.data };
     } catch (error) {
-      console.error('Erro ao buscar perguntas aleatórias:', error);
-      throw error;
+      console.error("Erro ao buscar perguntas aleatórias:", error);
+      return {
+        success: false,
+        message: error.message || "Erro ao buscar perguntas aleatórias",
+      };
     }
-  }
+  } // Validar resposta
 
-  // Validar resposta
   async validarResposta(perguntaId, alternativaId) {
     try {
       const response = await api.post(`/perguntas/${perguntaId}/validar`, {
-        alternativaId
+        alternativaId,
       });
-      return response.data;
+      return { success: true, data: response.data };
     } catch (error) {
-      console.error('Erro ao validar resposta:', error);
-      throw error;
+      console.error("Erro ao validar resposta:", error);
+      return {
+        success: false,
+        message: error.message || "Erro ao validar resposta",
+      };
     }
   }
 }
@@ -213,15 +261,23 @@ const quizService = new QuizService();
 
 // Named exports para compatibilidade
 export const getTemas = () => quizService.getTemas();
+export const getFormularios = () => quizService.getFormularios(); // --- NOVO EXPORT ---
 export const getPerguntas = (params) => quizService.getPerguntas(params);
-export const getPerguntasByTema = (temaId, params) => quizService.getPerguntasByTema(temaId, params);
+export const getPerguntasByTema = (temaId, params) =>
+  quizService.getPerguntasByTema(temaId, params);
 export const createTema = (temaData) => quizService.createTema(temaData);
-export const updateTema = (temaId, temaData) => quizService.updateTema(temaId, temaData);
+export const updateTema = (temaId, temaData) =>
+  quizService.updateTema(temaId, temaData);
 export const deleteTema = (temaId) => quizService.deleteTema(temaId);
-export const createPergunta = (perguntaData) => quizService.createPergunta(perguntaData);
-export const updatePergunta = (perguntaId, perguntaData) => quizService.updatePergunta(perguntaId, perguntaData);
-export const deletePergunta = (perguntaId) => quizService.deletePergunta(perguntaId);
-export const submitResposta = (respostaData) => quizService.submitResposta(respostaData);
-export const validarResposta = (perguntaId, alternativaId) => quizService.validarResposta(perguntaId, alternativaId);
+export const createPergunta = (perguntaData) =>
+  quizService.createPergunta(perguntaData);
+export const updatePergunta = (perguntaId, perguntaData) =>
+  quizService.updatePergunta(perguntaId, perguntaData);
+export const deletePergunta = (perguntaId) =>
+  quizService.deletePergunta(perguntaId);
+export const submitResposta = (respostaData) =>
+  quizService.submitResposta(respostaData);
+export const validarResposta = (perguntaId, alternativaId) =>
+  quizService.validarResposta(perguntaId, alternativaId);
 
 export default quizService;

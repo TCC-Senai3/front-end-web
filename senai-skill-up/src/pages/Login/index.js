@@ -32,7 +32,7 @@ export default function Login() {
         try {
             await login(loginEmail, loginSenha);
             console.log("Login realizado com sucesso");
-            navigate('/');
+            navigate('/game');
         } catch (error) {
             console.error("Erro no login:", error);
             alert("Erro no login. Verifique suas credenciais.");
