@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const API_CONFIG = {
-  BASE_URL: "https://apiosdrake.azurewebsites.net",
+  BASE_URL: "https://tccdrakes.azurewebsites.net",
   TIMEOUT: 10000, // Configurações de retry podem ser removidas se não estiverem sendo usadas // RETRY_ATTEMPTS: 3, // RETRY_DELAY: 1000,
 };
 
