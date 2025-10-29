@@ -16,7 +16,7 @@ class UserService {
   // Buscar usuário por ID
   async getUserById(userId) {
     try {
-      const response = await api.get(`/usuario/${userId}`);
+      const response = await api.get(`/usuarios/${userId}`);
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar usuário:', error);

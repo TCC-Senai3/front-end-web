@@ -1,25 +1,47 @@
 import api from './api';
 
 // Listar todos os formulários
-// (Esta função não precisa do { success: ... } porque seu useAuth não usa,
-// mas vou manter seu código original por consistência)
 export const getFormularios = async () => {
-  const response = await api.get('/formularios');
-  return response.data;
+  try {
+    const response = await api.get('/formularios');
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao listar formulários:", error);
+    throw error; // Re-lança para o componente tratar
+  }
 };
 
-// --- FUNÇÃO ATUALIZADA ---
-// Agora ela recebe o objeto 'quizData' completo (o JSON)
-// e o 'api.js' cuida do token de autorização automaticamente.
+// Criar novo formulário completo
 export const createFormulario = async (quizData) => {
-  const response = await api.post('/formularios/completo', quizData);
-  return response.data;
+  if (!quizData) throw new Error("Dados do formulário são necessários.");
+  try {
+    const response = await api.post('/formularios/completo', quizData);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao criar formulário:", error);
+    throw error;
+  }
 };
 
-// (Você pode querer adicionar as outras funções do quizService aqui também,
-// como getFormularioById, deleteFormulario, etc.)
 
+
+export const getFormularioById = async (id) => {
+  if (!id) throw new Error("ID do formulário é necessário.");
+  try {
+    // Ajuste a URL se o endpoint no backend for diferente (ex: /formularios/completo/{id})
+    const response = await api.get(`/formularios/${id}`); 
+    // Assumindo que a resposta já vem com as perguntas e alternativas aninhadas
+    return response.data; 
+  } catch (error) {
+    console.error(`Erro ao buscar formulário com ID ${id}:`, error);
+    throw error; 
+  }
+};
+
+
+// Exporta todas as funções
 export default {
   getFormularios,
-  createFormulario
+  createFormulario,
+  getFormularioById, 
 };

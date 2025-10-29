@@ -1,95 +1,147 @@
-import React, { useEffect, useState } from 'react'; // Import hooks
-import { useLocation, useNavigate } from 'react-router-dom'; // Import hooks
-import { Header, Footer } from '../../components'; // Footer não está sendo usado, mas ok
-import GameQuiz from '../../components/GameQuiz'; // O componente que executa o quiz
-import Loader from '../../components/common/Loader'; // Importe seu Loader
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Header } from "../../components";
+import GameQuiz from "../../components/GameQuiz";
+import Loader from "../../components/common/Loader";
+import formularioService from "../../services/formularioService";
 import "./style.css";
 
-// Estilos básicos (opcional)
-const pageStyle = { /* ... estilos ... */ };
-const errorStyle = { /* ... estilos ... */ };
-const buttonStyle = { /* ... estilos ... */ };
+// Estilos (mantidos como placeholders ou defina-os)
+const pageStyle = {
+  minHeight: "calc(100vh - 60px)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+}; // Exemplo
+const errorStyle = {
+  textAlign: "center",
+  color: "red",
+  border: "1px solid red",
+  padding: "20px",
+  borderRadius: "8px",
+  backgroundColor: "#ffeeee",
+}; // Exemplo
+const buttonStyle = {
+  padding: "10px 20px",
+  marginTop: "15px",
+  cursor: "pointer",
+}; // Exemplo
 
 export default function Jogo() {
-    // Hooks para ler o state da navegação
-    const location = useLocation();
-    const navigate = useNavigate();
-    
-    // Estados para guardar o quiz, erro e loading
-    const [quiz, setQuiz] = useState(null);
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(true);
+  const location = useLocation();
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        console.log("Jogo.js: Location state recebido:", location.state);
+  const [quiz, setQuiz] = useState(null); // Estado para guardar o quiz BUSCADO
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true); // --- LEITURA DO STATE CORRIGIDA ---
 
-        // Tenta ler o 'quizSelecionado' que veio do GameContent.js
-        const quizDoState = location.state?.quizSelecionado;
+  const idFormulario = location.state?.idFormulario;
+  const codigoSala = location.state?.codigoSala;
+  const idSala = location.state?.idSala; // <<< LÊ O ID NUMÉRICO DO STATE // useEffect para BUSCAR o quiz
 
-        if (quizDoState && quizDoState.perguntas && quizDoState.perguntas.length > 0) {
-            console.log("Jogo.js: Quiz válido encontrado no state. Passando para GameQuiz:", quizDoState);
-            setQuiz(quizDoState); // Guarda o quiz no estado
-            setError(null);
+  useEffect(() => {
+    const carregarQuiz = async () => {
+      setLoading(true);
+      setError(null);
+      // Log aprimorado
+      console.log("Jogo.js: Tentando carregar. Dados recebidos do state:", {
+        idFormulario,
+        codigoSala,
+        idSala,
+      });
+
+      if (!idFormulario) {
+        console.error(
+          "Jogo.js: Erro - ID do formulário não recebido via state."
+        );
+        setError("ID do Quiz não encontrado. Volte e inicie a sala novamente.");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const quizData = await formularioService.getFormularioById(
+          idFormulario
+        );
+        console.log("Jogo.js: Quiz recebido da API:", quizData);
+
+        if (quizData && quizData.perguntas && quizData.perguntas.length > 0) {
+          setQuiz(quizData);
         } else {
-            console.error("Jogo.js: Erro - Nenhum quiz válido encontrado no state da navegação.");
-            setError("Não foi possível carregar o quiz. Por favor, volte e selecione novamente.");
-            setQuiz(null);
+          console.error("Jogo.js: Erro - Quiz da API vazio ou inválido.");
+          setError("O quiz selecionado não contém perguntas válidas.");
+          setQuiz(null);
         }
-        
-        setLoading(false); // Terminou de ler o state
-
-    }, [location.state]); // Roda quando o state muda
-
-    // --- Renderização Condicional ---
-
-    if (loading) {
-        return (
-            <>
-                <Header />
-                <div style={pageStyle}><Loader /></div>
-            </>
+      } catch (err) {
+        console.error("Jogo.js: Erro ao buscar quiz da API:", err);
+        const apiErrorMessage =
+          err.response?.data?.message || err.response?.data || err.message;
+        setError(
+          `Erro ao carregar o quiz: ${apiErrorMessage || "Tente novamente."}`
         );
-    }
+        setQuiz(null);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    if (error) {
-        return (
-            <>
-                <Header />
-                <div style={pageStyle}>
-                    <div style={errorStyle}>
-                        <h2>Erro</h2>
-                        <p>{error}</p>
-                        <button style={buttonStyle} onClick={() => navigate('/')}>
-                            Voltar
-                        </button>
-                    </div>
-                </div>
-            </>
-        );
-    }
+    carregarQuiz();
+  }, [idFormulario]); // Dependência ok // --- Renderização Condicional ---
 
-    if (quiz) {
-        // --- CORREÇÃO PRINCIPAL ---
-        // Passa o objeto 'quiz' (que veio do state) como prop para GameQuiz
-        return (
-            <>
-                <Header />
-                <GameQuiz quizData={quiz} /> {/* Nome da prop: quizData */}
-            </>
-        );
-        // --- FIM DA CORREÇÃO ---
-    }
-
-    // Fallback
+  if (loading) {
     return (
-        <>
-            <Header />
-            <div style={pageStyle}>
-                <p>Nenhum quiz para jogar.</p>
-                <button style={buttonStyle} onClick={() => navigate('/')}>
-                    Voltar
-                </button>
-            </div>
-        </>
+      <>
+                  <Header />         {" "}
+        <div style={pageStyle}>
+          <Loader />
+        </div>
+               {" "}
+      </>
     );
+  }
+
+  if (error) {
+    return (
+      <>
+                  <Header />         {" "}
+        <div style={pageStyle}>
+                     {" "}
+          <div style={errorStyle}>
+                          <h2>Erro</h2>              <p>{error}</p>             {" "}
+            <button style={buttonStyle} onClick={() => navigate("/game")}>
+                              Voltar              {" "}
+            </button>
+                       {" "}
+          </div>
+                   {" "}
+        </div>
+               {" "}
+      </>
+    );
+  }
+
+  if (!quiz) {
+    return (
+      <>
+                  <Header />         {" "}
+        <div style={pageStyle}>
+                      <p>Não foi possível carregar os dados do quiz.</p>       
+             {" "}
+          <button style={buttonStyle} onClick={() => navigate("/game")}>
+            Voltar
+          </button>
+                   {" "}
+        </div>
+               {" "}
+      </>
+    );
+  } // --- RENDERIZAÇÃO PRINCIPAL CORRIGIDA ---
+
+  return (
+    <>
+              <Header />        {/* PASSA 'idSala' COMO PROP PARA GameQuiz */}
+             {" "}
+      <GameQuiz quizData={quiz} codigoSala={codigoSala} idSala={idSala} />     {" "}
+    </>
+  );
 }

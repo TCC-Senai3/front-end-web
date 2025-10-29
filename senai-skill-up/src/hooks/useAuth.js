@@ -1,164 +1,201 @@
 // hooks/useAuth.js
 
-import React, { useState, useEffect, useCallback, createContext, useContext } from "react";
-import authService from "../services/authService";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  createContext,
+  useContext,
+} from "react";
+import authService from "../services/authService"; // Assume que tem getUserProfile e updateProfile
 import api from "../services/api";
 
-// 1. CRIAR O CONTEXTO
 const AuthContext = createContext(null);
 
-// 2. CRIAR O COMPONENTE PROVEDOR
 export const AuthProvider = ({ children }) => {
   const [userData, setUserData] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loading, setLoading] = useState(true); // Começa carregando
+  const [loading, setLoading] = useState(true); // Loading inicial // --- LOGOUT --- (sem alterações)
 
-  // --- LOGOUT ---
   const logout = useCallback(() => {
-    console.log("AuthProvider: Executando logout...");
+    console.log("AuthProvider: Logout");
     setUserData(null);
     setIsLoggedIn(false);
     sessionStorage.removeItem("authToken");
     sessionStorage.removeItem("userData");
     delete api.defaults.headers.common["Authorization"];
-    // authService.logout(); // Se existir API de logout
   }, []);
 
-  // --- INITAUTH --- (Roda uma vez ao carregar)
+  // --- FUNÇÃO PARA BUSCAR E ATUALIZAR DADOS DO USUÁRIO ---
+  // Usada no initAuth, login e pode ser chamada manualmente (refreshUserData)
+  const fetchAndUpdateUser = useCallback(async () => {
+    console.log("AuthProvider: Buscando perfil (/me)...");
+    try {
+      const profileData = await authService.getUserProfile(); // Chama GET /usuarios/me
+      if (profileData && typeof profileData === "object" && profileData.id) {
+        console.log("AuthProvider: Perfil recebido:", profileData);
+        sessionStorage.setItem("userData", JSON.stringify(profileData));
+        setUserData(profileData); // <<< ATUALIZA O ESTADO
+        setIsLoggedIn(true);
+        return profileData; // Retorna para quem chamou (opcional)
+      } else {
+        console.warn("AuthProvider: Resposta de /me inválida. Deslogando.");
+        logout();
+        throw new Error("Dados de perfil inválidos recebidos.");
+      }
+    } catch (error) {
+      console.error(
+        "AuthProvider: Falha ao buscar perfil (token pode ter expirado?). Deslogando.",
+        error
+      );
+      logout();
+      throw error; // Re-lança o erro
+    }
+  }, [logout]); // Depende de logout // --- INITAUTH --- (Usa fetchAndUpdateUser)
+
   useEffect(() => {
     const initAuth = async () => {
       console.log("AuthProvider (initAuth): Verificando token...");
       const token = sessionStorage.getItem("authToken");
-      const storedUserData = sessionStorage.getItem("userData"); // Pega o user salvo
+      // Não usa mais storedUserData diretamente, sempre busca se tiver token
 
       if (token) {
-        console.log("AuthProvider (initAuth): Token encontrado.");
-        // Define o header imediatamente
+        console.log(
+          "AuthProvider (initAuth): Token encontrado. Definindo header e buscando perfil."
+        );
         api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-        if (storedUserData) {
-          // Se já temos os dados do usuário salvos, usa eles
-          console.log("AuthProvider (initAuth): Usando userData do sessionStorage.");
-          try {
-            const parsedUser = JSON.parse(storedUserData);
-            setUserData(parsedUser);
-            setIsLoggedIn(true);
-          } catch (e) {
-            console.error("AuthProvider (initAuth): Erro ao parsear userData. Deslogando.");
-            logout();
-          }
-        } else {
-          // Se não temos dados salvos, busca na API /me
-          console.log("AuthProvider (initAuth): Buscando perfil na API...");
-          try {
-            const profileData = await authService.getUserProfile();
-            if (profileData && typeof profileData === 'object') {
-              sessionStorage.setItem("userData", JSON.stringify(profileData));
-              setUserData(profileData);
-              setIsLoggedIn(true);
-              console.log("AuthProvider (initAuth): Perfil carregado da API e salvo.", profileData);
-            } else {
-              console.warn("AuthProvider (initAuth): API /me retornou dados inválidos. Deslogando.");
-              logout();
-            }
-          } catch (error) {
-            console.error("AuthProvider (initAuth): Falha ao buscar perfil (token inválido?). Deslogando.", error);
-            logout();
-          }
+        try {
+          await fetchAndUpdateUser(); // Busca dados frescos
+          console.log("AuthProvider (initAuth): Perfil carregado com sucesso.");
+        } catch (error) {
+          console.log(
+            "AuthProvider (initAuth): Falha ao carregar perfil inicial (ignorado)."
+          );
+          // O erro já foi logado e o logout chamado dentro de fetchAndUpdateUser
         }
       } else {
         console.log("AuthProvider (initAuth): Nenhum token encontrado.");
       }
-      setLoading(false); // Termina o carregamento inicial
+      setLoading(false); // Termina o carregamento inicial DEPOIS de tentar buscar
     };
-
     initAuth();
-  }, [logout]);
+  }, [fetchAndUpdateUser]); // Agora depende de fetchAndUpdateUser // --- LOGIN --- (Usa fetchAndUpdateUser)
 
-  // --- LOGIN ---
   const login = async (email, senha) => {
     try {
-      setLoading(true); // Começa loading do login
-      const loginData = await authService.login(email, senha);
-      if (!loginData || !loginData.token) {
-        throw new Error("API de login não retornou um token.");
-      }
+      setLoading(true);
+      const loginData = await authService.login(email, senha); // Chama POST /usuarios/login
+      if (!loginData?.token)
+        throw new Error("API de login não retornou token.");
 
-      console.log("AuthProvider (login): Token recebido.");
+      console.log(
+        "AuthProvider (login): Token recebido. Salvando e buscando perfil..."
+      );
       sessionStorage.setItem("authToken", loginData.token);
-      api.defaults.headers.common["Authorization"] = `Bearer ${loginData.token}`;
+      api.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${loginData.token}`;
 
-      console.log("AuthProvider (login): Buscando perfil após login...");
-      const profileData = await authService.getUserProfile();
-      if (!profileData || typeof profileData !== 'object') {
-        throw new Error("API /me retornou dados de perfil inválidos após o login.");
-      }
+      await fetchAndUpdateUser(); // Busca e atualiza o usuário após login
 
-      sessionStorage.setItem("userData", JSON.stringify(profileData));
-      setUserData(profileData);
-      setIsLoggedIn(true);
-      console.log("AuthProvider (login): Login completo. Perfil salvo.", profileData);
-      setLoading(false); // Termina loading do login
-
+      console.log("AuthProvider (login): Login completo.");
+      setLoading(false);
     } catch (error) {
       console.error("❌ Erro no hook de login:", error);
-      logout();
-      setLoading(false); // Termina loading mesmo com erro
-      const errorMessage =
-        error.response?.data?.message ||
-        error.response?.data ||
-        error.message ||
-        "Credenciais inválidas ou erro no login.";
-      throw new Error(errorMessage); // Lança o erro para o componente de Login tratar
+      logout(); // Garante logout em caso de falha
+      setLoading(false);
+      throw error; // Re-lança para o componente Login tratar
     }
-  };
+  }; // --- UPDATEUSERDATA --- (PARA EDIÇÃO DE PERFIL, NÃO PONTUAÇÃO)
 
-  // --- UPDATEUSERDATA ---
+  // Mantém a função, mas ela NÃO deve ser usada para pontuação.
   const updateUserData = async (userId, dataToUpdate) => {
+    // IMPORTANTE: NUNCA PERMITIR 'pontuacao' em dataToUpdate vindo do cliente.
+    // A validação deve ocorrer no backend (UsuarioService.java).
+    console.log("AuthProvider (update): Tentando atualizar perfil:", {
+      userId,
+      dataToUpdate,
+    });
     try {
+      // Chama PUT /usuarios/{id} (ou similar)
       const updatedUser = await authService.updateProfile(userId, dataToUpdate);
-      if (updatedUser && typeof updatedUser === 'object') {
+      if (updatedUser && typeof updatedUser === "object" && updatedUser.id) {
+        console.log(
+          "AuthProvider (update): Perfil atualizado pela API:",
+          updatedUser
+        );
         sessionStorage.setItem("userData", JSON.stringify(updatedUser));
-        setUserData(updatedUser);
-        console.log("AuthProvider (update): UserData atualizado e salvo.");
+        setUserData(updatedUser); // <<< ATUALIZA O ESTADO LOCAL
         return { success: true, data: updatedUser };
       } else {
         throw new Error("Resposta da API de atualização inesperada.");
       }
     } catch (error) {
       console.error("Erro ao atualizar dados do usuário:", error);
+      // Re-lança o erro com uma mensagem mais clara se possível
       const errorMessage =
-        error.response?.data?.message || error.message || "Falha ao atualizar perfil.";
+        error.response?.data?.message ||
+        error.message ||
+        "Falha ao atualizar perfil.";
       throw new Error(errorMessage);
     }
   };
 
-  // 3. VALORES QUE O CONTEXTO VAI FORNECER
+  // --- NOVA FUNÇÃO: REFRESH USER DATA ---
+  // Simplesmente chama fetchAndUpdateUser novamente.
+  const refreshUserData = useCallback(async () => {
+    if (!isLoggedIn) {
+      console.warn(
+        "AuthProvider (refresh): Usuário não está logado, não pode atualizar."
+      );
+      return; // Não faz nada se não estiver logado
+    }
+    // Reutiliza a lógica centralizada de busca e atualização
+    try {
+      await fetchAndUpdateUser();
+      console.log("AuthProvider (refresh): Dados do usuário atualizados.");
+    } catch (error) {
+      console.error(
+        "AuthProvider (refresh): Falha ao atualizar dados do usuário.",
+        error
+      );
+      // O erro já foi tratado (e logout chamado se necessário) em fetchAndUpdateUser
+    }
+  }, [isLoggedIn, fetchAndUpdateUser]); // Depende de isLoggedIn e da função de busca // --- VALORES FORNECIDOS PELO CONTEXTO ---
+
   const value = {
-    user: userData, // Renomeado para 'user' para consistência
+    user: userData, // <<<<<<< NOME CORRETO É 'user'
     isLoggedIn,
-    loading,
+    loading, // Loading inicial da autenticação
     login,
     logout,
-    updateUserData,
+    updateUserData, // Para edição de perfil (NÃO PONTUAÇÃO)
+    refreshUserData, // <<< NOVA FUNÇÃO EXPOSTA
   };
 
-  // 4. RETORNAR O PROVEDOR COM OS VALORES
   return (
     <AuthContext.Provider value={value}>
-      {children}
+            {children}   {" "}
     </AuthContext.Provider>
   );
 };
 
-// 5. CRIAR E EXPORTAR O HOOK useAuth QUE CONSOME O CONTEXTO
+// --- HOOK useAuth --- (Adiciona refreshUserData)
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
+    throw new Error("useAuth deve ser usado dentro de um AuthProvider");
   }
-  // Se o contexto for 'null' (valor inicial antes do useEffect rodar), 
-  // ainda assim retorna o objeto vazio para evitar erros, 
-  // mas o 'loading' ainda será true.
-  return context || { user: null, isLoggedIn: false, loading: true, login: () => { }, logout: () => { }, updateUserData: () => { } };
+  // Retorna um objeto padrão consistente enquanto carrega ou se o contexto for nulo
+  return (
+    context || {
+      user: null,
+      isLoggedIn: false,
+      loading: true,
+      login: async () => {},
+      logout: () => {},
+      updateUserData: async () => {},
+      refreshUserData: async () => {}, // <<< VALOR PADRÃO
+    }
+  );
 };
