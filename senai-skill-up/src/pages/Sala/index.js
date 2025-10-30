@@ -23,26 +23,23 @@ export default function Sala() {
   const stompClientRef = useRef(null);
   const [isConnected, setIsConnected] = useState(false);
 
-  // --- 1. FUNÇÃO REUTILIZÁVEL PARA BUSCAR DADOS DA SALA ---
-  const carregarSala = useCallback(
-    async (isMountedRef) => {
-      if (!codigo || !user?.id) return;
-      try {
-        const sala = await salaService.getSalaByPin(codigo);
-        if (!isMountedRef.current || !sala) return;
-        setSalaInfo(sala);
-        setIsDonoDaSala(sala.idUsuario === user.id);
-      } catch (err) {
-        console.error("Erro ao carregar sala:", err);
-        if (isMountedRef.current) {
-          setErrorMsg("Falha ao carregar informações da sala.");
-        }
+  // Função para carregar informações da sala
+  const carregarSala = useCallback(async (isMountedRef) => {
+    if (!codigo || !user?.id) return;
+    try {
+      const sala = await salaService.getSalaByPin(codigo);
+      if (!isMountedRef.current || !sala) return;
+      setSalaInfo(sala);
+      setIsDonoDaSala(sala.idUsuario === user.id);
+    } catch (err) {
+      console.error("Erro ao carregar sala:", err);
+      if (isMountedRef.current) {
+        setErrorMsg("Falha ao carregar informações da sala.");
       }
-    },
-    [codigo, user?.id]
-  );
+    }
+  }, [codigo, user?.id]);
 
-  // --- 2. Conexão WebSocket ---
+  // Conexão WebSocket
   useEffect(() => {
     if (!codigo || !user?.id) return;
     const isMountedRef = { current: true };
@@ -67,9 +64,6 @@ export default function Sala() {
               payload.type === "USUARIO_ENTROU" ||
               payload.type === "USUARIO_SAIU"
             ) {
-              console.log(
-                "WebSocket: " + payload.type + ". Recarregando dados da sala."
-              );
               carregarSala(isMountedRef);
             }
           } catch (e) {
@@ -98,7 +92,7 @@ export default function Sala() {
     };
   }, [codigo, navigate, user?.id, carregarSala]);
 
-  // === 3. POLLING e Carga Inicial ===
+  // Polling e carga inicial
   useEffect(() => {
     if (!codigo || !user?.id) {
       navigate("/game");
@@ -106,14 +100,9 @@ export default function Sala() {
     }
     const isMountedRef = { current: true };
 
-    if (!salaInfo) {
-      setLoading(true);
-    }
+    if (!salaInfo) setLoading(true);
     carregarSala(isMountedRef);
-
-    const interval = setInterval(() => {
-      carregarSala(isMountedRef);
-    }, 5000);
+    const interval = setInterval(() => carregarSala(isMountedRef), 5000);
 
     return () => {
       isMountedRef.current = false;
@@ -121,50 +110,32 @@ export default function Sala() {
     };
   }, [codigo, user?.id, carregarSala, navigate, salaInfo]);
 
-  // === 4. Atualizar usuários quando salaInfo mudar ===
+  // Atualizar usuários ao mudar salaInfo
   useEffect(() => {
     if (!salaInfo) return;
     const isMountedRef = { current: true };
 
     async function carregarUsuarios() {
-      if (!isMountedRef.current) return;
       try {
         const participantesIds =
           salaInfo.participantes || salaInfo.idParticipantes || [];
-        const currentIds = usuarios.map((u) => u.id).sort().join(",");
-        const newIds = [...participantesIds].sort().join(",");
-
-        if (currentIds === newIds) {
+        if (participantesIds.length === 0) {
+          setUsuarios([]);
           if (loading) setLoading(false);
           return;
         }
 
-        if (!loading) setLoading(true);
+        const userPromises = participantesIds.map((id) =>
+          userService.getUserById(id)
+        );
+        const results = await Promise.allSettled(userPromises);
+        if (!isMountedRef.current) return;
 
-        if (participantesIds.length === 0) {
-          setUsuarios([]);
-          if (loading) setLoading(false);
-        } else {
-          const userPromises = participantesIds.map((id) =>
-            userService.getUserById(id)
-          );
-          const results = await Promise.allSettled(userPromises);
-          if (!isMountedRef.current) return;
-
-          const validUsers = results
-            .filter((r) => r.status === "fulfilled" && r.value?.id)
-            .map((r) => r.value);
-
-          setUsuarios(validUsers);
-
-          results
-            .filter((r) => r.status === "rejected")
-            .forEach((r) =>
-              console.error("Erro ao buscar usuário:", r.reason)
-            );
-
-          if (isMountedRef.current) setLoading(false);
-        }
+        const validUsers = results
+          .filter((r) => r.status === "fulfilled" && r.value?.id)
+          .map((r) => r.value);
+        setUsuarios(validUsers);
+        setLoading(false);
       } catch (err) {
         console.error("Erro ao carregar usuários da sala:", err);
         if (isMountedRef.current) setLoading(false);
@@ -172,65 +143,53 @@ export default function Sala() {
     }
 
     carregarUsuarios();
-
     return () => {
       isMountedRef.current = false;
     };
-  }, [salaInfo, usuarios]);
+  }, [salaInfo]);
 
-  // === 5. Iniciar Jogo ===
+  // Iniciar jogo
   const handleIniciar = async () => {
     if (!salaInfo || !isDonoDaSala || actionLoading || !isConnected) {
-      setErrorMsg(
-        "Não é possível iniciar. Verifique a conexão ou se você é dono da sala."
-      );
+      setErrorMsg("Não é possível iniciar agora.");
       return;
     }
     setActionLoading(true);
-    setErrorMsg("");
     try {
-      if (!stompClientRef.current?.connected) {
-        throw new Error("Cliente STOMP não conectado.");
-      }
       const destination = `/app/sala/${codigo}/iniciar`;
       stompClientRef.current.publish({
         destination,
         body: JSON.stringify({ idUsuario: user.id }),
       });
     } catch (err) {
-      console.error("Erro ao publicar mensagem 'iniciar':", err);
+      console.error("Erro ao iniciar jogo:", err);
       setErrorMsg("Falha ao enviar comando de início.");
     } finally {
       setActionLoading(false);
     }
   };
 
-  // === 6. Sair ou Desmanchar ===
+  // Sair ou desmanchar sala
   const handleDesmanchar = async () => {
     if (!salaInfo || !user) return;
     const confirmMessage = isDonoDaSala
-      ? "Desmanchar esta sala para todos?"
-      : "Sair desta sala?";
+      ? "Deseja desmanchar esta sala?"
+      : "Deseja sair desta sala?";
     if (!window.confirm(confirmMessage)) return;
 
     setActionLoading(true);
-    setErrorMsg("");
     try {
-      if (isDonoDaSala) {
-        await salaService.fecharSala(salaInfo.idSala);
-      } else {
-        await salaService.sairDaSala(codigo, user.id);
-      }
+      if (isDonoDaSala) await salaService.fecharSala(salaInfo.idSala);
+      else await salaService.sairDaSala(codigo, user.id);
       navigate("/game");
     } catch (err) {
       console.error("Erro ao sair/desmanchar sala:", err);
-      const backendError = err.response?.data?.message || err.response?.data;
-      setErrorMsg(`Erro: ${backendError || err.message || "Ação falhou."}`);
+      setErrorMsg("Ação falhou. Tente novamente.");
+    } finally {
       setActionLoading(false);
     }
   };
 
-  // === 7. Renderização ===
   return (
     <>
       <Header />
@@ -246,28 +205,14 @@ export default function Sala() {
               onClick={handleDesmanchar}
               disabled={actionLoading || !salaInfo}
             >
-              {isDonoDaSala ? (
-                <>
-                  DESMANCHAR
-                  <br />
-                  SALA
-                </>
-              ) : (
-                <>
-                  SAIR DA
-                  <br />
-                  SALA
-                </>
-              )}
+              {isDonoDaSala ? "DESMANCHAR SALA" : "SAIR DA SALA"}
             </button>
 
             {isDonoDaSala && (
               <button
                 className="btn btn-warning"
                 onClick={handleIniciar}
-                disabled={
-                  loading || actionLoading || usuarios.length < 1 || !isConnected
-                }
+                disabled={loading || actionLoading || usuarios.length < 1 || !isConnected}
               >
                 INICIAR
               </button>
@@ -277,29 +222,24 @@ export default function Sala() {
           <div className="sala-grid">
             {loading && usuarios.length === 0 ? (
               <div className="sala-mensagem">Carregando...</div>
-            ) : !loading && usuarios.length === 0 ? (
+            ) : usuarios.length === 0 ? (
               <div className="sala-mensagem">Aguardando jogadores...</div>
             ) : (
-              usuarios.map((participante) => (
-                <div key={participante.id} className="sala-user">
+              usuarios.map((p) => (
+                <div key={p.id} className="sala-user">
                   <div
                     className="sala-avatar"
                     style={{
-                      backgroundImage: participante.avatar
-                        ? `url(${participante.avatar})`
-                        : undefined,
+                      backgroundImage: p.avatar ? `url(${p.avatar})` : undefined,
                     }}
                   />
                   <div
                     className="nome"
                     style={{
-                      fontWeight:
-                        user && participante.id === user.id
-                          ? "bold"
-                          : "normal",
+                      fontWeight: user && p.id === user.id ? "bold" : "normal",
                     }}
                   >
-                    {participante.nome || "Nome não encontrado"}
+                    {p.nome || "Jogador"}
                   </div>
                 </div>
               ))
