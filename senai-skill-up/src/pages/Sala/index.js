@@ -14,6 +14,7 @@ export default function Sala() {
   const { user } = useAuth();
 
   const codigo = location.state?.codigo || null;
+
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -23,8 +24,11 @@ export default function Sala() {
   const stompClientRef = useRef(null);
   const [isConnected, setIsConnected] = useState(false);
 
+  // Ref para controle de montagem do componente
+  const isMountedRef = useRef(true);
+
   // Função para carregar informações da sala
-  const carregarSala = useCallback(async (isMountedRef) => {
+  const carregarSala = useCallback(async () => {
     if (!codigo || !user?.id) return;
     try {
       const sala = await salaService.getSalaByPin(codigo);
@@ -42,18 +46,22 @@ export default function Sala() {
   // Conexão WebSocket
   useEffect(() => {
     if (!codigo || !user?.id) return;
-    const isMountedRef = { current: true };
+
+    isMountedRef.current = true;
     const socketUrl = "https://tccdrakes.azurewebsites.net/ws";
+
     const client = new Client({
       webSocketFactory: () => new SockJS(socketUrl),
       reconnectDelay: 10000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
       onConnect: () => {
+        if (!isMountedRef.current) return;
         setIsConnected(true);
         console.log("WebSocket Conectado.");
         const topic = `/topic/sala/${codigo}`;
         client.subscribe(topic, (message) => {
+          if (!isMountedRef.current) return;
           try {
             const payload = JSON.parse(message.body);
             console.log("Mensagem WS recebida:", payload.type);
@@ -64,7 +72,7 @@ export default function Sala() {
               payload.type === "USUARIO_ENTROU" ||
               payload.type === "USUARIO_SAIU"
             ) {
-              carregarSala(isMountedRef);
+              carregarSala();
             }
           } catch (e) {
             console.error("Erro ao processar mensagem WebSocket:", e);
@@ -73,13 +81,15 @@ export default function Sala() {
       },
       onStompError: (frame) => {
         console.error("Erro STOMP:", frame.headers["message"]);
-        setIsConnected(false);
+        if (isMountedRef.current) setIsConnected(false);
       },
       onWebSocketError: (error) => {
         console.error("Erro WebSocket:", error);
-        setIsConnected(false);
+        if (isMountedRef.current) setIsConnected(false);
       },
-      onDisconnect: () => setIsConnected(false),
+      onDisconnect: () => {
+        if (isMountedRef.current) setIsConnected(false);
+      },
     });
 
     client.activate();
@@ -98,11 +108,12 @@ export default function Sala() {
       navigate("/game");
       return;
     }
-    const isMountedRef = { current: true };
+
+    isMountedRef.current = true;
 
     if (!salaInfo) setLoading(true);
-    carregarSala(isMountedRef);
-    const interval = setInterval(() => carregarSala(isMountedRef), 5000);
+    carregarSala();
+    const interval = setInterval(() => carregarSala(), 5000);
 
     return () => {
       isMountedRef.current = false;
@@ -113,7 +124,8 @@ export default function Sala() {
   // Atualizar usuários ao mudar salaInfo
   useEffect(() => {
     if (!salaInfo) return;
-    const isMountedRef = { current: true };
+
+    isMountedRef.current = true;
 
     async function carregarUsuarios() {
       try {
@@ -143,6 +155,7 @@ export default function Sala() {
     }
 
     carregarUsuarios();
+
     return () => {
       isMountedRef.current = false;
     };
@@ -179,7 +192,8 @@ export default function Sala() {
 
     setActionLoading(true);
     try {
-      if (isDonoDaSala) await salaService.fecharSala(salaInfo.idSala);
+      // Use salaInfo.id conforme sua API
+      if (isDonoDaSala) await salaService.fecharSala(salaInfo.id || salaInfo.idSala);
       else await salaService.sairDaSala(codigo, user.id);
       navigate("/game");
     } catch (err) {
