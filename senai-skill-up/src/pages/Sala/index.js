@@ -1,17 +1,17 @@
-import React, { useState, useEffect, useRef } from "react"; // Adicionado useRef
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../../components/header";
 import salaService from "../../services/salaService";
 import userService from "../../services/userService";
 import { useAuth } from "../../hooks/useAuth";
-import SockJS from "sockjs-client"; // <<< Adicionado import SockJS
-import { Client } from "@stomp/stompjs"; // <<< Adicionado import Cliente STOMP
+import SockJS from "sockjs-client";
+import { Client } from "@stomp/stompjs";
 import "./style.css";
 
 export default function Sala() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useAuth(); // Pega usuário logado
+  const { user } = useAuth();
 
   const codigo = location.state?.codigo || null;
   const [usuarios, setUsuarios] = useState([]);
@@ -20,35 +20,29 @@ export default function Sala() {
   const [salaInfo, setSalaInfo] = useState(null);
   const [isDonoDaSala, setIsDonoDaSala] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-  const stompClientRef = useRef(null); // Ref para o cliente STOMP
+  const stompClientRef = useRef(null);
+  const [isConnected, setIsConnected] = useState(false);
 
-  // <<< NOVO ESTADO para rastrear a conexão real >>>
-  const [isConnected, setIsConnected] = useState(false); // --- Efeito para Conexão WebSocket ---
-
+  // === 1. Conexão WebSocket ===
   useEffect(() => {
-    // Só conecta se tivermos código E se o usuário já estiver carregado
     if (!codigo || !user?.id) {
-      // Se desconectar enquanto estiver na sala (ex: logout), limpa o estado
-      setIsConnected(false);
       console.log("WebSocket: Aguardando código da sala e usuário...");
-      return; // Sai se não tiver código ou usuário ainda
+      return;
     }
 
     const socketUrl = "https://tccdrakes.azurewebsites.net/ws";
     console.log("Sala.js: Configurando conexão WebSocket...");
-    setIsConnected(false); // Garante que começa como desconectado a cada tentativa
+    setIsConnected(false);
 
     const client = new Client({
       webSocketFactory: () => new SockJS(socketUrl),
       reconnectDelay: 10000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
-      // debug: (str) => { console.log('STOMP:', str); }, // Descomente para debug
       onConnect: (frame) => {
         console.log("WebSocket Conectado via STOMP:", frame);
-        // <<< ATUALIZA O ESTADO isConnected PARA true >>>
         setIsConnected(true);
-        setErrorMsg(""); // Limpa erros de conexão anteriores se conectar com sucesso
+        setErrorMsg("");
 
         const topic = `/topic/sala/${codigo}`;
         console.log(`Inscrevendo-se em ${topic}`);
@@ -58,11 +52,15 @@ export default function Sala() {
             console.log(`Mensagem recebida em ${topic}:`, payload);
 
             if (payload.type === "JOGO_INICIADO") {
-              console.log("Mensagem de início de jogo recebida! Navegando...");
               const { idFormulario, idSala, codigoSala } = payload;
               navigate("/jogo", {
                 state: { idFormulario, idSala, codigoSala },
               });
+            } else if (
+              payload.type === "USUARIO_ENTROU" ||
+              payload.type === "USUARIO_SAIU"
+            ) {
+              carregarUsuarios();
             }
           } catch (e) {
             console.error(
@@ -76,53 +74,78 @@ export default function Sala() {
       onStompError: (frame) => {
         console.error("Erro STOMP:", frame.headers["message"], frame.body);
         setErrorMsg("Erro de comunicação com o servidor.");
-        // <<< ATUALIZA O ESTADO isConnected PARA false >>>
         setIsConnected(false);
       },
       onWebSocketError: (error) => {
         console.error("Erro WebSocket:", error);
-        if (error?.message?.includes("403")) {
-          setErrorMsg(
-            "Falha ao conectar (403). Verifique permissões do backend para /ws."
-          );
-        } else {
-          setErrorMsg("Erro de conexão WebSocket. Tentando reconectar..."); // Mensagem pode indicar reconexão
-        }
-        // <<< ATUALIZA O ESTADO isConnected PARA false >>>
+        setErrorMsg("Erro de conexão WebSocket. Tentando reconectar...");
         setIsConnected(false);
       },
       onDisconnect: () => {
         console.log("WebSocket Desconectado");
-        // <<< ATUALIZA O ESTADO isConnected PARA false >>>
         setIsConnected(false);
       },
     });
 
     console.log("Ativando cliente WebSocket...");
     client.activate();
-    stompClientRef.current = client; // --- Função de Limpeza ---
+    stompClientRef.current = client;
 
     return () => {
       console.log("Sala.js: Limpeza - Desativando cliente WebSocket...");
-      setIsConnected(false); // Garante que fica false ao sair/desmontar
+      setIsConnected(false);
       if (stompClientRef.current && stompClientRef.current.active) {
         stompClientRef.current.deactivate();
         console.log("Cliente WebSocket desativado.");
       }
     };
-    // Dependências: Reconecta se código ou ID do usuário mudar.
-  }, [codigo, user?.id, navigate]); // --- useEffect do Polling (Mantido) ---
+  }, [codigo, user?.id, navigate]);
+
+  // === 2. Carregar informações da sala ===
+  useEffect(() => {
+    if (!codigo || !user?.id) return;
+
+    async function carregarSala() {
+      try {
+        const sala = await salaService.getSalaByPin(codigo);
+        console.log("Sala carregada:", sala);
+        setSalaInfo(sala);
+        setIsDonoDaSala(sala.idUsuario === user.id);
+      } catch (err) {
+        console.error("Erro ao carregar sala:", err);
+        setErrorMsg("Falha ao carregar informações da sala.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    carregarSala();
+  }, [codigo, user?.id]);
+
+  // === 3. Buscar usuários periodicamente ===
+  async function carregarUsuarios() {
+    if (!codigo) return;
+    try {
+      const response = await userService.listarUsuariosPorSala(codigo);
+      console.log("Usuários da sala:", response);
+      setUsuarios(response);
+    } catch (err) {
+      console.error("Erro ao buscar usuários:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    /* ... sua lógica de polling ... */
-  }, [codigo, navigate, user?.id, loading, usuarios]); // --- Handler Desmanchar/Sair (Mantido) ---
+    if (!codigo) return;
+    carregarUsuarios();
 
-  const handleDesmanchar = async () => {
-    /* ... sua lógica ... */
-  }; // --- Handler Iniciar (Usa isConnected e verifica .connected) ---
+    const interval = setInterval(carregarUsuarios, 5000);
+    return () => clearInterval(interval);
+  }, [codigo]);
 
+  // === 4. Botão "Iniciar" ===
   const handleIniciar = async () => {
-    // <<< USA isConnected NA VERIFICAÇÃO INICIAL >>>
     if (!salaInfo || !isDonoDaSala || actionLoading || !isConnected) {
       const motivoErro = !isConnected
         ? "Não conectado ao servidor."
@@ -137,67 +160,77 @@ export default function Sala() {
 
     try {
       const destination = `/app/sala/${codigo}/iniciar`;
-      console.log(`Sala.js: Publicando mensagem 'iniciar' para ${destination}`);
+      console.log(`Publicando mensagem 'iniciar' para ${destination}`);
 
-      // <<< VERIFICAÇÃO EXTRA antes de publicar >>>
-      // Usa a propriedade 'connected' do cliente STOMP que indica se a conexão STOMP está estabelecida
       if (!stompClientRef.current?.connected) {
-        console.error("Tentativa de publicar sem conexão STOMP estabelecida.");
-        throw new Error("Não conectado ao STOMP. Aguarde a conexão."); // Lança erro
-      } // Envia a mensagem
+        throw new Error("Não conectado ao STOMP. Aguarde a conexão.");
+      }
 
-      stompClientRef.current.publish({ destination: destination }); // A navegação acontece no 'subscribe'
+      stompClientRef.current.publish({ destination });
     } catch (error) {
       console.error("Erro ao publicar mensagem 'iniciar':", error);
-      // Mostra a mensagem de erro específica ou uma genérica
-      setErrorMsg(
-        error.message || "Falha ao enviar comando de início. Tente novamente."
-      );
+      setErrorMsg(error.message || "Falha ao enviar comando de início.");
       setActionLoading(false);
     }
-  }; // --- Renderização ---
+  };
 
+  // === 5. Botão "Desmanchar / Sair" ===
+  const handleDesmanchar = async () => {
+    if (!salaInfo) return;
+    setActionLoading(true);
+    try {
+      if (isDonoDaSala) {
+        // 🔧 ALTERADO: agora usa fecharSala (compatível com salaService.js)
+        await salaService.fecharSala(salaInfo.idSala);
+      } else {
+        // 🔧 ALTERADO: parâmetros na ordem correta (codigo, idUsuario)
+        await salaService.sairDaSala(codigo, user.id);
+      }
+      navigate("/home");
+    } catch (err) {
+      console.error("Erro ao sair da sala:", err);
+      setErrorMsg("Erro ao sair da sala.");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // === Renderização ===
   return (
     <>
-            <Header />     {" "}
+      <Header />
       <div className="sala-container">
-               {" "}
         <div className="sala-content">
-                    <div className="sala-codigo">CODE: {codigo || "ERRO"}</div> 
-                 {" "}
-          {errorMsg && <div className="sala-mensagem error">{errorMsg}</div>}   
-               {" "}
+          <div className="sala-codigo">CODE: {codigo || "ERRO"}</div>
+
+          {errorMsg && <div className="sala-mensagem error">{errorMsg}</div>}
+
           <div className="sala-actions">
-                       {" "}
             <button
               className="btn btn-danger"
               onClick={handleDesmanchar}
               disabled={loading || actionLoading}
             >
-                           {" "}
-              {isDonoDaSala ? "DESMANCHAR\nSALA" : "SAIR DA\nSALA"}           {" "}
+              {isDonoDaSala ? "DESMANCHAR\nSALA" : "SAIR DA\nSALA"}
             </button>
-                       {" "}
+
             {isDonoDaSala && (
               <button
                 className="btn btn-warning"
                 onClick={handleIniciar}
                 disabled={
-                  // <<< USA isConnected NO disabled >>>
                   loading ||
                   actionLoading ||
-                  !isConnected || // Desabilita se não estiver conectado via STOMP
+                  !isConnected ||
                   usuarios.length < 1
                 }
               >
-                                INICIAR              {" "}
+                INICIAR
               </button>
             )}
-                     {" "}
           </div>
-                   {" "}
+
           <div className="sala-grid">
-                       {" "}
             {loading ? (
               <div className="sala-mensagem">Carregando...</div>
             ) : usuarios.length === 0 ? (
@@ -205,7 +238,6 @@ export default function Sala() {
             ) : (
               usuarios.map((participante) => (
                 <div key={participante.id} className="sala-user">
-                                     {" "}
                   <div
                     className="sala-avatar"
                     style={{
@@ -214,7 +246,6 @@ export default function Sala() {
                         : undefined,
                     }}
                   />
-                                     {" "}
                   <div
                     className="nome"
                     style={{
@@ -222,21 +253,14 @@ export default function Sala() {
                         user && participante.id === user.id ? "bold" : "normal",
                     }}
                   >
-                                         {" "}
-                    {participante.nome || "Nome não encontrado"}               
-                       {" "}
+                    {participante.nome || "Nome não encontrado"}
                   </div>
-                                   {" "}
                 </div>
               ))
             )}
-                     {" "}
           </div>
-                 {" "}
         </div>
-             {" "}
       </div>
-         {" "}
     </>
   );
 }

@@ -1,6 +1,13 @@
 import api from "./api";
 
-// Listar todas as salas
+/**
+ * Serviço para gerenciar operações relacionadas às Salas.
+ * Inclui funções para listar, criar, entrar, sair e fechar salas.
+ */
+
+// ===============================
+// 📋 Listar todas as salas
+// ===============================
 export const getSalas = async () => {
   try {
     const response = await api.get("/salas");
@@ -11,7 +18,9 @@ export const getSalas = async () => {
   }
 };
 
-// Buscar sala por ID (Numérico)
+// ===============================
+// 🔍 Buscar sala por ID (Numérico)
+// ===============================
 export const getSalaById = async (id) => {
   if (!id) throw new Error("ID da sala é necessário.");
   try {
@@ -23,7 +32,9 @@ export const getSalaById = async (id) => {
   }
 };
 
-// Criar nova sala
+// ===============================
+// 🏗️ Criar nova sala
+// ===============================
 export const createSala = async (salaData) => {
   if (!salaData) throw new Error("Dados da sala são necessários.");
   try {
@@ -35,7 +46,9 @@ export const createSala = async (salaData) => {
   }
 };
 
-// Entrar em uma sala usando o CÓDIGO (String)
+// ===============================
+// 🚪 Entrar em uma sala usando o CÓDIGO (String)
+// ===============================
 export const entrarNaSala = async (codigoSala, idUsuario) => {
   if (!codigoSala || !idUsuario)
     throw new Error("Código da sala e ID do usuário são necessários.");
@@ -51,7 +64,9 @@ export const entrarNaSala = async (codigoSala, idUsuario) => {
   }
 };
 
-// Busca sala pelo código PIN (String)
+// ===============================
+// 🔑 Buscar sala pelo código PIN (String)
+// ===============================
 export const getSalaByPin = async (pin) => {
   if (!pin) throw new Error("PIN é necessário.");
   try {
@@ -63,7 +78,9 @@ export const getSalaByPin = async (pin) => {
   }
 };
 
-// Fechar/Desmanchar uma sala (dono)
+// ===============================
+// ❌ Fechar/Desmanchar uma sala (somente dono)
+// ===============================
 export const fecharSala = async (idSala) => {
   if (!idSala) throw new Error("ID da sala é necessário para fechar.");
   try {
@@ -75,8 +92,9 @@ export const fecharSala = async (idSala) => {
   }
 };
 
-// --- NOVA FUNÇÃO ADICIONADA ---
-// Sair de uma sala (para participantes)
+// ===============================
+// 🚶‍♂️ Sair de uma sala (para participantes)
+// ===============================
 export const sairDaSala = async (codigoSala, idUsuario) => {
   if (!codigoSala || !idUsuario) {
     throw new Error(
@@ -84,13 +102,14 @@ export const sairDaSala = async (codigoSala, idUsuario) => {
     );
   }
   try {
-    // Chama o endpoint DELETE /salas/{codigoSala}/sair/{idUsuario}
     console.log(
       `salaService: Tentando remover usuário ${idUsuario} da sala ${codigoSala}`
     );
+
     const response = await api.delete(`/salas/${codigoSala}/sair/${idUsuario}`);
-    console.log(`salaService: Resposta da API ao sair:`, response.data);
-    return response.data; // Retorna a mensagem de sucesso do backend
+
+    console.log("salaService: Resposta da API ao sair:", response.data);
+    return response.data; // Mensagem de sucesso do backend
   } catch (error) {
     console.error(
       `Erro ao tentar sair da sala ${codigoSala} para usuário ${idUsuario}:`,
@@ -99,9 +118,10 @@ export const sairDaSala = async (codigoSala, idUsuario) => {
     throw error; // Re-lança para o componente tratar
   }
 };
-// --- FIM DA NOVA FUNÇÃO ---
 
-// Exporta todas as funções
+// ===============================
+// 📦 Exporta todas as funções
+// ===============================
 export default {
   getSalas,
   getSalaById,
@@ -109,5 +129,5 @@ export default {
   entrarNaSala,
   getSalaByPin,
   fecharSala,
-  sairDaSala, // <<< ADICIONADA AO EXPORT
+  sairDaSala,
 };
