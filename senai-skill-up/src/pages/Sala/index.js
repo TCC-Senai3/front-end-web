@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../../components/header";
 import salaService from "../../services/salaService";
@@ -23,10 +23,27 @@ export default function Sala() {
   const stompClientRef = useRef(null);
   const [isConnected, setIsConnected] = useState(false);
 
-  // === 1. Conexão WebSocket ===
+  // --- 1. FUNÇÃO REUTILIZÁVEL PARA BUSCAR DADOS DA SALA ---
+  const carregarSala = useCallback(async (isMountedRef) => {
+    if (!codigo || !user?.id) return;
+    try {
+      const sala = await salaService.getSalaByPin(codigo);
+      if (!isMountedRef.current || !sala) return;
+      setSalaInfo(sala);
+      setIsDonoDaSala(sala.idUsuario === user.id);
+    } catch (err) {
+      console.error("Erro ao carregar sala:", err);
+      if (isMountedRef.current) {
+        setErrorMsg("Falha ao carregar informações da sala.");
+      }
+    }
+  }, [codigo, user?.id]);
+
+
+  // --- 2. Conexão WebSocket ---
   useEffect(() => {
     if (!codigo || !user?.id) return;
-
+    const isMountedRef = { current: true };
     const socketUrl = "https://tccdrakes.azurewebsites.net/ws";
     const client = new Client({
       webSocketFactory: () => new SockJS(socketUrl),
@@ -35,31 +52,24 @@ export default function Sala() {
       heartbeatOutgoing: 4000,
       onConnect: () => {
         setIsConnected(true);
+        console.log("WebSocket Conectado.");
         const topic = `/topic/sala/${codigo}`;
         client.subscribe(topic, (message) => {
           try {
             const payload = JSON.parse(message.body);
+            console.log("Mensagem WS recebida:", payload.type);
             if (payload.type === "JOGO_INICIADO") {
               const { idFormulario, idSala, codigoSala } = payload;
               navigate("/jogo", { state: { idFormulario, idSala, codigoSala } });
             } else if (payload.type === "USUARIO_ENTROU" || payload.type === "USUARIO_SAIU") {
-              carregarUsuarios();
+              console.log("WebSocket: " + payload.type + ". Recarregando dados da sala.");
+              carregarSala(isMountedRef);
             }
-          } catch (e) {
-            console.error("Erro ao processar mensagem WebSocket:", e, message.body);
-          }
+          } catch (e) { console.error("Erro ao processar mensagem WebSocket:", e); }
         });
       },
-      onStompError: (frame) => {
-        console.error("Erro STOMP:", frame.headers["message"], frame.body);
-        setErrorMsg("Erro de comunicação com o servidor.");
-        setIsConnected(false);
-      },
-      onWebSocketError: (error) => {
-        console.error("Erro WebSocket:", error);
-        setErrorMsg("Erro de conexão WebSocket. Tentando reconectar...");
-        setIsConnected(false);
-      },
+      onStompError: (frame) => { console.error("Erro STOMP:", frame.headers["message"]); setIsConnected(false); },
+      onWebSocketError: (error) => { console.error("Erro WebSocket:", error); setIsConnected(false); },
       onDisconnect: () => setIsConnected(false),
     });
 
@@ -67,82 +77,101 @@ export default function Sala() {
     stompClientRef.current = client;
 
     return () => {
+      isMountedRef.current = false;
       if (stompClientRef.current?.active) stompClientRef.current.deactivate();
       setIsConnected(false);
     };
-  }, [codigo, navigate, user?.id]);
+  }, [codigo, navigate, user?.id, carregarSala]);
 
-  // === 2. Carregar informações da sala ===
+  // === 3. POLLING e Carga Inicial ===
   useEffect(() => {
-    if (!codigo || !user?.id) return;
-    let isMounted = true;
-
-    async function carregarSala() {
-      try {
-        const sala = await salaService.getSalaByPin(codigo);
-        if (!isMounted || !sala) return;
-        setSalaInfo(sala);
-        setIsDonoDaSala(sala.idUsuario === user.id);
-      } catch (err) {
-        console.error("Erro ao carregar sala:", err);
-        setErrorMsg("Falha ao carregar informações da sala.");
-      } finally {
-        if (isMounted) setLoading(false);
-      }
+    if (!codigo || !user?.id) {
+      navigate("/game");
+      return;
     }
+    const isMountedRef = { current: true };
 
-    carregarSala();
-    return () => { isMounted = false; };
-  }, [codigo, user?.id]);
+    // Só define loading=true na carga inicial (quando salaInfo é null)
+    if (!salaInfo) {
+      setLoading(true);
+    }
+    carregarSala(isMountedRef);
 
-  // === 3. Carregar usuários (polling) ===
-  async function carregarUsuarios() {
+    const interval = setInterval(() => {
+      carregarSala(isMountedRef); // Polling
+    }, 5000);
+
+    return () => {
+      isMountedRef.current = false;
+      clearInterval(interval);
+    };
+  }, [codigo, user?.id, carregarSala, navigate, salaInfo]); // Adicionado salaInfo
+
+  // === 4. useEffect para ATUALIZAR USUÁRIOS (Sempre que 'salaInfo' mudar) ===
+  useEffect(() => {
     if (!salaInfo) return;
 
-    try {
-      let participantesIds = salaInfo.participantes || salaInfo.idParticipantes || [];
-      if (participantesIds.length === 0) {
-        setUsuarios([]);
-        return;
+    const isMountedRef = { current: true };
+
+    async function carregarUsuarios() {
+      if (!isMountedRef.current) return;
+
+      // Define o loading=true ANTES de começar a buscar os usuários
+      // Isso garante que o estado "Carregando..." apareça se a busca demorar
+      setLoading(true);
+
+      try {
+        let participantesIds = salaInfo.participantes || salaInfo.idParticipantes || [];
+        const currentIds = usuarios.map(u => u.id).sort().join(',');
+        const newIds = [...participantesIds].sort().join(',');
+
+        if (currentIds === newIds) {
+          setLoading(false); // Lista é a mesma, para o loading
+          return;
+        }
+
+        if (participantesIds.length === 0) {
+          setUsuarios([]);
+        } else {
+          const userPromises = participantesIds.map((id) => userService.getUserById(id));
+          const results = await Promise.allSettled(userPromises);
+          if (!isMountedRef.current) return;
+
+          const validUsers = results
+            .filter((r) => r.status === "fulfilled" && r.value?.id)
+            .map((r) => r.value);
+          setUsuarios(validUsers);
+
+          results.filter((r) => r.status === "rejected")
+            .forEach((r) => console.error("Erro ao buscar usuário:", r.reason));
+        }
+      } catch (err) {
+        console.error("Erro ao carregar usuários da sala:", err);
+      } finally {
+        if (isMountedRef.current) setLoading(false); // Para o loading após processar
       }
-
-      const userPromises = participantesIds.map((id) => userService.getUserById(id));
-      const results = await Promise.allSettled(userPromises);
-
-      const validUsers = results
-        .filter((r) => r.status === "fulfilled" && r.value?.id)
-        .map((r) => r.value);
-
-      setUsuarios(validUsers);
-
-      results
-        .filter((r) => r.status === "rejected")
-        .forEach((r) => console.error("Erro ao buscar usuário:", r.reason));
-    } catch (err) {
-      console.error("Erro ao carregar usuários da sala:", err);
-    } finally {
-      setLoading(false);
     }
-  }
 
-  useEffect(() => {
-    if (!codigo) return;
-    carregarUsuarios();
-    const interval = setInterval(carregarUsuarios, 5000);
-    return () => clearInterval(interval);
-  }, [codigo, salaInfo]);
+    carregarUsuarios(); // Chama a função
 
-  // === 4. Botão "Iniciar" ===
+    return () => { isMountedRef.current = false; };
+
+    // *** CORREÇÃO DO LOOP: Removido 'loading' da dependência ***
+  }, [salaInfo]); // <<< Depende APENAS de salaInfo
+
+
+  // === 5. Botão "Iniciar" ===
   const handleIniciar = async () => {
-    if (!salaInfo || !isDonoDaSala || actionLoading || !stompClientRef.current?.active) {
+    if (!salaInfo || !isDonoDaSala || actionLoading || !isConnected) {
       setErrorMsg("Não é possível iniciar. Verifique a conexão ou se você é dono da sala.");
       return;
     }
-
     setActionLoading(true);
     setErrorMsg("");
     try {
-      // Agora enviamos idUsuario no payload
+      if (!stompClientRef.current?.connected) {
+        throw new Error("Cliente STOMP não conectado.");
+      }
       const destination = `/app/sala/${codigo}/iniciar`;
       stompClientRef.current.publish({
         destination,
@@ -156,12 +185,14 @@ export default function Sala() {
     }
   };
 
-  // === 5. Botão "Desmanchar / Sair" ===
+  // === 6. Botão "Desmanchar / Sair" ===
   const handleDesmanchar = async () => {
     if (!salaInfo || !user) return;
+    const confirmMessage = isDonoDaSala ? "Desmanchar esta sala para todos?" : "Sair desta sala?";
+    if (!window.confirm(confirmMessage)) return;
+
     setActionLoading(true);
     setErrorMsg("");
-
     try {
       if (isDonoDaSala) {
         await salaService.fecharSala(salaInfo.idSala);
@@ -171,13 +202,13 @@ export default function Sala() {
       navigate("/game");
     } catch (err) {
       console.error("Erro ao sair/desmanchar sala:", err);
-      setErrorMsg("Erro ao sair da sala.");
-    } finally {
+      const backendError = err.response?.data?.message || err.response?.data;
+      setErrorMsg(`Erro: ${backendError || err.message || "Ação falhou."}`);
       setActionLoading(false);
     }
   };
 
-  // === Renderização ===
+  // === 7. Renderização (JSX Corrigido) ===
   return (
     <>
       <Header />
@@ -191,7 +222,7 @@ export default function Sala() {
             <button
               className="btn btn-danger"
               onClick={handleDesmanchar}
-              disabled={loading || actionLoading}
+              disabled={actionLoading || !salaInfo}
             >
               {isDonoDaSala ? "DESMANCHAR\nSALA" : "SAIR DA\nSALA"}
             </button>
@@ -208,15 +239,18 @@ export default function Sala() {
           </div>
 
           <div className="sala-grid">
-            {loading ? (
+            {/* Lógica de Loading/Vazio Corrigida */}
+            {loading && usuarios.length === 0 ? (
               <div className="sala-mensagem">Carregando...</div>
-            ) : usuarios.length === 0 ? (
+            ) : !loading && usuarios.length === 0 ? (
               <div className="sala-mensagem">Aguardando jogadores...</div>
             ) : (
+              // Se tiver usuários (mesmo que 'loading' esteja true por um refresh)
               usuarios.map((participante) => (
                 <div key={participante.id} className="sala-user">
                   <div
                     className="sala-avatar"
+                    // Corrigido: Removido ' _ ' e '...'
                     style={{
                       backgroundImage: participante.avatar
                         ? `url(${participante.avatar})`
@@ -226,7 +260,9 @@ export default function Sala() {
                   <div
                     className="nome"
                     style={{
-                      fontWeight: participante.id === user.id ? "bold" : "normal",
+                      fontWeight:
+                        // Corrigido: Removido '...'
+                        user && participante.id === user.id ? "bold" : "normal",
                     }}
                   >
                     {participante.nome || "Nome não encontrado"}
