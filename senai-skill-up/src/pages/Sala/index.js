@@ -25,49 +25,28 @@ export default function Sala() {
 
   // === 1. Conexão WebSocket ===
   useEffect(() => {
-    if (!codigo || !user?.id) {
-      console.log("WebSocket: Aguardando código da sala e usuário...");
-      return;
-    }
+    if (!codigo || !user?.id) return;
 
     const socketUrl = "https://tccdrakes.azurewebsites.net/ws";
-    console.log("Sala.js: Configurando conexão WebSocket...");
-    setIsConnected(false);
-
     const client = new Client({
       webSocketFactory: () => new SockJS(socketUrl),
       reconnectDelay: 10000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
       onConnect: (frame) => {
-        console.log("WebSocket Conectado via STOMP:", frame);
         setIsConnected(true);
-        setErrorMsg("");
-
         const topic = `/topic/sala/${codigo}`;
-        console.log(`Inscrevendo-se em ${topic}`);
         client.subscribe(topic, (message) => {
           try {
             const payload = JSON.parse(message.body);
-            console.log(`Mensagem recebida em ${topic}:`, payload);
-
             if (payload.type === "JOGO_INICIADO") {
               const { idFormulario, idSala, codigoSala } = payload;
-              navigate("/jogo", {
-                state: { idFormulario, idSala, codigoSala },
-              });
-            } else if (
-              payload.type === "USUARIO_ENTROU" ||
-              payload.type === "USUARIO_SAIU"
-            ) {
+              navigate("/jogo", { state: { idFormulario, idSala, codigoSala } });
+            } else if (payload.type === "USUARIO_ENTROU" || payload.type === "USUARIO_SAIU") {
               carregarUsuarios();
             }
           } catch (e) {
-            console.error(
-              "Erro ao processar mensagem WebSocket:",
-              e,
-              message.body
-            );
+            console.error("Erro ao processar mensagem WebSocket:", e, message.body);
           }
         });
       },
@@ -81,56 +60,74 @@ export default function Sala() {
         setErrorMsg("Erro de conexão WebSocket. Tentando reconectar...");
         setIsConnected(false);
       },
-      onDisconnect: () => {
-        console.log("WebSocket Desconectado");
-        setIsConnected(false);
-      },
+      onDisconnect: () => setIsConnected(false),
     });
 
-    console.log("Ativando cliente WebSocket...");
     client.activate();
     stompClientRef.current = client;
 
     return () => {
-      console.log("Sala.js: Limpeza - Desativando cliente WebSocket...");
+      if (stompClientRef.current?.active) stompClientRef.current.deactivate();
       setIsConnected(false);
-      if (stompClientRef.current && stompClientRef.current.active) {
-        stompClientRef.current.deactivate();
-        console.log("Cliente WebSocket desativado.");
-      }
     };
-  }, [codigo, user?.id, navigate]);
+  }, [codigo, navigate]);
 
   // === 2. Carregar informações da sala ===
   useEffect(() => {
     if (!codigo || !user?.id) return;
 
+    let isMounted = true;
+
     async function carregarSala() {
       try {
         const sala = await salaService.getSalaByPin(codigo);
-        console.log("Sala carregada:", sala);
+        if (!isMounted || !sala) return;
         setSalaInfo(sala);
         setIsDonoDaSala(sala.idUsuario === user.id);
       } catch (err) {
         console.error("Erro ao carregar sala:", err);
         setErrorMsg("Falha ao carregar informações da sala.");
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     }
 
     carregarSala();
+    return () => { isMounted = false; };
   }, [codigo, user?.id]);
 
-  // === 3. Buscar usuários periodicamente ===
+  // === 3. Carregar usuários (polling pelo IDs de participantes) ===
   async function carregarUsuarios() {
-    if (!codigo) return;
+    if (!salaInfo) return;
+
     try {
-      const response = await userService.listarUsuariosPorSala(codigo);
-      console.log("Usuários da sala:", response);
-      setUsuarios(response);
+      let participantesIds = [];
+      if (Array.isArray(salaInfo.idParticipantes)) {
+        participantesIds = salaInfo.idParticipantes;
+      } else if (Array.isArray(salaInfo.participantes)) {
+        participantesIds = salaInfo.participantes;
+      }
+
+      if (participantesIds.length === 0) {
+        setUsuarios([]);
+        return;
+      }
+
+      const userPromises = participantesIds.map((id) => userService.getUserById(id));
+      const results = await Promise.allSettled(userPromises);
+
+      const validUsers = results
+        .filter((r) => r.status === "fulfilled" && r.value?.id)
+        .map((r) => r.value);
+
+      setUsuarios(validUsers);
+
+      results
+        .filter((r) => r.status === "rejected")
+        .forEach((r) => console.error("Erro ao buscar usuário:", r.reason));
+
     } catch (err) {
-      console.error("Erro ao buscar usuários:", err);
+      console.error("Erro ao carregar usuários da sala:", err);
     } finally {
       setLoading(false);
     }
@@ -139,56 +136,44 @@ export default function Sala() {
   useEffect(() => {
     if (!codigo) return;
     carregarUsuarios();
-
     const interval = setInterval(carregarUsuarios, 5000);
     return () => clearInterval(interval);
-  }, [codigo]);
+  }, [codigo, salaInfo]);
 
   // === 4. Botão "Iniciar" ===
   const handleIniciar = async () => {
-    if (!salaInfo || !isDonoDaSala || actionLoading || !isConnected) {
-      const motivoErro = !isConnected
-        ? "Não conectado ao servidor."
-        : "Faltam dados ou não é o dono.";
-      console.error("Não pode iniciar o jogo:", motivoErro);
-      setErrorMsg(`Não é possível iniciar. ${motivoErro}`);
+    if (!salaInfo || !isDonoDaSala || actionLoading || !stompClientRef.current?.active) {
+      setErrorMsg("Não é possível iniciar. Verifique a conexão ou se você é dono da sala.");
       return;
     }
 
     setActionLoading(true);
     setErrorMsg("");
-
     try {
       const destination = `/app/sala/${codigo}/iniciar`;
-      console.log(`Publicando mensagem 'iniciar' para ${destination}`);
-
-      if (!stompClientRef.current?.connected) {
-        throw new Error("Não conectado ao STOMP. Aguarde a conexão.");
-      }
-
       stompClientRef.current.publish({ destination });
-    } catch (error) {
-      console.error("Erro ao publicar mensagem 'iniciar':", error);
-      setErrorMsg(error.message || "Falha ao enviar comando de início.");
+    } catch (err) {
+      console.error("Erro ao publicar mensagem 'iniciar':", err);
+      setErrorMsg("Falha ao enviar comando de início.");
       setActionLoading(false);
     }
   };
 
   // === 5. Botão "Desmanchar / Sair" ===
   const handleDesmanchar = async () => {
-    if (!salaInfo) return;
+    if (!salaInfo || !user) return;
     setActionLoading(true);
+    setErrorMsg("");
+
     try {
       if (isDonoDaSala) {
-        // 🔧 ALTERADO: agora usa fecharSala (compatível com salaService.js)
         await salaService.fecharSala(salaInfo.idSala);
       } else {
-        // 🔧 ALTERADO: parâmetros na ordem correta (codigo, idUsuario)
         await salaService.sairDaSala(codigo, user.id);
       }
       navigate("/home");
     } catch (err) {
-      console.error("Erro ao sair da sala:", err);
+      console.error("Erro ao sair/desmanchar sala:", err);
       setErrorMsg("Erro ao sair da sala.");
     } finally {
       setActionLoading(false);
@@ -218,12 +203,7 @@ export default function Sala() {
               <button
                 className="btn btn-warning"
                 onClick={handleIniciar}
-                disabled={
-                  loading ||
-                  actionLoading ||
-                  !isConnected ||
-                  usuarios.length < 1
-                }
+                disabled={loading || actionLoading || usuarios.length < 1 || !isConnected}
               >
                 INICIAR
               </button>
