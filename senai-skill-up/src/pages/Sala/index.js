@@ -168,7 +168,7 @@ export default function Sala() {
       } else {
         await salaService.sairDaSala(codigo, user.id);
       }
-      navigate("/home");
+      navigate("/game");
     } catch (err) {
       console.error("Erro ao sair/desmanchar sala:", err);
       setErrorMsg("Erro ao sair da sala.");
