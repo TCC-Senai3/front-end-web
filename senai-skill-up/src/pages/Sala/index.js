@@ -34,7 +34,7 @@ export default function Sala() {
       return; // Sai se não tiver código ou usuário ainda
     }
 
-    const socketUrl = "http://localhost:8080/ws";
+    const socketUrl = "https://tccdrakes.azurewebsites.net/ws";
     console.log("Sala.js: Configurando conexão WebSocket...");
     setIsConnected(false); // Garante que começa como desconectado a cada tentativa
 
