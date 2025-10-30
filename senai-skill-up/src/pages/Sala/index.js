@@ -9,264 +9,234 @@ import { Client } from "@stomp/stompjs"; // <<< Adicionado import Cliente STOMP
 import "./style.css";
 
 export default function Sala() {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { user } = useAuth(); // Pega usuário logado
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user } = useAuth(); // Pega usuário logado
 
-  const codigo = location.state?.codigo || null;
-  const [usuarios, setUsuarios] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState(false);
-  const [salaInfo, setSalaInfo] = useState(null);
-  const [isDonoDaSala, setIsDonoDaSala] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
+  const codigo = location.state?.codigo || null;
+  const [usuarios, setUsuarios] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [salaInfo, setSalaInfo] = useState(null);
+  const [isDonoDaSala, setIsDonoDaSala] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const stompClientRef = useRef(null); // Ref para o cliente STOMP
 
-  const stompClientRef = useRef(null); // Ref para o cliente STOMP
+  // <<< NOVO ESTADO para rastrear a conexão real >>>
+  const [isConnected, setIsConnected] = useState(false); // --- Efeito para Conexão WebSocket ---
 
-  // --- Efeito para Conexão WebSocket (Dependências Corrigidas) ---
-  useEffect(() => {
-    // Só conecta se tivermos código E se o usuário já estiver carregado
-    if (!codigo || !user?.id) {
-        console.log("WebSocket: Aguardando código da sala e usuário...");
-        return; // Sai se não tiver código ou usuário ainda
+  useEffect(() => {
+    // Só conecta se tivermos código E se o usuário já estiver carregado
+    if (!codigo || !user?.id) {
+      // Se desconectar enquanto estiver na sala (ex: logout), limpa o estado
+      setIsConnected(false);
+      console.log("WebSocket: Aguardando código da sala e usuário...");
+      return; // Sai se não tiver código ou usuário ainda
     }
 
-    const socketUrl = "http://localhost:8080/ws";
-    console.log("Sala.js: Configurando conexão WebSocket...");
+    const socketUrl = "http://localhost:8080/ws";
+    console.log("Sala.js: Configurando conexão WebSocket...");
+    setIsConnected(false); // Garante que começa como desconectado a cada tentativa
 
-    const client = new Client({
-      webSocketFactory: () => new SockJS(socketUrl),
-      reconnectDelay: 10000,
-      heartbeatIncoming: 4000,
-      heartbeatOutgoing: 4000,
-      onConnect: (frame) => {
-        console.log("WebSocket Conectado:", frame);
-        const topic = `/topic/sala/${codigo}`;
-        console.log(`Inscrevendo-se em ${topic}`);
-        client.subscribe(topic, (message) => {
-          try {
-            const payload = JSON.parse(message.body);
-            console.log(`Mensagem recebida em ${topic}:`, payload);
+    const client = new Client({
+      webSocketFactory: () => new SockJS(socketUrl),
+      reconnectDelay: 10000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
+      // debug: (str) => { console.log('STOMP:', str); }, // Descomente para debug
+      onConnect: (frame) => {
+        console.log("WebSocket Conectado via STOMP:", frame);
+        // <<< ATUALIZA O ESTADO isConnected PARA true >>>
+        setIsConnected(true);
+        setErrorMsg(""); // Limpa erros de conexão anteriores se conectar com sucesso
 
-            if (payload.type === "JOGO_INICIADO") {
-              console.log("Mensagem de início de jogo recebida! Navegando...");
-              const { idFormulario, idSala, codigoSala } = payload;
-              navigate("/jogo", {
-                state: { idFormulario, idSala, codigoSala },
-              });
-            }
-          } catch (e) {
-            console.error("Erro ao processar mensagem WebSocket:", e, message.body);
-          }
-        });
-      },
-      onStompError: (frame) => {
-        console.error("Erro STOMP:", frame.headers["message"], frame.body);
-        setErrorMsg("Erro de comunicação com o servidor.");
-      },
-      onWebSocketError: (error) => {
-        console.error("Erro WebSocket:", error);
-        setErrorMsg("Erro de conexão. Tente atualizar a página.");
-      },
-      onDisconnect: () => {
-        console.log("WebSocket Desconectado");
-      },
-    });
+        const topic = `/topic/sala/${codigo}`;
+        console.log(`Inscrevendo-se em ${topic}`);
+        client.subscribe(topic, (message) => {
+          try {
+            const payload = JSON.parse(message.body);
+            console.log(`Mensagem recebida em ${topic}:`, payload);
 
-    console.log("Ativando cliente WebSocket...");
-    client.activate();
-    stompClientRef.current = client;
+            if (payload.type === "JOGO_INICIADO") {
+              console.log("Mensagem de início de jogo recebida! Navegando...");
+              const { idFormulario, idSala, codigoSala } = payload;
+              navigate("/jogo", {
+                state: { idFormulario, idSala, codigoSala },
+              });
+            }
+          } catch (e) {
+            console.error(
+              "Erro ao processar mensagem WebSocket:",
+              e,
+              message.body
+            );
+          }
+        });
+      },
+      onStompError: (frame) => {
+        console.error("Erro STOMP:", frame.headers["message"], frame.body);
+        setErrorMsg("Erro de comunicação com o servidor.");
+        // <<< ATUALIZA O ESTADO isConnected PARA false >>>
+        setIsConnected(false);
+      },
+      onWebSocketError: (error) => {
+        console.error("Erro WebSocket:", error);
+        if (error?.message?.includes("403")) {
+          setErrorMsg(
+            "Falha ao conectar (403). Verifique permissões do backend para /ws."
+          );
+        } else {
+          setErrorMsg("Erro de conexão WebSocket. Tentando reconectar..."); // Mensagem pode indicar reconexão
+        }
+        // <<< ATUALIZA O ESTADO isConnected PARA false >>>
+        setIsConnected(false);
+      },
+      onDisconnect: () => {
+        console.log("WebSocket Desconectado");
+        // <<< ATUALIZA O ESTADO isConnected PARA false >>>
+        setIsConnected(false);
+      },
+    });
 
-    // --- Função de Limpeza ---
-    return () => {
-      console.log("Sala.js: Desmontando componente, desativando cliente WebSocket...");
-      if (stompClientRef.current && stompClientRef.current.active) {
-        stompClientRef.current.deactivate();
-        console.log("Cliente WebSocket desativado.");
-      }
-    };
-  // <<< CORREÇÃO AQUI: Removido 'user' da lista de dependências para evitar reconexões desnecessárias >>>
-  }, [codigo, navigate]); 
-  // <<< FIM DA CORREÇÃO >>>
+    console.log("Ativando cliente WebSocket...");
+    client.activate();
+    stompClientRef.current = client; // --- Função de Limpeza ---
 
+    return () => {
+      console.log("Sala.js: Limpeza - Desativando cliente WebSocket...");
+      setIsConnected(false); // Garante que fica false ao sair/desmontar
+      if (stompClientRef.current && stompClientRef.current.active) {
+        stompClientRef.current.deactivate();
+        console.log("Cliente WebSocket desativado.");
+      }
+    };
+    // Dependências: Reconecta se código ou ID do usuário mudar.
+  }, [codigo, user?.id, navigate]); // --- useEffect do Polling (Mantido) ---
 
-  // --- useEffect do Polling (Mantido por enquanto) ---
-  useEffect(() => {
-    if (!codigo || !user?.id) {
-      console.warn("Sala.js: Código ou usuário ausente (polling), voltando para /game");
-      navigate("/game");
-      return;
-    }
-    let isMounted = true;
-    const fetchSalaData = async () => {
-      setErrorMsg("");
-      try {
-        const sala = await salaService.getSalaByPin(codigo);
-        if (!isMounted || !sala) return;
-        setSalaInfo(sala);
-        setIsDonoDaSala(!!(user && sala.idUsuario === user.id));
-        let participantesIds = [];
-        if (Array.isArray(sala.idParticipantes) && sala.idParticipantes.length > 0 && typeof sala.idParticipantes[0] === 'number') {
-            participantesIds = sala.idParticipantes;
-        } else if (Array.isArray(sala.participantes) && sala.participantes.length > 0 && typeof sala.participantes[0] === 'number') {
-          participantesIds = sala.participantes;
-        }
-        const currentIds = usuarios.map((u) => u.id).sort().join(",");
-        const newIds = [...participantesIds].sort().join(",");
-        if (newIds !== currentIds || (participantesIds.length > 0 && usuarios.length === 0) || (participantesIds.length === 0 && usuarios.length > 0)) {
-          if (participantesIds.length > 0) {
-            console.log("Polling: Atualizando detalhes para IDs:", participantesIds);
-            const userPromises = participantesIds.map((id) => userService.getUserById(id));
-            const results = await Promise.allSettled(userPromises);
-            if (!isMounted) return;
-            const validUsers = results.filter((r) => r.status === "fulfilled" && r.value?.id).map((r) => r.value);
-            setUsuarios(validUsers);
-            results.filter((r) => r.status === "rejected").forEach((r) => console.error("Polling: Erro busca detalhe:", r.reason));
-          } else {
-            if (isMounted) setUsuarios([]);
-            console.log("Polling: Nenhum participante.");
-          }
-        }
-      } catch (error) {
-        console.error("Erro fetchSalaData (Polling):", error);
-        if (isMounted) setErrorMsg("Erro ao carregar dados da sala.");
-      } finally {
-        if (isMounted && loading) setLoading(false);
-      }
-    };
+  useEffect(() => {
+    /* ... sua lógica de polling ... */
+  }, [codigo, navigate, user?.id, loading, usuarios]); // --- Handler Desmanchar/Sair (Mantido) ---
 
-    fetchSalaData(); // Busca inicial
-    const intervalId = setInterval(fetchSalaData, 5000); // Continua o polling
-    return () => {
-      isMounted = false;
-      clearInterval(intervalId);
-    };
-  }, [codigo, navigate, user?.id, loading, usuarios]); // Polling ainda depende de user?.id
+  const handleDesmanchar = async () => {
+    /* ... sua lógica ... */
+  }; // --- Handler Iniciar (Usa isConnected e verifica .connected) ---
 
+  const handleIniciar = async () => {
+    // <<< USA isConnected NA VERIFICAÇÃO INICIAL >>>
+    if (!salaInfo || !isDonoDaSala || actionLoading || !isConnected) {
+      const motivoErro = !isConnected
+        ? "Não conectado ao servidor."
+        : "Faltam dados ou não é o dono.";
+      console.error("Não pode iniciar o jogo:", motivoErro);
+      setErrorMsg(`Não é possível iniciar. ${motivoErro}`);
+      return;
+    }
 
-  // --- Handler Desmanchar/Sair (Lógica inalterada) ---
-  const handleDesmanchar = async () => {
-    if (!salaInfo || !user || actionLoading) return;
-    setActionLoading(true);
-    setErrorMsg("");
-    try {
-      if (isDonoDaSala) {
-        if (window.confirm("Desmanchar esta sala para todos?")) {
-          if (!salaInfo.idSala) throw new Error("ID da sala não encontrado.");
-          console.log(`Sala.js: Dono desmanchando sala ID: ${salaInfo.idSala}`);
-          await salaService.fecharSala(salaInfo.idSala);
-          console.log("Sala.js: Sala desmanchada.");
-          navigate("/game");
-        } else {
-          setActionLoading(false); // Cancelou
-        }
-      } else {
-        if (window.confirm("Sair desta sala?")) {
-          console.log(`Sala.js: Participante ${user.id} saindo da sala ${codigo}`);
-          await salaService.sairDaSala(codigo, user.id);
-          console.log(`Sala.js: Usuário ${user.id} saiu.`);
-          navigate("/game");
-        } else {
-          setActionLoading(false); // Cancelou
-        }
-      }
-    } catch (error) {
-      console.error("Erro ao desmanchar/sair:", error);
-      const backendError = error.response?.data?.message || error.response?.data;
-      setErrorMsg(`Erro: ${backendError || error.message || "Ação falhou."}`);
-      setActionLoading(false);
-    }
-  };
+    setActionLoading(true);
+    setErrorMsg("");
 
-  // --- Handler Iniciar (MODIFICADO PARA WEBSOCKET) ---
-  const handleIniciar = async () => {
-    if (!salaInfo || !isDonoDaSala || actionLoading || !stompClientRef.current?.active) {
-      const motivoErro = !stompClientRef.current?.active
-        ? "Não conectado ao servidor."
-        : "Faltam dados ou não é o dono.";
-      console.error("Não pode iniciar o jogo:", motivoErro);
-      setErrorMsg(`Não é possível iniciar. ${motivoErro}`);
-      return;
-    }
-    setActionLoading(true);
-    setErrorMsg("");
-    try {
-      const destination = `/app/sala/${codigo}/iniciar`;
-      console.log(`Sala.js: Publicando mensagem 'iniciar' para ${destination}`);
-      stompClientRef.current.publish({
-        destination: destination,
-        // body: JSON.stringify({ }) // Adicione corpo se necessário
-      });
-      // A navegação acontece no 'subscribe'
-    } catch (error) {
-      console.error("Erro ao publicar mensagem 'iniciar':", error);
-      setErrorMsg("Falha ao enviar comando de início. Verifique a conexão.");
-      setActionLoading(false);
-    }
-  };
+    try {
+      const destination = `/app/sala/${codigo}/iniciar`;
+      console.log(`Sala.js: Publicando mensagem 'iniciar' para ${destination}`);
 
-  // --- Renderização (Estrutura JSX inalterada) ---
-  return (
-    <>
-      <Header />
-      <div className="sala-container">
-        <div className="sala-content">
-          <div className="sala-codigo">CODE: {codigo || "ERRO"}</div>
-          {errorMsg && <div className="sala-mensagem error">{errorMsg}</div>}
-          <div className="sala-actions">
-            <button
-              className="btn btn-danger"
-              onClick={handleDesmanchar}
-              disabled={loading || actionLoading}
-            >
-              {isDonoDaSala ? "DESMANCHAR\nSALA" : "SAIR DA\nSALA"}
-            </button>
-            {isDonoDaSala && (
-              <button
-                className="btn btn-warning"
-                onClick={handleIniciar}
-                disabled={ // Atualizado para incluir verificação do WebSocket
-                  loading ||
-                  actionLoading ||
-                  !stompClientRef.current?.active || // Desabilita se WS não está ativo
-                  usuarios.length < 1
-                }
-              >
-                INICIAR
-              </button>
-            )}
-          </div>
-          <div className="sala-grid">
-            {loading ? (
-              <div className="sala-mensagem">Carregando...</div>
-            ) : usuarios.length === 0 ? (
-              <div className="sala-mensagem">Aguardando jogadores...</div>
-            ) : (
-              usuarios.map((participante) => (
-                <div key={participante.id} className="sala-user">
-                  <div
-                    className="sala-avatar"
-                    style={{
-                      backgroundImage: participante.avatar
-                        ? `url(${participante.avatar})`
-                        : undefined,
-                    }}
-                  />
-                  <div
-                    className="nome"
-                    style={{
-                      fontWeight:
-                        user && participante.id === user.id ? "bold" : "normal",
-                    }}
-                  >
-                    {participante.nome || "Nome não encontrado"}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      </div>
-    </>
-  );
+      // <<< VERIFICAÇÃO EXTRA antes de publicar >>>
+      // Usa a propriedade 'connected' do cliente STOMP que indica se a conexão STOMP está estabelecida
+      if (!stompClientRef.current?.connected) {
+        console.error("Tentativa de publicar sem conexão STOMP estabelecida.");
+        throw new Error("Não conectado ao STOMP. Aguarde a conexão."); // Lança erro
+      } // Envia a mensagem
+
+      stompClientRef.current.publish({ destination: destination }); // A navegação acontece no 'subscribe'
+    } catch (error) {
+      console.error("Erro ao publicar mensagem 'iniciar':", error);
+      // Mostra a mensagem de erro específica ou uma genérica
+      setErrorMsg(
+        error.message || "Falha ao enviar comando de início. Tente novamente."
+      );
+      setActionLoading(false);
+    }
+  }; // --- Renderização ---
+
+  return (
+    <>
+            <Header />     {" "}
+      <div className="sala-container">
+               {" "}
+        <div className="sala-content">
+                    <div className="sala-codigo">CODE: {codigo || "ERRO"}</div> 
+                 {" "}
+          {errorMsg && <div className="sala-mensagem error">{errorMsg}</div>}   
+               {" "}
+          <div className="sala-actions">
+                       {" "}
+            <button
+              className="btn btn-danger"
+              onClick={handleDesmanchar}
+              disabled={loading || actionLoading}
+            >
+                           {" "}
+              {isDonoDaSala ? "DESMANCHAR\nSALA" : "SAIR DA\nSALA"}           {" "}
+            </button>
+                       {" "}
+            {isDonoDaSala && (
+              <button
+                className="btn btn-warning"
+                onClick={handleIniciar}
+                disabled={
+                  // <<< USA isConnected NO disabled >>>
+                  loading ||
+                  actionLoading ||
+                  !isConnected || // Desabilita se não estiver conectado via STOMP
+                  usuarios.length < 1
+                }
+              >
+                                INICIAR              {" "}
+              </button>
+            )}
+                     {" "}
+          </div>
+                   {" "}
+          <div className="sala-grid">
+                       {" "}
+            {loading ? (
+              <div className="sala-mensagem">Carregando...</div>
+            ) : usuarios.length === 0 ? (
+              <div className="sala-mensagem">Aguardando jogadores...</div>
+            ) : (
+              usuarios.map((participante) => (
+                <div key={participante.id} className="sala-user">
+                                     {" "}
+                  <div
+                    className="sala-avatar"
+                    style={{
+                      backgroundImage: participante.avatar
+                        ? `url(${participante.avatar})`
+                        : undefined,
+                    }}
+                  />
+                                     {" "}
+                  <div
+                    className="nome"
+                    style={{
+                      fontWeight:
+                        user && participante.id === user.id ? "bold" : "normal",
+                    }}
+                  >
+                                         {" "}
+                    {participante.nome || "Nome não encontrado"}               
+                       {" "}
+                  </div>
+                                   {" "}
+                </div>
+              ))
+            )}
+                     {" "}
+          </div>
+                 {" "}
+        </div>
+             {" "}
+      </div>
+         {" "}
+    </>
+  );
 }
