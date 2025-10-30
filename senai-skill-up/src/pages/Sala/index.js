@@ -33,7 +33,7 @@ export default function Sala() {
       reconnectDelay: 10000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
-      onConnect: (frame) => {
+      onConnect: () => {
         setIsConnected(true);
         const topic = `/topic/sala/${codigo}`;
         client.subscribe(topic, (message) => {
@@ -70,12 +70,11 @@ export default function Sala() {
       if (stompClientRef.current?.active) stompClientRef.current.deactivate();
       setIsConnected(false);
     };
-  }, [codigo, navigate]);
+  }, [codigo, navigate, user?.id]);
 
   // === 2. Carregar informações da sala ===
   useEffect(() => {
     if (!codigo || !user?.id) return;
-
     let isMounted = true;
 
     async function carregarSala() {
@@ -96,18 +95,12 @@ export default function Sala() {
     return () => { isMounted = false; };
   }, [codigo, user?.id]);
 
-  // === 3. Carregar usuários (polling pelo IDs de participantes) ===
+  // === 3. Carregar usuários (polling) ===
   async function carregarUsuarios() {
     if (!salaInfo) return;
 
     try {
-      let participantesIds = [];
-      if (Array.isArray(salaInfo.idParticipantes)) {
-        participantesIds = salaInfo.idParticipantes;
-      } else if (Array.isArray(salaInfo.participantes)) {
-        participantesIds = salaInfo.participantes;
-      }
-
+      let participantesIds = salaInfo.participantes || salaInfo.idParticipantes || [];
       if (participantesIds.length === 0) {
         setUsuarios([]);
         return;
@@ -125,7 +118,6 @@ export default function Sala() {
       results
         .filter((r) => r.status === "rejected")
         .forEach((r) => console.error("Erro ao buscar usuário:", r.reason));
-
     } catch (err) {
       console.error("Erro ao carregar usuários da sala:", err);
     } finally {
@@ -150,11 +142,16 @@ export default function Sala() {
     setActionLoading(true);
     setErrorMsg("");
     try {
+      // Agora enviamos idUsuario no payload
       const destination = `/app/sala/${codigo}/iniciar`;
-      stompClientRef.current.publish({ destination });
+      stompClientRef.current.publish({
+        destination,
+        body: JSON.stringify({ idUsuario: user.id }),
+      });
     } catch (err) {
       console.error("Erro ao publicar mensagem 'iniciar':", err);
       setErrorMsg("Falha ao enviar comando de início.");
+    } finally {
       setActionLoading(false);
     }
   };
@@ -229,8 +226,7 @@ export default function Sala() {
                   <div
                     className="nome"
                     style={{
-                      fontWeight:
-                        user && participante.id === user.id ? "bold" : "normal",
+                      fontWeight: participante.id === user.id ? "bold" : "normal",
                     }}
                   >
                     {participante.nome || "Nome não encontrado"}
