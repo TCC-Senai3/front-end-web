@@ -1,50 +1,116 @@
 import api from "./api";
 
 /**
- * Retorna todos os usuários cadastrados.
+ * Lista todas as salas.
  */
-export const listarUsuarios = async () => {
+export const getSalas = async () => {
   try {
-    const response = await api.get("/usuarios");
+    const response = await api.get("/salas");
     return response.data;
   } catch (error) {
-    console.error("Erro ao listar usuários:", error);
+    console.error("Erro ao listar salas:", error);
     throw error;
   }
 };
 
 /**
- * Busca um usuário pelo ID.
- * Retorna null se o usuário não for encontrado.
+ * Busca sala por ID.
  */
-export const getUserById = async (id) => {
-  if (!id) throw new Error("ID do usuário é necessário.");
+export const getSalaById = async (id) => {
+  if (!id) throw new Error("ID da sala é necessário.");
   try {
-    const response = await api.get(`/usuarios/${id}`);
+    const response = await api.get(`/salas/${id}`);
     return response.data;
   } catch (error) {
-    console.warn(`Usuário com ID ${id} não encontrado:`, error.response?.status);
-    return null; // Retorna null em vez de lançar para não quebrar o polling
+    console.error(`Erro ao buscar sala com ID ${id}:`, error);
+    throw error;
   }
 };
 
 /**
- * Lista usuários de uma sala pelo código da sala.
- * Pode ser usado em implementações futuras, mas não é obrigatório.
+ * Busca sala pelo PIN/código.
  */
-export const listarUsuariosPorSala = async (codigoSala) => {
-  if (!codigoSala) throw new Error("Código da sala é necessário.");
+export const getSalaByPin = async (pin) => {
+  if (!pin) throw new Error("PIN é necessário.");
   try {
-    const response = await api.get(`/salas/${codigoSala}/usuarios`);
+    const response = await api.get(`/salas/codigo/${pin}`);
     return response.data;
   } catch (error) {
-    console.error(`Erro ao listar usuários da sala ${codigoSala}:`, error);
+    console.error(`Erro ao buscar sala com PIN ${pin}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Cria uma nova sala.
+ */
+export const createSala = async (salaData) => {
+  if (!salaData) throw new Error("Dados da sala são necessários.");
+  try {
+    const response = await api.post("/salas", salaData);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao criar sala:", error);
+    throw error;
+  }
+};
+
+/**
+ * Entrar em uma sala pelo código.
+ */
+export const entrarNaSala = async (codigoSala, idUsuario) => {
+  if (!codigoSala || !idUsuario)
+    throw new Error("Código da sala e ID do usuário são necessários.");
+  try {
+    const response = await api.post(`/salas/${codigoSala}/entrar/${idUsuario}`);
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Erro ao entrar na sala ${codigoSala} para usuário ${idUsuario}:`,
+      error
+    );
+    throw error;
+  }
+};
+
+/**
+ * Sair da sala.
+ */
+export const sairDaSala = async (codigoSala, idUsuario) => {
+  if (!codigoSala || !idUsuario)
+    throw new Error("Código da sala e ID do usuário são necessários para sair.");
+  try {
+    const response = await api.delete(`/salas/${codigoSala}/sair/${idUsuario}`);
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Erro ao tentar sair da sala ${codigoSala} para usuário ${idUsuario}:`,
+      error
+    );
+    throw error;
+  }
+};
+
+/**
+ * Fechar sala (apenas dono).
+ */
+export const fecharSala = async (idSala) => {
+  if (!idSala) throw new Error("ID da sala é necessário para fechar.");
+  try {
+    const response = await api.put(`/salas/${idSala}/fechar`);
+    return response.data;
+  } catch (error) {
+    console.error(`Erro ao fechar sala com ID ${idSala}:`, error);
     throw error;
   }
 };
 
 export default {
-  listarUsuarios,
-  getUserById,
-  listarUsuariosPorSala,
+  getSalas,
+  getSalaById,
+  getSalaByPin,
+  createSala,
+  entrarNaSala,
+  sairDaSala,
+  fecharSala,
 };
