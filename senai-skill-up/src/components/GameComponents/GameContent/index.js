@@ -1,125 +1,144 @@
-import React, { useState } from 'react';
-// 1. Importe useLocation
-import { useLocation, useNavigate } from 'react-router-dom'; 
-import { useAuth } from '../../../hooks/useAuth';
-import salaService from '../../../services/salaService';
-// Importe seu CSS aqui (ex: './style.css')
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import RankingSection from '../RankingSection';
+import QuizSection from '../QuizSection';
+import { getRankingGlobal } from '../../../services/rankingService';
+import "./style.css";
 
-// Este é o componente que está na rota "/jogo" (sua tela de Criar Sala)
-export default function Game() { 
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  
-  // 2. Use o hook useLocation para ler o 'state'
-  const location = useLocation(); 
+export default function GameContent() {
+    const [ranking, setRanking] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [currentSlide, setCurrentSlide] = useState(0);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    const navigate = useNavigate();
 
-  const [pin, setPin] = useState(""); 
-  const [loading, setLoading] = useState(false);
+    // Atualiza o estado de isMobile quando a janela for redimensionada
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
 
-  // 3. Leia os dados do "state" que o GameContent enviou
-  // O nome 'quizSelecionado' deve ser o mesmo usado no 'navigate'
-  const quizPreSelecionado = location.state?.quizSelecionado;
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
-  // Função para CRIAR sala
-  const handleCriarSala = async () => {
-    if (!user) {
-      alert("Você precisa estar logado para criar uma sala.");
-      return;
+    // Carregar dados do ranking
+    useEffect(() => {
+        const loadRankingData = async () => {
+            try {
+                setLoading(true);
+                
+                // Carregar ranking
+                const rankingResponse = await getRankingGlobal();
+                if (rankingResponse.success) {
+                    setRanking(rankingResponse.data);
+                }
+
+            } catch (error) {
+                console.error("Erro ao carregar ranking:", error);
+                setRanking([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        // Removido verificação de autenticação para permitir acesso livre
+
+        loadRankingData();
+
+        // Recarregar dados periodicamente (opcional)
+        const interval = setInterval(loadRankingData, 30000); // A cada 30 segundos
+        return () => clearInterval(interval);
+    }, [navigate]);
+
+    const handleQuizSelect = (questionario) => {
+        // Navegar para a página do jogo/quiz com o tema selecionado
+        navigate('/criarsala', { state: { quizSelecionado: questionario } });
+    };
+
+    const nextSlide = () => {
+        setCurrentSlide(prev => {
+            const next = prev + 1;
+            return next > 1 ? 0 : next;
+        });
+    };
+
+    const prevSlide = () => {
+        setCurrentSlide(prev => {
+            const next = prev - 1;
+            return next < 0 ? 1 : next;
+        });
+    };
+    
+    // Verifica se as setas devem estar desabilitadas
+    const isFirstSlide = currentSlide === 0;
+    const isLastSlide = currentSlide === 1;
+
+    // Estilo para o container dos slides
+    const slideContainerStyle = {
+        display: 'flex',
+        transition: 'transform 0.5s ease-in-out',
+        transform: `translateX(${-currentSlide * 100}%)`,
+        width: '200%',
+    };
+
+    const renderDesktopView = () => (
+        <div className="game-content-wrapper">
+            <RankingSection />
+            <QuizSection onQuizSelect={handleQuizSelect} />
+        </div>
+    );
+
+    const renderMobileView = () => (
+        <div className="mobile-tabs-container">
+            {/* Botões de Tab */}
+            <div className="tabs-buttons">
+                <button 
+                    className={`tab-button ${currentSlide === 0 ? 'active' : ''}`}
+                    onClick={() => setCurrentSlide(0)}
+                >
+                    Ranking
+                </button>
+                <button 
+                    className={`tab-button ${currentSlide === 1 ? 'active' : ''}`}
+                    onClick={() => setCurrentSlide(1)}
+                >
+                    Questionário
+                </button>
+            </div>
+            
+            {/* Conteúdo das seções */}
+            <div className="tabs-content">
+                <div className="slides-container" style={slideContainerStyle}>
+                    {/* Card Ranking */}
+                    <div className="mobile-slide">
+                        <RankingSection />
+                    </div>
+
+                    {/* Card Quiz */}
+                    <div className="mobile-slide">
+                        <QuizSection onQuizSelect={handleQuizSelect} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+
+    if (loading) {
+        return (
+            <div className="game-content-wrapper">
+                <div style={{ padding: '20px', textAlign: 'center' }}>
+                    <p>Carregando dados do jogo...</p>
+                </div>
+            </div>
+        );
     }
 
-    // 4. Verifique se o quizPreSelecionado existe
-    // (Assumindo que o objeto 'quiz' tem 'idFormulario' e 'titulo')
-    if (!quizPreSelecionado || !quizPreSelecionado.idFormulario) { 
-      alert("Erro: Nenhum formulário foi selecionado."); 
-      // Envia o usuário de volta para a lista para escolher um
-      navigate("/home"); // Ou para a rota onde está o GameContent
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const salaData = {
-        idUsuario: user.id,
-        idFormulario: quizPreSelecionado.idFormulario, // Use o ID do quiz
-        nomeSala: `Sala de ${user.nome}` // Nome padrão da sala
-      };
-
-      // 5. Crie a sala
-      const novaSala = await salaService.createSala(salaData);
-
-      // 6. Navegue para o lobby da sala (Sala.js)
-      navigate(`/sala/${novaSala.codigoSala}`, { 
-        state: { codigo: novaSala.codigoSala } 
-      });
-
-    } catch (error) {
-      console.error("Erro ao criar sala", error);
-      alert("Não foi possível criar a sala.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Função para ENTRAR em sala (PIN)
-  const handleEntrarSala = async () => {
-    // (Aqui vai sua lógica existente para entrar com PIN)
-    // Exemplo:
-    if (!pin) return alert("Digite um PIN.");
-    setLoading(true);
-    try {
-      // (Lógica de entrar na sala...)
-      // navigate(`/sala/${pin}`, { state: { codigo: pin } });
-    } catch (error) {
-      alert("Sala não encontrada ou erro ao entrar.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="game-container"> {/* Use sua classe de container */}
-      {/* (Header, etc.) */}
-      
-      {/* Seção de Entrar na Sala (existente) */}
-      <div className="entrar-sala-box">
-        <input 
-          type="text" 
-          value={pin} 
-          onChange={(e) => setPin(e.target.value)}
-          placeholder="Digite o PIN"
-          disabled={loading}
-        />
-        <button onClick={handleEntrarSala} disabled={loading}>
-          Entrar na Sala
-        </button>
-      </div>
-
-      <hr /> 
-
-      {/* --- 7. SEÇÃO DE CRIAR SALA ATUALIZADA --- */}
-      <div className="criar-sala-box">
-        {quizPreSelecionado ? (
-          // Se um formulário foi selecionado:
-          <>
-            <h3>Criar Sala com o Quiz:</h3>
-            <p><strong>{quizPreSelecionado.titulo || 'Quiz Selecionado'}</strong></p>
-            <button onClick={handleCriarSala} disabled={loading}>
-              {loading ? "Criando..." : "Confirmar e Criar Sala"}
-            </button>
-          </>
-        ) : (
-          // Se nenhum formulário foi selecionado (usuário veio direto para /game):
-          <>
-            <h3>Criar uma nova sala</h3>
-            <p>Para criar uma sala, primeiro escolha um quiz na lista.</p>
-            <button onClick={() => navigate('/home')} disabled={loading}> 
-              {/* Ou '/formularios', etc. */}
-              Escolher um Quiz
-            </button>
-          </>
-        )}
-      </div>
-
-    </div>
-  );
+    return (
+        <>
+            {isMobile ? renderMobileView() : renderDesktopView()}
+            <div className="game-spacing"></div>
+        </>
+    );
 }
