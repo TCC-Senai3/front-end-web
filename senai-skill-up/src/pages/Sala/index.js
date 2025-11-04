@@ -14,36 +14,62 @@ export default function Sala() {
   const { user } = useAuth();
 
   const codigo = location.state?.codigo || null;
-
-  const [usuarios, setUsuarios] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [usuarios, setUsuarios] = useState([]); // Detalhes dos usuários (objetos)
+  const [loading, setLoading] = useState(true); // Loading principal da tela
   const [actionLoading, setActionLoading] = useState(false);
-  const [salaInfo, setSalaInfo] = useState(null);
+  const [salaInfo, setSalaInfo] = useState(null); // Dados brutos da sala (inclui lista de IDs)
   const [isDonoDaSala, setIsDonoDaSala] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const stompClientRef = useRef(null);
   const [isConnected, setIsConnected] = useState(false);
 
-  // Ref para controle de montagem do componente
-  const isMountedRef = useRef(true);
+  // Ref para controle de montagem
+  const isMountedRef = useRef(true); // Definido como true na inicialização
 
-  // Função para carregar informações da sala
-  const carregarSala = useCallback(async () => {
+  // --- 1. FUNÇÃO DE CARGA INICIAL ---
+  // Busca a sala E os detalhes dos usuários iniciais (APENAS UMA VEZ)
+  const carregarDadosIniciais = useCallback(async () => {
     if (!codigo || !user?.id) return;
+    
+    // Garante que o componente ainda está montado
+    if (!isMountedRef.current) return;
+    setLoading(true); // Inicia o loading
+
     try {
       const sala = await salaService.getSalaByPin(codigo);
       if (!isMountedRef.current || !sala) return;
+      
       setSalaInfo(sala);
       setIsDonoDaSala(sala.idUsuario === user.id);
+
+      // Processa a lista inicial de participantes
+      const participantesIds = sala.participantes || sala.idParticipantes || [];
+      if (participantesIds.length > 0) {
+        const userPromises = participantesIds.map((id) => userService.getUserById(id));
+        const results = await Promise.allSettled(userPromises);
+        if (!isMountedRef.current) return;
+
+        const validUsers = results
+          .filter((r) => r.status === "fulfilled" && r.value?.id)
+          .map((r) => r.value);
+        setUsuarios(validUsers);
+      } else {
+        setUsuarios([]); // Lista vazia se não houver ninguém
+      }
+
     } catch (err) {
-      console.error("Erro ao carregar sala:", err);
+      console.error("Erro ao carregar dados iniciais:", err);
       if (isMountedRef.current) {
         setErrorMsg("Falha ao carregar informações da sala.");
       }
+    } finally {
+      if (isMountedRef.current) {
+        setLoading(false); // Para o loading
+      }
     }
-  }, [codigo, user?.id]);
+  }, [codigo, user?.id]); // Depende apenas do código e do usuário
 
-  // Conexão WebSocket
+  // --- 2. Conexão WebSocket (LÓGICA ATUALIZADA) ---
   useEffect(() => {
     if (!codigo || !user?.id) return;
 
@@ -65,14 +91,29 @@ export default function Sala() {
           try {
             const payload = JSON.parse(message.body);
             console.log("Mensagem WS recebida:", payload.type);
+            
             if (payload.type === "JOGO_INICIADO") {
               const { idFormulario, idSala, codigoSala } = payload;
               navigate("/jogo", { state: { idFormulario, idSala, codigoSala } });
-            } else if (
-              payload.type === "USUARIO_ENTROU" ||
-              payload.type === "USUARIO_SAIU"
-            ) {
-              carregarSala();
+            
+            // --- PARTE 2: ATUALIZA O ESTADO LOCALMENTE ---
+            } else if (payload.type === "USUARIO_ENTROU") {
+              // Adiciona o novo usuário (que veio no payload) ao estado
+              console.log("WS: Usuário entrou", payload.usuario);
+              setUsuarios(prevUsuarios => {
+                // Previne duplicados
+                if (prevUsuarios.find(u => u.id === payload.usuario.id)) {
+                  return prevUsuarios;
+                }
+                return [...prevUsuarios, payload.usuario];
+              });
+            
+            } else if (payload.type === "USUARIO_SAIU") {
+              // Remove o usuário (pelo ID) do estado
+              console.log("WS: Usuário saiu", payload.idUsuario);
+              setUsuarios(prevUsuarios => 
+                prevUsuarios.filter(u => u.id !== payload.idUsuario)
+              );
             }
           } catch (e) {
             console.error("Erro ao processar mensagem WebSocket:", e);
@@ -100,9 +141,9 @@ export default function Sala() {
       if (stompClientRef.current?.active) stompClientRef.current.deactivate();
       setIsConnected(false);
     };
-  }, [codigo, navigate, user?.id, carregarSala]);
+  }, [codigo, navigate, user?.id]); // Removido 'carregarSala' daqui
 
-  // Polling e carga inicial
+  // --- 3. Carga Inicial (POLLING REMOVIDO) ---
   useEffect(() => {
     if (!codigo || !user?.id) {
       navigate("/game");
@@ -110,58 +151,21 @@ export default function Sala() {
     }
 
     isMountedRef.current = true;
+    
+    // Chama a função de carga inicial (que agora busca sala E usuários)
+    carregarDadosIniciais(); 
 
-    if (!salaInfo) setLoading(true);
-    carregarSala();
-    const interval = setInterval(() => carregarSala(), 5000);
-
-    return () => {
-      isMountedRef.current = false;
-      clearInterval(interval);
-    };
-  }, [codigo, user?.id, carregarSala, navigate, salaInfo]);
-
-  // Atualizar usuários ao mudar salaInfo
-  useEffect(() => {
-    if (!salaInfo) return;
-
-    isMountedRef.current = true;
-
-    async function carregarUsuarios() {
-      try {
-        const participantesIds =
-          salaInfo.participantes || salaInfo.idParticipantes || [];
-        if (participantesIds.length === 0) {
-          setUsuarios([]);
-          if (loading) setLoading(false);
-          return;
-        }
-
-        const userPromises = participantesIds.map((id) =>
-          userService.getUserById(id)
-        );
-        const results = await Promise.allSettled(userPromises);
-        if (!isMountedRef.current) return;
-
-        const validUsers = results
-          .filter((r) => r.status === "fulfilled" && r.value?.id)
-          .map((r) => r.value);
-        setUsuarios(validUsers);
-        setLoading(false);
-      } catch (err) {
-        console.error("Erro ao carregar usuários da sala:", err);
-        if (isMountedRef.current) setLoading(false);
-      }
-    }
-
-    carregarUsuarios();
-
+    // O setInterval(carregarSala, 5000) foi REMOVIDO.
+    
     return () => {
       isMountedRef.current = false;
     };
-  }, [salaInfo]);
+  }, [codigo, user?.id, carregarDadosIniciais, navigate]); // Roda apenas uma vez
 
-  // Iniciar jogo
+  // --- 4. useEffect para ATUALIZAR USUÁRIOS (REMOVIDO) ---
+  // Não é mais necessário.
+
+  // --- 5. Iniciar jogo (Sem alteração) ---
   const handleIniciar = async () => {
     if (!salaInfo || !isDonoDaSala || actionLoading || !isConnected) {
       setErrorMsg("Não é possível iniciar agora.");
@@ -169,6 +173,9 @@ export default function Sala() {
     }
     setActionLoading(true);
     try {
+      if (!stompClientRef.current?.connected) { 
+        throw new Error("Cliente STOMP não conectado.");
+      }
       const destination = `/app/sala/${codigo}/iniciar`;
       stompClientRef.current.publish({
         destination,
@@ -182,7 +189,7 @@ export default function Sala() {
     }
   };
 
-  // Sair ou desmanchar sala
+  // --- 6. Sair ou desmanchar sala (Lógica de ID Corrigida) ---
   const handleDesmanchar = async () => {
     if (!salaInfo || !user) return;
     const confirmMessage = isDonoDaSala
@@ -192,18 +199,20 @@ export default function Sala() {
 
     setActionLoading(true);
     try {
-      // Use salaInfo.id conforme sua API
-      if (isDonoDaSala) await salaService.fecharSala(salaInfo.id || salaInfo.idSala);
+      // Usa salaInfo.idSala (que vem do DTO do backend)
+      if (isDonoDaSala) await salaService.fecharSala(salaInfo.idSala);
       else await salaService.sairDaSala(codigo, user.id);
       navigate("/game");
     } catch (err) {
       console.error("Erro ao sair/desmanchar sala:", err);
-      setErrorMsg("Ação falhou. Tente novamente.");
+      const backendError = err.response?.data?.message || err.response?.data;
+      setErrorMsg(`Erro: ${backendError || err.message || "Ação falhou."}`);
     } finally {
       setActionLoading(false);
     }
   };
 
+  // === 7. Renderização (JSX 100% LIMPO) ===
   return (
     <>
       <Header />
@@ -234,26 +243,31 @@ export default function Sala() {
           </div>
 
           <div className="sala-grid">
-            {loading && usuarios.length === 0 ? (
+            {/* Lógica de Loading/Vazio Corrigida */}
+            {loading ? (
               <div className="sala-mensagem">Carregando...</div>
             ) : usuarios.length === 0 ? (
               <div className="sala-mensagem">Aguardando jogadores...</div>
             ) : (
-              usuarios.map((p) => (
-                <div key={p.id} className="sala-user">
+              // Se tiver usuários
+              usuarios.map((participante) => (
+                <div key={participante.id} className="sala-user">
                   <div
                     className="sala-avatar"
                     style={{
-                      backgroundImage: p.avatar ? `url(${p.avatar})` : undefined,
+                      backgroundImage: participante.avatar
+                        ? `url(${participante.avatar})`
+                        : undefined,
                     }}
                   />
                   <div
                     className="nome"
                     style={{
-                      fontWeight: user && p.id === user.id ? "bold" : "normal",
+                      fontWeight:
+                        user && participante.id === user.id ? "bold" : "normal",
                     }}
                   >
-                    {p.nome || "Jogador"}
+                    {participante.nome || "Nome não encontrado"}
                   </div>
                 </div>
               ))
