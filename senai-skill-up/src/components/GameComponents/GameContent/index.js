@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 // 1. Importe useLocation
 import { useLocation, useNavigate } from 'react-router-dom'; 
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../../hooks/useAuth';
 import salaService from '../../services/salaService';
 // Importe seu CSS aqui (ex: './style.css')
 
