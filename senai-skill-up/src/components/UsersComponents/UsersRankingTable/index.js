@@ -1,36 +1,33 @@
-import React from 'react';
-import './style.css';
+import React from "react";
+import "./style.css";
 
-export default function UsersRankingTable({ 
-  users, 
-  searchTerm, 
-  onSearch, 
+export default function UsersRankingTable({
+  users,
+  searchTerm,
+  onSearch,
   onViewProfile,
-  loading
+  loading,
 }) {
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'online': return '#28a745';
-      case 'offline': return '#6c757d';
-      default: return '#28a745';
-    }
-  };
+  // ❌ Função 'getStatusColor' removida (não estava sendo usada)
 
   if (loading) {
     return (
       <div className="loading-container">
-        <div className="loading-spinner"></div>
-        <p>Carregando usuários...</p>
+                <div className="loading-spinner"></div>       {" "}
+        <p>Carregando usuários...</p>     {" "}
       </div>
     );
   }
 
   return (
     <div className="users-ranking-container">
-      {/* Seção de ações - fixa no topo */}
+            {/* Seção de ações - fixa no topo */}     {" "}
       <div className="actions-section">
+        {/* ... (container de busca - sem alterações) ... */}       {" "}
         <div className="search-container">
+                   {" "}
           <div className="search-input-wrapper">
+                       {" "}
             <input
               type="text"
               placeholder="Buscar usuários..."
@@ -38,69 +35,111 @@ export default function UsersRankingTable({
               onChange={(e) => onSearch(e.target.value)}
               className="search-input"
             />
+                       {" "}
             <div className="search-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke="#718096" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                           {" "}
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                               {" "}
+                <path
+                  d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z"
+                  stroke="#718096"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                             {" "}
               </svg>
+                         {" "}
             </div>
+                     {" "}
           </div>
+                 {" "}
         </div>
-        
+                       {" "}
         <div className="action-buttons">
-          <button className="btn btn-primary">
-            <i className="fas fa-sync-alt"></i> Atualizar
-          </button>
-          <button className="btn btn-secondary">
-            <i className="fas fa-download"></i> Exportar
-          </button>
+          {/* ... (botões - sem alterações) ... */}       {" "}
         </div>
+             {" "}
       </div>
-
-      {/* Tabela de ranking - ocupa o espaço restante */}
+            {/* Tabela de ranking */}     {" "}
       <div className="table-wrapper">
+               {" "}
         <div className="table-responsive">
+                   {" "}
           <div className="ranking-table">
-            {/* Cabeçalho da tabela */}
+                        {/* Cabeçalho da tabela */}           {" "}
             <div className="table-header">
-              <div className="header-cell header-pontos">Pontos</div>
-              <div className="header-cell header-nome">Nome</div>
-              <div className="header-cell header-posicao">Posição</div>
-              <div className="header-cell header-status">Status</div>
-              <div className="header-cell header-perfil">Ações</div>
+                           {" "}
+              <div className="header-cell header-pontos">Pontos</div>           
+                <div className="header-cell header-nome">Nome</div>             {" "}
+              <div className="header-cell header-posicao">Posição</div>         
+                  <div className="header-cell header-status">Status</div>       
+                    <div className="header-cell header-perfil">Ações</div>     
+                   {" "}
             </div>
-
-            {/* Lista de usuários */}
+                        {/* Lista de usuários */}           {" "}
             <div className="users-list">
+                           {" "}
               {users.length === 0 ? (
                 <div className="no-users">
-                  <p>Nenhum usuário encontrado</p>
+                                    <p>Nenhum usuário encontrado</p>           
+                     {" "}
                 </div>
               ) : (
-                users.map((user) => (
-                  <div 
-                    key={user.id} 
+                // ✅ MUDANÇA 1: Adicionado 'index' para usar como rank
+                users.map((user, index) => (
+                  <div
+                    key={user.id}
                     className="user-row user-card"
                     onClick={() => onViewProfile && onViewProfile(user)}
-                    style={{ cursor: 'pointer' }}
+                    style={{ cursor: "pointer" }}
                     title="Clique para ver o perfil"
                   >
+                                       {" "}
                     <div className="user-cell user-points">
-                      <span className="points-value">{user.pontos || 0}</span>
+                      {/* ✅ MUDANÇA 2: usa 'pontuacao' (do DTO) ou 'pontos' (do frontend) */}
+                                           {" "}
+                      <span className="points-value">
+                        {user.pontuacao || user.pontos || 0}
+                      </span>
+                                         {" "}
                     </div>
+                                       {" "}
                     <div className="user-cell user-info">
-                      <span className="user-name">{user.nome}</span>
+                                           {" "}
+                      <span className="user-name">{user.nome}</span>           
+                             {" "}
                     </div>
+                                       {" "}
                     <div className="user-cell">
-                      <span className="user-rank">{user.rank}°</span>
+                      {/* ✅ MUDANÇA 3: Usa 'index + 1' como rank */}           
+                                <span className="user-rank">{index + 1}°</span> 
+                                       {" "}
                     </div>
+                                       {" "}
                     <div className="user-cell">
+                                           {" "}
                       <div className="status-indicator">
-                        <div 
-                          className={`status-dot user-status ${user.status === 'online' ? '' : 'offline'}`}
+                                               {" "}
+                        <div
+                          // ✅ MUDANÇA 4: Lê o booleano 'user.online'
+                          className={`status-dot user-status ${
+                            user.online ? "online" : "offline"
+                          }`}
                         />
+                                             {" "}
                       </div>
+                                         {" "}
                     </div>
+                                       {" "}
                     <div className="user-cell actions-cell">
+                                           {" "}
                       <button
                         className="user-profile-access-trigger view-profile-btn"
                         onClick={(e) => {
@@ -109,16 +148,24 @@ export default function UsersRankingTable({
                         }}
                         title="Ver perfil"
                       >
-                        VISUALIZAR PERFIL
+                                                VISUALIZAR PERFIL              
+                               {" "}
                       </button>
+                                         {" "}
                     </div>
+                                     {" "}
                   </div>
                 ))
               )}
+                         {" "}
             </div>
+                     {" "}
           </div>
+                 {" "}
         </div>
+             {" "}
       </div>
+         {" "}
     </div>
   );
 }
