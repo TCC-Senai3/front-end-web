@@ -7,7 +7,7 @@
     min-height: 400px;
     max-height: 520px;
     box-sizing: border-box;
-    overflow: auto; /* impede conteúdo de vazar */
+    overflow:visible /* impede conteúdo de vazar */
     display: flex;
     flex-direction: column;
 }
