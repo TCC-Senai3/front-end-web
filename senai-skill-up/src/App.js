@@ -59,7 +59,7 @@ function AppContent() {
         <>
             <ScrollToHashElement />
             <Routes>
-                {/* ****** CORREÇÃO AQUI: LISTA COMPLETA DE VOLTA ****** */}
+                {/* ****** CORREÇÃO: LISTA COMPLETA DE VOLTA ****** */}
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/contato" element={<Contato />} />
