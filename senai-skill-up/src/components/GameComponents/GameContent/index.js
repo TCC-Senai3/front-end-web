@@ -71,7 +71,7 @@ export default function GameContent() {
         });
     };
     
-    // Verifica se as setas devem estar desabilitadas
+    // Verifica se as setas devem estar desabilitadas.
     const isFirstSlide = currentSlide === 0;
     const isLastSlide = currentSlide === 1;
 
