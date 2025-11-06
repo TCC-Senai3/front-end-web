@@ -7,7 +7,7 @@
     min-height: 400px;
     max-height: 520px;
     box-sizing: border-box;
-    overflow: visible; /* <<< CORREÇÃO 1: De 'hidden' para 'visible' */
+    overflow: visible; /* CORREÇÃO 1: Permite o slogan "vazar" para cima */
 }
 
 .quiz-slogan {
@@ -51,7 +51,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    max-height: 400px; /* <<< CORREÇÃO 2: De '480px' para '400px' */
+    max-height: 400px; /* CORREÇÃO 2: Altura reduzida para o scroll funcionar */
     overflow-y: auto;
     overflow-x: visible;
     scrollbar-width: none;
@@ -88,7 +88,7 @@
     transform: none;
 }
 
-/* Regra .search-icon duplicada removida */
+/* Regra duplicada .search-icon removida */
 
 .questionarios-item {
     display: flex;
@@ -103,8 +103,8 @@
     cursor: pointer;
     box-sizing: border-box;
     overflow: visible;
-    position: relative; /* Adicionado para o botão JOGAR */
-    padding-right: 60px; 
+    position: relative; 
+    padding-right: 60px;
 }
 
 .questionarios-item:hover {
@@ -143,7 +143,6 @@
     line-height: 1.3;
 }
 
-/* Estilo do botão JOGAR que aparece no hover */
 .questionarios-item-btn {
     position: absolute;
     right: 10px;
@@ -163,12 +162,10 @@
     min-width: 50px;
 }
 
-/* Regra .questionarios-item duplicada removida */
-
 .questionarios-item:hover .questionarios-item-titulo,
 .questionarios-item:hover .questionarios-item-desc {
-    max-width: calc(100% - 65px); 
-    padding-right: 3px; 
+    max-width: calc(100% - 65px);
+    padding-right: 3px;
 }
 
 .questionarios-item:hover .questionarios-item-btn {
@@ -185,7 +182,6 @@
     text-overflow: ellipsis;
 }
 
-/* Estilos para loading */
 .loading {
     display: flex;
     flex-direction: column;
@@ -210,7 +206,6 @@
     100% { transform: rotate(360deg); }
 }
 
-/* Estilos para mensagens de erro */
 .error-message {
     text-align: center;
     padding: 30px 20px;
@@ -239,7 +234,6 @@
     background: #b71c1c;
 }
 
-/* Estilos para itens com erro */
 .questionarios-item.error {
     background: #ffebee;
     border-left: 4px solid #f44336;
@@ -255,7 +249,6 @@
     font-weight: normal;
 }
 
-/* Botão de limpar busca */
 .clear-search {
     background: #e0e0e0;
     border: none;
@@ -271,10 +264,8 @@
     background: #d0d0d0;
 }
 
-/* Container da busca */
 /* Regra .search-container duplicada removida */
 
-/* Estilo do input de busca */
 .search-input {
     border: 0 !important;
     outline: 0 !important;
@@ -291,33 +282,30 @@
     height: 24px;
 }
 
-/* Estado desabilitado */
 .search-input:disabled {
     background: transparent;
     cursor: not-allowed;
 }
 
-/* Estilo para botão desabilitado */
 .questionarios-item-btn:disabled {
     background: #cccccc;
     cursor: not-allowed;
 }
 
-/* Ajustes para responsividade */
 @media (max-width: 768px) {
     .questionarios-container {
         width: 100%;
         max-width: 400px;
-        padding: 30px 15px 15px 15px; /* Padding superior aumentado para os botões */
+        padding: 30px 15px 15px 15px;
         margin: 0 auto;
-        margin-top: -30px; /* Margem negativa para aproximar dos botões */
+        margin-top: -30px;
         overflow: visible;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: flex-start;
         position: relative;
-        z-index: 1; /* Z-index baixo para ficar atrás dos botões */
+        z-index: 1;
     }
     
     .quiz-slogan {
