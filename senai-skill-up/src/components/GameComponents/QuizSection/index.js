@@ -89,7 +89,7 @@ export default function QuizSection({ onQuizSelect }) {
                 </div>
             </div>
 
-            <div className="questionarios-list">
+            <div className="questionarios-lista">
                 {loading ? (
                     <Loader />
                 ) : error ? (

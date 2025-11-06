@@ -7,7 +7,9 @@
     min-height: 400px;
     max-height: 520px;
     box-sizing: border-box;
-    overflow: visible; /* CORREÇÃO 1: Permite o slogan "vazar" para cima */
+    overflow: hidden; /* impede conteúdo de vazar */
+    display: flex;
+    flex-direction: column;
 }
 
 .quiz-slogan {
@@ -51,17 +53,22 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    max-height: 400px; /* CORREÇÃO 2: Altura reduzida para o scroll funcionar */
+    max-height: 400px;
     overflow-y: auto;
-    overflow-x: visible;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #ccc transparent;
     word-wrap: break-word;
     word-break: break-word;
 }
 
 .questionarios-lista::-webkit-scrollbar {
-    display: none;
+    width: 6px;
+}
+
+.questionarios-lista::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 6px;
 }
 
 .search-container {
@@ -88,8 +95,6 @@
     transform: none;
 }
 
-/* Regra duplicada .search-icon removida */
-
 .questionarios-item {
     display: flex;
     align-items: flex-start;
@@ -102,8 +107,7 @@
     transition: box-shadow 0.2s, background 0.2s, transform 0.2s;
     cursor: pointer;
     box-sizing: border-box;
-    overflow: visible;
-    position: relative; 
+    position: relative;
     padding-right: 60px;
 }
 
@@ -123,7 +127,6 @@
     color: #222;
     white-space: normal;
     overflow: visible;
-    text-overflow: unset;
     transition: all 0.3s ease;
     word-wrap: break-word;
     word-break: break-word;
@@ -136,7 +139,6 @@
     margin-top: 2px;
     white-space: normal;
     overflow: visible;
-    text-overflow: unset;
     transition: all 0.3s ease;
     word-wrap: break-word;
     word-break: break-word;
@@ -264,8 +266,6 @@
     background: #d0d0d0;
 }
 
-/* Regra .search-container duplicada removida */
-
 .search-input {
     border: 0 !important;
     outline: 0 !important;
@@ -276,7 +276,7 @@
     flex: 1;
     font-size: 16px;
     background: transparent;
-    padding: 0 0 0 15px; /* Espaço à esquerda para a lupa */
+    padding: 0 0 0 15px;
     margin: 0;
     width: 100%;
     height: 24px;
@@ -299,7 +299,7 @@
         padding: 30px 15px 15px 15px;
         margin: 0 auto;
         margin-top: -30px;
-        overflow: visible;
+        overflow: hidden;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -307,20 +307,19 @@
         position: relative;
         z-index: 1;
     }
-    
+
     .quiz-slogan {
         width: 280px;
         top: -15px;
         z-index: 1;
     }
-    
+
     .questionarios-item {
         padding: 15px;
         width: 100%;
         box-sizing: border-box;
-        overflow: visible;
     }
-    
+
     .questionarios-item-btn {
         position: relative;
         right: auto;
@@ -331,14 +330,14 @@
         visibility: visible;
         width: 100%;
     }
-    
+
     .questionarios-item:hover .questionarios-item-titulo,
     .questionarios-item:hover .questionarios-item-desc {
         max-width: 100%;
     }
-    
+
     .questionarios-lista {
-        overflow-x: visible;
+        overflow-x: hidden;
         overflow-y: auto;
     }
 }
