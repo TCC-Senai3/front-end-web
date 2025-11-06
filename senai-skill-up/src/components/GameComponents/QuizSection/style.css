@@ -1,27 +1,25 @@
 .questionarios-container {
     background: #d6e6fa;
     border-radius: 12px;
-    padding: 60px 20px 20px 20px; /* aumentei o padding-top */
+    padding: 30px 20px 20px 20px;
     width: 600px;
     position: relative;
     min-height: 400px;
     max-height: 520px;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow: auto; /* impede conteúdo de vazar */
     display: flex;
     flex-direction: column;
-    align-items: center;
 }
 
 .quiz-slogan {
     position: absolute;
-    top: 0; /* gruda no topo */
-    left: 50%;
-    transform: translateX(-50%) translateY(-50%); /* centraliza horizontal e sobe um pouco */
-    width: 300px;
-    height: auto;
-    z-index: 2;
+    top: -38px;
+    left: 22px;
+    z-index: 1;
     pointer-events: none;
+    width: 350px;
+    height: auto;
 }
 
 .questionarios-pesquisa-container {
