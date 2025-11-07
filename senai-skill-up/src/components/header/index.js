@@ -85,7 +85,7 @@ export default function Header() {
         }
 
         switch (option) {
-            case 'INICIO': navigate('/'); break;
+            case 'INICIO': navigate('/game'); break;
             case 'TERMOS': navigate('/termos'); break;
             case 'CONTATO': navigate('/contato'); break;
             case 'MINHA CONTA': navigate('/perfil'); break;
@@ -154,7 +154,7 @@ export default function Header() {
 
                 <div className="right-section">
                     <div className="nav-section">
-                        <Link to="/" className="nav-link">INICIO</Link>
+                        <Link to="/game" className="nav-link">INICIO</Link>
                     </div>
 
                     {/* Perfil do Usuário */}
