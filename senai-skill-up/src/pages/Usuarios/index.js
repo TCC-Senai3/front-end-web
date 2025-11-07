@@ -15,19 +15,13 @@ export default function Usuarios() {
   useEffect(() => {
     const loadUsers = async () => {
       try {
-        // 1. Busca os dados (que agora incluem 'online' e 'pontuacao')
         const apiUsers = await userService.getAllUsers();
-
-        // 2. Ordena a lista aqui no frontend (do maior para o menor)
         apiUsers.sort((a, b) => (b.pontuacao || 0) - (a.pontuacao || 0));
-
-        // 3. Adiciona o campo 'rank' (posição) a cada usuário
         const usersWithRank = apiUsers.map((user, index) => ({
           ...user,
-          rank: index + 1, // Adiciona a posição (1, 2, 3...)
+          rank: index + 1,
         }));
-
-        setUsers(usersWithRank); // Salva a lista completa e ordenada
+        setUsers(usersWithRank);
       } catch (error) {
         console.error("Erro ao carregar usuários:", error);
         setUsers([]);
@@ -35,11 +29,10 @@ export default function Usuarios() {
         setLoading(false);
       }
     };
-
     loadUsers();
-  }, []); // Roda apenas uma vez
+  }, []); 
 
-  // Filtra os usuários (sem alteração, 'nome' e 'email' existem no DTO)
+  // Filtra os usuários
   const filteredUsers = useMemo(() => {
     if (!searchTerm.trim()) return users;
     const term = searchTerm.toLowerCase();
@@ -47,7 +40,6 @@ export default function Usuarios() {
       (user) =>
         user.nome?.toLowerCase().includes(term) ||
         user.email?.toLowerCase().includes(term)
-      // (Filtro por 'nivel' removido pois não existe no DTO)
     );
   }, [searchTerm, users]);
 
@@ -55,26 +47,27 @@ export default function Usuarios() {
     setSearchTerm(term);
   };
 
-  // --- handleViewProfile (ATUALIZADO) ---
+  // --- handleViewProfile (CORRIGIDO) ---
   const handleViewProfile = (user) => {
-    // 'user' aqui é o objeto vindo da lista (DTO do backend + rank)
+    // 'user' é o objeto do DTO (com 'biografia', 'pontuacao', etc.)
     const profileData = {
-      ...user, // Passa 'id', 'nome', 'email', 'biografia', 'online', 'roles'
+      ...user, 
       name: user.nome,
       email: user.email,
-      points: user.pontuacao, // Usa 'pontuacao' do DTO
-      position: user.rank, // Usa 'rank' que criamos
+      points: user.pontuacao, 
+      position: user.rank,
       
-      // ✅ MELHORIA: Formata a data se ela existir no DTO
+      // ✅ A CORREÇÃO ESTÁ AQUI:
+      // Mapeia 'biografia' (do DTO) para 'bio' (que o Modal espera)
+      bio: user.biografia || 'Sem biografia.', 
+      
       memberSince: user.dataCriacao 
         ? new Date(user.dataCriacao).getFullYear() 
         : "N/A",
-      
-      // Fallbacks para dados que não vêm no DTO
+        
       gamesPlayed: user.jogosJogados || 0,
       accuracy: user.precisao || 0,
       
-      // Conquistas derivadas (está ótimo)
       achievements: [
         { icon: "🏆", name: "Primeiro Quiz Completado" },
         {
@@ -84,12 +77,12 @@ export default function Usuarios() {
           } Pontos Alcançados`,
         },
         { icon: "🎯", name: `Precisão de ${user.precisao || 0}%` },
-        { icon: "🏅", name: `Nível ${user.nivel || 1}` }, 
+        { icon: "🏅", name: `Nível ${user.nivel || 1}` },
       ],
     };
     setSelectedUser(profileData);
   };
-  // --- FIM DA ATUALIZAÇÃO ---
+  // --- FIM DA CORREÇÃO ---
 
   const handleCloseProfile = () => {
     setSelectedUser(null);
@@ -117,8 +110,8 @@ export default function Usuarios() {
 
       {selectedUser && (
         <PerfilModal
-          user={selectedUser}
-          isMyProfile={false} 
+          user={selectedUser} // Agora 'selectedUser' contém o campo 'bio'
+          isMyProfile={false}
           onClose={handleCloseProfile}
         />
       )}
