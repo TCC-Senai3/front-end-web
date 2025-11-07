@@ -9,8 +9,9 @@ export default function Usuarios() {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Carregar usuários ao montar o componente
+  const [loading, setLoading] = useState(true);
 
+  // Carregar usuários ao montar o componente
   useEffect(() => {
     const loadUsers = async () => {
       try {
@@ -36,37 +37,44 @@ export default function Usuarios() {
     };
 
     loadUsers();
-  }, []); // Roda apenas uma vez // Filtra os usuários (sem alteração, 'nome' e 'email' existem no DTO)
+  }, []); // Roda apenas uma vez
 
+  // Filtra os usuários (sem alteração, 'nome' e 'email' existem no DTO)
   const filteredUsers = useMemo(() => {
     if (!searchTerm.trim()) return users;
     const term = searchTerm.toLowerCase();
     return users.filter(
       (user) =>
         user.nome?.toLowerCase().includes(term) ||
-        user.email?.toLowerCase().includes(term) ||
-        // 'nivel' não existe no UsuarioPerfilDTO, talvez remover este filtro?
-        user.nivel?.toLowerCase().includes(term)
+        user.email?.toLowerCase().includes(term)
+      // (Filtro por 'nivel' removido pois não existe no DTO)
     );
   }, [searchTerm, users]);
 
   const handleSearch = (term) => {
     setSearchTerm(term);
-  }; // --- handleViewProfile (CORRIGIDO) ---
+  };
 
-  // Agora lê os campos corretos vindos do DTO (e o 'rank' que adicionamos)
+  // --- handleViewProfile (ATUALIZADO) ---
   const handleViewProfile = (user) => {
+    // 'user' aqui é o objeto vindo da lista (DTO do backend + rank)
     const profileData = {
       ...user, // Passa 'id', 'nome', 'email', 'biografia', 'online', 'roles'
       name: user.nome,
       email: user.email,
-      points: user.pontuacao, // ✅ CORRIGIDO: Usa 'pontuacao' do DTO
-      position: user.rank, // ✅ CORRIGIDO: Usa 'rank' que criamos
-      // O DTO não envia 'jogosJogados' ou 'precisao', então usamos 0
+      points: user.pontuacao, // Usa 'pontuacao' do DTO
+      position: user.rank, // Usa 'rank' que criamos
+      
+      // ✅ MELHORIA: Formata a data se ela existir no DTO
+      memberSince: user.dataCriacao 
+        ? new Date(user.dataCriacao).getFullYear() 
+        : "N/A",
+      
+      // Fallbacks para dados que não vêm no DTO
       gamesPlayed: user.jogosJogados || 0,
       accuracy: user.precisao || 0,
-      // O DTO não envia 'dataCriacao', podemos buscar ou omitir
-      memberSince: user.dataCriacao || "N/A",
+      
+      // Conquistas derivadas (está ótimo)
       achievements: [
         { icon: "🏆", name: "Primeiro Quiz Completado" },
         {
@@ -76,12 +84,12 @@ export default function Usuarios() {
           } Pontos Alcançados`,
         },
         { icon: "🎯", name: `Precisão de ${user.precisao || 0}%` },
-        { icon: "🏅", name: `Nível ${user.nivel || 1}` }, // O DTO não tem 'nivel'
+        { icon: "🏅", name: `Nível ${user.nivel || 1}` }, 
       ],
     };
     setSelectedUser(profileData);
   };
-  // --- FIM DA CORREÇÃO ---
+  // --- FIM DA ATUALIZAÇÃO ---
 
   const handleCloseProfile = () => {
     setSelectedUser(null);
@@ -89,16 +97,14 @@ export default function Usuarios() {
 
   return (
     <>
-            <Header />     {" "}
+      <Header />
       <div className="usuarios-container">
-               {" "}
         <div className="usuarios-content">
-                   {" "}
           <div className="usuarios-header">
-                        <h1>Ranking de Usuários</h1>           {" "}
-            <p>Veja o desempenho dos usuários do SENAI Skill-Up</p>         {" "}
+            <h1>Ranking de Usuários</h1>
+            <p>Veja o desempenho dos usuários do SENAI Skill-Up</p>
           </div>
-                             {" "}
+
           <UsersRankingTable
             users={filteredUsers}
             searchTerm={searchTerm}
@@ -106,19 +112,18 @@ export default function Usuarios() {
             onViewProfile={handleViewProfile}
             loading={loading}
           />
-                 {" "}
         </div>
-             {" "}
       </div>
-           {" "}
+
       {selectedUser && (
         <PerfilModal
           user={selectedUser}
-          isMyProfile={false}
+          isMyProfile={false} // ✅ CORRETO: Isso desabilita a edição
           onClose={handleCloseProfile}
         />
       )}
-            <Footer />   {" "}
+
+      <Footer />
     </>
   );
 }
