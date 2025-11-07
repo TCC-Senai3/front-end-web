@@ -118,7 +118,7 @@ export default function Usuarios() {
       {selectedUser && (
         <PerfilModal
           user={selectedUser}
-          isMyProfile={false} // ✅ CORRETO: Isso desabilita a edição
+          isMyProfile={false} 
           onClose={handleCloseProfile}
         />
       )}
