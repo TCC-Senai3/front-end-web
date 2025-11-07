@@ -1,64 +1,148 @@
-import React, { useState } from 'react';
-import Header from '../../components/header';
+import React, { useState, useEffect } from 'react';
 import './style.css';
 import editIcon from '../../assets/images/Vector.png';
 import trophyIcon from '../../assets/images/trophy 1.svg';
 import pointsIcon from '../../assets/images/image 33.png';
 
-export default function PerfilModal({ isMyProfile = true, onClose, user: propUser, isOpen = true }) {
-  const [user, setUser] = useState(propUser || {
-    name: 'Usuario123',
-    email: 'Usuario123@gmail.com',
-    status: 'online',
-    position: 1,
-    points: 1000,
-    level: 'Diamante',
-    gamesPlayed: 999,
-    accuracy: 92,
-    memberSince: '2024',
-    tag: '#123',
-    bio: 'texto limitado a uma quantidade de caracteres'
-  });
+// --- NOVOS IMPORTS ---
+import { useAuth } from '../../hooks/useAuth'; 
+import userService from '../../services/userService';
+import Loader from '../../components/common/Loader'; 
+import { useNavigate } from 'react-router-dom'; // ✅ 1. IMPORTAR useNavigate
 
+export default function PerfilModal({ isMyProfile = true, onClose: propOnClose, user: propUser, isOpen = true }) {
+  
+  const navigate = useNavigate(); // ✅ 2. INICIALIZAR O HOOK
+  
+  // --- ESTADOS ---
+  const [user, setUser] = useState(isMyProfile ? null : propUser);
+  const [form, setForm] = useState({ name: '', bio: '' });
   const [isEditing, setIsEditing] = useState(false);
-  const [form, setForm] = useState({
-    name: user.name,
-    bio: user.bio
-  });
+  const [loading, setLoading] = useState(isMyProfile);
+  const [isSaving, setIsSaving] = useState(false);
+  const { user: authUser } = useAuth();
+  
+  // ✅ 3. CRIAR A FUNÇÃO DE FECHAR/NAVEGAR
+  // Esta função substitui o 'onClose' que veio das props
+  const handleCloseAndNavigate = () => {
+    // Se o 'onClose' original existir (como em Usuarios.js), chame-o
+    if (propOnClose) {
+      propOnClose(); 
+    }
+    // E então navegue para /game (que é o que você quer da página /home)
+    navigate('/game');
+  };
 
+  // --- GOAL 1: BUSCAR DADOS (GET /me) ---
+  useEffect(() => {
+    const fetchMyData = async () => {
+      if (!isOpen) return; 
+      setLoading(true);
+      try {
+        const myData = await userService.getMeuPerfil();
+        const mappedData = {
+          ...myData, 
+          name: myData.nome,
+          points: myData.pontuacao,
+          bio: myData.biografia || 'Sem biografia.',
+          position: myData.rank, 
+          memberSince: myData.dataCriacao ? new Date(myData.dataCriacao).getFullYear() : 'N/A' 
+        };
+        setUser(mappedData);
+      } catch (error) {
+        console.error("Erro ao buscar meu perfil:", error);
+        alert("Não foi possível carregar seu perfil.");
+        handleCloseAndNavigate(); // ✅ 4. USAR A NOVA FUNÇÃO EM CASO DE ERRO
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (isMyProfile) {
+      fetchMyData();
+    } else {
+      setUser(propUser);
+      setLoading(false);
+    }
+  }, [isMyProfile, propUser, isOpen]); // Removido 'handleCloseAndNavigate' das dependências
+
+
+  // --- FUNÇÕES DE EDIÇÃO ---
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
-    setUser({ ...user, ...form });
+  const handleEdit = () => {
+    setForm({
+      name: user.name, 
+      bio: user.bio,
+    });
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
     setIsEditing(false);
   };
 
+  // --- GOAL 2: SALVAR DADOS (PUT /biografia) ---
+  const handleSave = async () => {
+    if (!authUser) {
+      alert("Erro: Você não está autenticado.");
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const payload = {
+        biografia: form.bio
+      };
+      await userService.updateBiografia(authUser.id, payload);
+      setUser({ ...user, bio: form.bio });
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Erro ao salvar biografia:", error);
+      alert("Não foi possível salvar sua biografia. Tente novamente.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // --- RENDERIZAÇÃO ---
   if (!isOpen) return null;
 
+  // Renderiza o Loading
+  if (loading || !user) {
+    return (
+      <div className="perfil-modal-wrapper">
+        <div className="perfil-modal-overlay" onClick={handleCloseAndNavigate}> {/* ✅ 5. USAR AQUI */}
+          <div className="perfil-modal-container" style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}} onClick={e => e.stopPropagation()}>
+            <Loader />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Renderização principal do modal
   return (
     <div className="perfil-modal-wrapper">
-      <div className="perfil-modal-overlay" onClick={onClose}>
+      <div className="perfil-modal-overlay" onClick={handleCloseAndNavigate}> {/* ✅ 6. USAR AQUI */}
         <div className="perfil-modal-container" onClick={e => e.stopPropagation()}>
-          {/* Botão de fechar */}
-          <button className="perfil-close-btn" onClick={onClose}>
+          
+          <button className="perfil-close-btn" onClick={handleCloseAndNavigate}> {/* ✅ 7. USAR AQUI */}
             ×
           </button>
           
-          {/* Ícone de edição - só aparece no meu perfil */}
-          {isMyProfile && (
-            <div className="perfil-edit-icon" onClick={() => setIsEditing(!isEditing)}>
+          {isMyProfile && !isEditing && (
+            <div className="perfil-edit-icon" onClick={handleEdit}>
               <img src={editIcon} alt="Editar" />
             </div>
           )}
 
-          {/* Avatar centralizado */}
           <div className="perfil-avatar-section">
             <div className="perfil-avatar">
               <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`} alt={user.name} />
-              <div className="perfil-status-indicator"></div>
+              <div className={`perfil-status-indicator ${user.online ? 'online' : 'offline'}`}></div>
             </div>
             {isEditing ? (
               <input
@@ -67,38 +151,34 @@ export default function PerfilModal({ isMyProfile = true, onClose, user: propUse
                 value={form.name}
                 onChange={handleChange}
                 placeholder="Nome"
+                disabled 
               />
             ) : (
               <h3 className="perfil-name">{user.name}</h3>
             )}
           </div>
 
-          {/* Grid de estatísticas 2x2 */}
           <div className="perfil-stats-grid">
             <div className="perfil-stat-card">
-              <div className="perfil-stat-icon">
-                <img src={trophyIcon} alt="Troféu" />
-              </div>
+              <div className="perfil-stat-icon"><img src={trophyIcon} alt="Troféu" /></div>
               <div className="perfil-stat-content">
                 <span className="perfil-stat-label">POSIÇÃO NO RANKING</span>
-                <span className="perfil-stat-value">{user.position}</span>
+                <span className="perfil-stat-value">{user.position || 'N/A'}</span>
               </div>
             </div>
 
             <div className="perfil-stat-card">
-              <div className="perfil-stat-icon">
-                <img src={pointsIcon} alt="Pontos" />
-              </div>
+              <div className="perfil-stat-icon"><img src={pointsIcon} alt="Pontos" /></div>
               <div className="perfil-stat-content">
                 <span className="perfil-stat-label">PONTOS</span>
-                <span className="perfil-stat-value">{user.points}</span>
+                <span className="perfil-stat-value">{user.points || 0}</span>
               </div>
             </div>
 
             <div className="perfil-stat-card">
               <div className="perfil-stat-content">
                 <span className="perfil-stat-label">MEMBRO DESDE</span>
-                <span className="perfil-stat-value">{user.memberSince}</span>
+                <span className="perfil-stat-value">{user.memberSince || 'N/A'}</span>
               </div>
             </div>
 
@@ -112,6 +192,7 @@ export default function PerfilModal({ isMyProfile = true, onClose, user: propUse
                     value={form.bio}
                     onChange={handleChange}
                     placeholder="Biografia"
+                    disabled={isSaving}
                   />
                 ) : (
                   <span className="perfil-stat-bio">{user.bio}</span>
@@ -120,11 +201,14 @@ export default function PerfilModal({ isMyProfile = true, onClose, user: propUse
             </div>
           </div>
 
-          {/* Botões de ação - só aparecem no meu perfil */}
           {isMyProfile && isEditing && (
             <div className="perfil-actions">
-              <button className="perfil-save-btn" onClick={handleSave}>Salvar</button>
-              <button className="perfil-cancel-btn" onClick={() => { setIsEditing(false); setForm({ name: user.name, bio: user.bio }); }}>Cancelar</button>
+              <button className="perfil-save-btn" onClick={handleSave} disabled={isSaving}>
+                {isSaving ? 'Salvando...' : 'Salvar'}
+              </button>
+              <button className="perfil-cancel-btn" onClick={handleCancel} disabled={isSaving}>
+                Cancelar
+              </button>
             </div>
           )}
         </div>
@@ -132,5 +216,3 @@ export default function PerfilModal({ isMyProfile = true, onClose, user: propUse
     </div>
   );
 }
-
-
