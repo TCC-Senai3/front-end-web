@@ -6,13 +6,13 @@ import Loader from "../../components/common/Loader";
 import formularioService from "../../services/formularioService";
 import "./style.css";
 
-// Estilos (mantidos como placeholders ou defina-os)
+// Estilos
 const pageStyle = {
   minHeight: "calc(100vh - 60px)",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-}; // Exemplo
+};
 const errorStyle = {
   textAlign: "center",
   color: "red",
@@ -20,30 +20,31 @@ const errorStyle = {
   padding: "20px",
   borderRadius: "8px",
   backgroundColor: "#ffeeee",
-}; // Exemplo
+};
 const buttonStyle = {
   padding: "10px 20px",
   marginTop: "15px",
   cursor: "pointer",
-}; // Exemplo
+};
 
 export default function Jogo() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [quiz, setQuiz] = useState(null); // Estado para guardar o quiz BUSCADO
+  const [quiz, setQuiz] = useState(null); 
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true); // --- LEITURA DO STATE CORRIGIDA ---
+  const [loading, setLoading] = useState(true); 
 
   const idFormulario = location.state?.idFormulario;
   const codigoSala = location.state?.codigoSala;
-  const idSala = location.state?.idSala; // <<< LÊ O ID NUMÉRICO DO STATE // useEffect para BUSCAR o quiz
+  const idSala = location.state?.idSala; 
 
+  // useEffect para BUSCAR o quiz
   useEffect(() => {
     const carregarQuiz = async () => {
       setLoading(true);
       setError(null);
-      // Log aprimorado
+      
       console.log("Jogo.js: Tentando carregar. Dados recebidos do state:", {
         idFormulario,
         codigoSala,
@@ -86,16 +87,20 @@ export default function Jogo() {
     };
 
     carregarQuiz();
-  }, [idFormulario]); // Dependência ok // --- Renderização Condicional ---
+    
+    // ✅ CORREÇÃO: Adicionadas 'codigoSala' e 'idSala' ao array
+    // O Vercel reclamou porque elas são usadas no 'console.log' dentro do hook.
+  }, [idFormulario, codigoSala, idSala]); 
+
+  // --- Renderização Condicional ---
 
   if (loading) {
     return (
       <>
-                  <Header />         {" "}
+        <Header /> 
         <div style={pageStyle}>
           <Loader />
         </div>
-               {" "}
       </>
     );
   }
@@ -103,19 +108,15 @@ export default function Jogo() {
   if (error) {
     return (
       <>
-                  <Header />         {" "}
+        <Header /> 
         <div style={pageStyle}>
-                     {" "}
           <div style={errorStyle}>
-                          <h2>Erro</h2>              <p>{error}</p>             {" "}
+            <h2>Erro</h2> <p>{error}</p> 
             <button style={buttonStyle} onClick={() => navigate("/game")}>
-                              Voltar              {" "}
+              Voltar 
             </button>
-                       {" "}
           </div>
-                   {" "}
         </div>
-               {" "}
       </>
     );
   }
@@ -123,25 +124,22 @@ export default function Jogo() {
   if (!quiz) {
     return (
       <>
-                  <Header />         {" "}
+        <Header /> 
         <div style={pageStyle}>
-                      <p>Não foi possível carregar os dados do quiz.</p>       
-             {" "}
+          <p>Não foi possível carregar os dados do quiz.</p> 
           <button style={buttonStyle} onClick={() => navigate("/game")}>
             Voltar
           </button>
-                   {" "}
         </div>
-               {" "}
       </>
     );
-  } // --- RENDERIZAÇÃO PRINCIPAL CORRIGIDA ---
+  } 
 
+  // --- RENDERIZAÇÃO PRINCIPAL ---
   return (
     <>
-              <Header />        {/* PASSA 'idSala' COMO PROP PARA GameQuiz */}
-             {" "}
-      <GameQuiz quizData={quiz} codigoSala={codigoSala} idSala={idSala} />     {" "}
+      <Header /> 
+      <GameQuiz quizData={quiz} codigoSala={codigoSala} idSala={idSala} /> 
     </>
   );
 }

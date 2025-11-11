@@ -35,7 +35,7 @@ export default function FimDeJogo() {
 
   // ✅ 2. ESTABILIZAR a função refreshUserData com useCallback
   // Isso é necessário para o useEffect não entrar em loop
-  const stableRefreshUserData = useCallback(refreshUserData, []);
+  const stableRefreshUserData = useCallback(refreshUserData, [refreshUserData]); // Corrigido para incluir a dependência
 
   // --- useEffect CORRIGIDO para o Vercel ---
   useEffect(() => {
