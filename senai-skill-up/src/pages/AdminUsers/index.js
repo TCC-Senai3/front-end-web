@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Header, Footer } from '../../components';
+import { Header} from '../../components';
 import UserManagementTable from '../../components/UsersComponents/UserManagementTable';
 import UserEditModal from '../../components/UsersComponents/UserEditModal';
 import ProtectedRoute from '../../components/ProtectedRoute';

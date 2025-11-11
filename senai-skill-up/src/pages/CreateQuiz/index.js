@@ -85,7 +85,7 @@ function MiniCard({ selected, onClick, index, pergunta, onDelete }) {
 }
 // --- Componente Principal CreateQuiz ---
 export default function CreateQuiz() {
-  const { canCreateQuiz, userData, isLoggedIn, userRoles } = usePermissions();
+  const { canCreateQuiz, userData, isLoggedIn} = usePermissions();
 
   // ✅ MUDANÇA 1: Defina o novo limite máximo aqui
   const MAX_PERGUNTAS = 10; // (Você pode mudar 10 para 20, 50, etc.)
