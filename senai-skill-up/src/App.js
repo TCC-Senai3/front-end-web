@@ -13,7 +13,7 @@ import CreateQuiz from './pages/CreateQuiz';
 import CriarSala from './pages/CriarSala';
 import Sala from './pages/Sala';
 import FimDeJogo from './pages/FimDeJogo';
-import FimRecompensas from './pages/FimRecompensas';
+// import FimRecompensas from './pages/FimRecompensas'; // ✅ CORREÇÃO: Linha removida (não era usada)
 import PerfilModal from './pages/PerfilModal';
 import Suporte from './pages/Suporte';
 import Termos from './pages/Termos';
@@ -59,12 +59,12 @@ function AppContent() {
         <>
             <ScrollToHashElement />
             <Routes>
-                {/* ****** CORREÇÃO: LISTA COMPLETA DE VOLTA ****** */}
+                {/* ****** Rotas limpas ****** */}
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/contato" element={<Contato />} />
                 <Route path="/SkillHelp" element={<Contato />} />
-                <Route path="/game" element={<Game />} /> {/* <-- A ROTA QUE FALTAVA */}
+                <Route path="/game" element={<Game />} /> 
                 <Route path="/jogo" element={<Jogo />} />
                 <Route path="/perfil" element={<PerfilModal isMyProfile={true} />} />
                 <Route path="/suporte" element={<Suporte />} />
