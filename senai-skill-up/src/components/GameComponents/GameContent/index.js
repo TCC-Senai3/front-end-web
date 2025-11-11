@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+// import { FaChevronLeft, FaChevronRight } from "react-icons/fa"; // Removido, pois não era usado
 import RankingSection from '../RankingSection';
 import QuizSection from '../QuizSection';
 import { getRankingGlobal } from '../../../services/rankingService';
 import "./style.css";
 
 export default function GameContent() {
-    const [ranking, setRanking] = useState([]);
+    // ✅ CORREÇÃO 1: 'ranking' não era usado, então foi removido do array
+    const [, setRanking] = useState([]);
     const [loading, setLoading] = useState(true);
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -28,7 +29,7 @@ export default function GameContent() {
         const loadRankingData = async () => {
             try {
                 setLoading(true);
-                
+
                 // Carregar ranking
                 const rankingResponse = await getRankingGlobal();
                 if (rankingResponse.success) {
@@ -43,8 +44,6 @@ export default function GameContent() {
             }
         };
 
-        // Removido verificação de autenticação para permitir acesso livre
-
         loadRankingData();
 
         // Recarregar dados periodicamente (opcional)
@@ -57,23 +56,8 @@ export default function GameContent() {
         navigate('/criarsala', { state: { quizSelecionado: questionario } });
     };
 
-    const nextSlide = () => {
-        setCurrentSlide(prev => {
-            const next = prev + 1;
-            return next > 1 ? 0 : next;
-        });
-    };
-
-    const prevSlide = () => {
-        setCurrentSlide(prev => {
-            const next = prev - 1;
-            return next < 0 ? 1 : next;
-        });
-    };
-    
-    // Verifica se as setas devem estar desabilitadas.
-    const isFirstSlide = currentSlide === 0;
-    const isLastSlide = currentSlide === 1;
+    // ✅ CORREÇÃO 2: Funções 'nextSlide', 'prevSlide', 'isFirstSlide', 'isLastSlide'
+    // foram removidas (linhas 60-76) pois não estavam sendo usadas.
 
     // Estilo para o container dos slides
     const slideContainerStyle = {
@@ -94,20 +78,20 @@ export default function GameContent() {
         <div className="mobile-tabs-container">
             {/* Botões de Tab */}
             <div className="tabs-buttons">
-                <button 
+                <button
                     className={`tab-button ${currentSlide === 0 ? 'active' : ''}`}
                     onClick={() => setCurrentSlide(0)}
                 >
                     Ranking
                 </button>
-                <button 
+                <button
                     className={`tab-button ${currentSlide === 1 ? 'active' : ''}`}
                     onClick={() => setCurrentSlide(1)}
                 >
                     Questionário
                 </button>
             </div>
-            
+
             {/* Conteúdo das seções */}
             <div className="tabs-content">
                 <div className="slides-container" style={slideContainerStyle}>

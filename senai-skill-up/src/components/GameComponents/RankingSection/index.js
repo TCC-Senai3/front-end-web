@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react"; // ✅ 1. IMPORTAR useMemo
 import SearchIcon from "../../../assets/images/search 1.svg";
 import image6 from "../../../assets/images/image 6.svg"; // 1º Lugar
 import image7 from "../../../assets/images/image 7.svg"; // 2º Lugar
@@ -15,7 +15,8 @@ export default function RankingSection() {
     const [loading, setLoading] = useState(true);
 
     // Mapeia os ícones de pódio para facilitar o acesso
-    const podiumIcons = [image6, image7, image8];
+    // ✅ 2. Mover 'podiumIcons' para useMemo para estabilizar a referência
+    const podiumIcons = useMemo(() => [image6, image7, image8], []);
 
     // Carrega ranking do backend
     useEffect(() => {
@@ -23,15 +24,12 @@ export default function RankingSection() {
             try {
                 setLoading(true);
                 const response = await getRankingGlobal();
-                
+
                 if (response.success && Array.isArray(response.data)) {
-                    // *** AJUSTE PRINCIPAL AQUI ***
-                    // Transformamos os dados da API ({ nomeUsuario, pontuacao })
-                    // para o formato que o componente espera ({ id, nome, pontos, posicao, avatar })
                     const transformedData = response.data.map((user, index) => {
                         const position = index + 1;
                         return {
-                            id: user.nomeUsuario, // Usando nomeUsuario como ID (assumindo ser único)
+                            id: user.nomeUsuario,
                             nome: user.nomeUsuario,
                             pontos: user.pontuacao,
                             posicao: position,
@@ -53,19 +51,16 @@ export default function RankingSection() {
         };
 
         loadRanking();
-    }, []); // Array de dependências vazio está correto
+
+        // ✅ 3. CORREÇÃO: 'podiumIcons' foi adicionado ao array de dependências
+    }, [podiumIcons]);
 
     // Filtra usuários com base na pesquisa
-    // Esta função não precisa mudar, pois agora filtramos por `user.nome`
     const filteredRanking = ranking.filter(user =>
         user.nome.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    // Esta função não é mais necessária, pois `user.avatar` agora contém o ícone correto
-    // const getRankIcon = (iconPath) => { ... };
-
     const handleViewProfile = (user) => {
-        // Esta função não precisa mudar
         alert(`Usuário: ${user.nome}\nPontos: ${user.pontos}\nPosição: ${user.posicao}`);
     };
 
@@ -73,8 +68,8 @@ export default function RankingSection() {
         <div className="ranking-container">
             <img src={rankingSlogan} alt="Ranking" className="ranking-slogan" />
             <div className="ranking-pesquisa-container">
-                <input 
-                    placeholder="Pesquisar..." 
+                <input
+                    placeholder="Pesquisar..."
                     className="ranking-pesquisa-input"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -87,33 +82,25 @@ export default function RankingSection() {
                         <Loader />
                     </div>
                 ) : filteredRanking.length > 0 ? (
-                    filteredRanking.map((user) => ( // `idx` removido, usamos `user.posicao`
+                    filteredRanking.map((user) => (
                         <div
-                            key={user.id} // Usando o `id` que criamos
+                            key={user.id}
                             className="ranking-item"
                             onClick={() => handleViewProfile(user)}
                         >
-                            {/* *** AJUSTE NA LÓGICA DE ÍCONE *** */}
-                            {/* Verificamos se `user.avatar` existe (só existirá para 1º, 2º, 3º).
-                                Isso corrige um bug: antes, se você pesquisasse o 5º lugar,
-                                ele apareceria em 1º na lista (idx=0) e ganharia o ícone de ouro.
-                                Agora, o ícone está ligado à posição real (user.posicao).
-                            */}
                             {user.avatar ? (
-                                <img src={user.avatar} alt={`Rank ${user.posicao}`} className="ranking-pos-icon" /> 
+                                <img src={user.avatar} alt={`Rank ${user.posicao}`} className="ranking-pos-icon" />
                             ) : (
                                 <span className="ranking-pos">{user.posicao}</span>
                             )}
-                            <img 
-                                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.nome)}&background=random`} 
-                                alt="avatar" 
-                                className="ranking-avatar" 
+                            <img
+                                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.nome)}&background=random`}
+                                alt="avatar"
+                                className="ranking-avatar"
                             />
                             <span className="ranking-nome">{user.nome}</span>
                             <div className="ranking-points-container">
                                 <img src={image31} alt="Medalha" className="ranking-medal-icon" />
-                                {/* *** AJUSTE NOS PONTOS *** */}
-                                {/* Usamos apenas user.pontos, que vem direto da API */}
                                 <span className="ranking-pontos">{user.pontos}</span>
                             </div>
                         </div>
