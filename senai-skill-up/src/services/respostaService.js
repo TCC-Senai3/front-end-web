@@ -18,6 +18,9 @@ export const enviarResposta = async (respostaData) => {
 };
 
 // Exporta a função para ser usada em outros lugares
-export default {
+const respostaService = {
   enviarResposta
 };
+
+// 2. Exportamos a constante
+export default respostaService;

@@ -105,12 +105,15 @@ export const fecharSala = async (idSala) => {
   }
 };
 
-export default {
-  getSalas,
-  getSalaById,
-  getSalaByPin,
-  createSala,
-  entrarNaSala,
-  sairDaSala,
-  fecharSala,
+const salaService = {
+  getSalas,
+  getSalaById,
+  getSalaByPin,
+  createSala,
+  entrarNaSala,
+  sairDaSala,
+  fecharSala,
 };
+
+// 2. Exportamos a constante
+export default salaService;

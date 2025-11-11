@@ -39,9 +39,12 @@ export const getFormularioById = async (id) => {
 };
 
 
-// Exporta todas as funções
-export default {
+// 1. Criamos a constante com o objeto
+const formularioService = {
   getFormularios,
   createFormulario,
-  getFormularioById, 
+  getFormularioById, 
 };
+
+// 2. Exportamos a constante
+export default formularioService;

@@ -1,20 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'; // ✅ 1. IMPORTAR useCallback
 import './style.css';
 import editIcon from '../../assets/images/Vector.png';
 import trophyIcon from '../../assets/images/trophy 1.svg';
 import pointsIcon from '../../assets/images/image 33.png';
 
-// --- NOVOS IMPORTS ---
 import { useAuth } from '../../hooks/useAuth'; 
 import userService from '../../services/userService';
 import Loader from '../../components/common/Loader'; 
-import { useNavigate } from 'react-router-dom'; // ✅ 1. IMPORTAR useNavigate
+import { useNavigate } from 'react-router-dom';
 
 export default function PerfilModal({ isMyProfile = true, onClose: propOnClose, user: propUser, isOpen = true }) {
   
-  const navigate = useNavigate(); // ✅ 2. INICIALIZAR O HOOK
+  const navigate = useNavigate(); 
   
-  // --- ESTADOS ---
   const [user, setUser] = useState(isMyProfile ? null : propUser);
   const [form, setForm] = useState({ name: '', bio: '' });
   const [isEditing, setIsEditing] = useState(false);
@@ -22,16 +20,14 @@ export default function PerfilModal({ isMyProfile = true, onClose: propOnClose, 
   const [isSaving, setIsSaving] = useState(false);
   const { user: authUser } = useAuth();
   
-  // ✅ 3. CRIAR A FUNÇÃO DE FECHAR/NAVEGAR
-  // Esta função substitui o 'onClose' que veio das props
-  const handleCloseAndNavigate = () => {
-    // Se o 'onClose' original existir (como em Usuarios.js), chame-o
+  // ✅ 2. ESTABILIZAR A FUNÇÃO COM useCallback
+  // Isso garante que a função não seja recriada em cada renderização
+  const handleCloseAndNavigate = useCallback(() => {
     if (propOnClose) {
       propOnClose(); 
     }
-    // E então navegue para /game (que é o que você quer da página /home)
     navigate('/game');
-  };
+  }, [navigate, propOnClose]); // Dependências do useCallback
 
   // --- GOAL 1: BUSCAR DADOS (GET /me) ---
   useEffect(() => {
@@ -52,7 +48,7 @@ export default function PerfilModal({ isMyProfile = true, onClose: propOnClose, 
       } catch (error) {
         console.error("Erro ao buscar meu perfil:", error);
         alert("Não foi possível carregar seu perfil.");
-        handleCloseAndNavigate(); // ✅ 4. USAR A NOVA FUNÇÃO EM CASO DE ERRO
+        handleCloseAndNavigate(); // Agora é seguro chamar
       } finally {
         setLoading(false);
       }
@@ -64,20 +60,20 @@ export default function PerfilModal({ isMyProfile = true, onClose: propOnClose, 
       setUser(propUser);
       setLoading(false);
     }
-  }, [isMyProfile, propUser, isOpen]); // Removido 'handleCloseAndNavigate' das dependências
+  
+  // ✅ 3. ADICIONAR A FUNÇÃO E CORRIGIR A PROP NO ARRAY DE DEPENDÊNCIAS
+  }, [isMyProfile, propUser, isOpen, propOnClose, handleCloseAndNavigate]); 
 
 
   // --- FUNÇÕES DE EDIÇÃO ---
+  // (O resto do arquivo não muda)
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleEdit = () => {
-    setForm({
-      name: user.name, 
-      bio: user.bio,
-    });
+    setForm({ name: user.name, bio: user.bio });
     setIsEditing(true);
   };
 
@@ -85,7 +81,6 @@ export default function PerfilModal({ isMyProfile = true, onClose: propOnClose, 
     setIsEditing(false);
   };
 
-  // --- GOAL 2: SALVAR DADOS (PUT /biografia) ---
   const handleSave = async () => {
     if (!authUser) {
       alert("Erro: Você não está autenticado.");
@@ -93,9 +88,7 @@ export default function PerfilModal({ isMyProfile = true, onClose: propOnClose, 
     }
     setIsSaving(true);
     try {
-      const payload = {
-        biografia: form.bio
-      };
+      const payload = { biografia: form.bio };
       await userService.updateBiografia(authUser.id, payload);
       setUser({ ...user, bio: form.bio });
       setIsEditing(false);
@@ -110,11 +103,10 @@ export default function PerfilModal({ isMyProfile = true, onClose: propOnClose, 
   // --- RENDERIZAÇÃO ---
   if (!isOpen) return null;
 
-  // Renderiza o Loading
   if (loading || !user) {
     return (
       <div className="perfil-modal-wrapper">
-        <div className="perfil-modal-overlay" onClick={handleCloseAndNavigate}> {/* ✅ 5. USAR AQUI */}
+        <div className="perfil-modal-overlay" onClick={handleCloseAndNavigate}>
           <div className="perfil-modal-container" style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}} onClick={e => e.stopPropagation()}>
             <Loader />
           </div>
@@ -123,15 +115,11 @@ export default function PerfilModal({ isMyProfile = true, onClose: propOnClose, 
     );
   }
 
-  // Renderização principal do modal
   return (
     <div className="perfil-modal-wrapper">
-      <div className="perfil-modal-overlay" onClick={handleCloseAndNavigate}> {/* ✅ 6. USAR AQUI */}
+      <div className="perfil-modal-overlay" onClick={handleCloseAndNavigate}>
         <div className="perfil-modal-container" onClick={e => e.stopPropagation()}>
-          
-          <button className="perfil-close-btn" onClick={handleCloseAndNavigate}> {/* ✅ 7. USAR AQUI */}
-            ×
-          </button>
+          <button className="perfil-close-btn" onClick={handleCloseAndNavigate}>×</button>
           
           {isMyProfile && !isEditing && (
             <div className="perfil-edit-icon" onClick={handleEdit}>
@@ -159,6 +147,7 @@ export default function PerfilModal({ isMyProfile = true, onClose: propOnClose, 
           </div>
 
           <div className="perfil-stats-grid">
+            {/* ... (o resto do seu JSX não muda) ... */}
             <div className="perfil-stat-card">
               <div className="perfil-stat-icon"><img src={trophyIcon} alt="Troféu" /></div>
               <div className="perfil-stat-content">
