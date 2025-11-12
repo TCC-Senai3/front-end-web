@@ -5,9 +5,9 @@ export const usePermissions = () => {
   // ****** CORREÇÃO 1: Pegar 'user' em vez de 'userData' ******
   const { user, isLoggedIn, loading } = useAuth();
   /**
-   * Função interna para extrair as roles do objeto 'user'.
-   * Esta função ESTÁ PRONTA para o seu log: { ... roles: [...] }
-   */
+  * Função interna para extrair as roles do objeto 'user'.
+  * Esta função ESTÁ PRONTA para o seu log: { ... roles: [...] }
+  */
 
   const extractRoles = (currentUser) => {
     // Renomeado parâmetro para clareza
@@ -37,11 +37,11 @@ export const usePermissions = () => {
 
     // Adicione aqui se as roles vierem de 'authorities: [{ authority: "..." }]'
     // if (Array.isArray(currentUser.authorities)) {
-    //    currentUser.authorities.forEach(auth => {
-    //      if (auth && typeof auth.authority === 'string') {
-    //         roles.push(auth.authority);
-    //      }
-    //    });
+    //   currentUser.authorities.forEach(auth => {
+    //     if (auth && typeof auth.authority === 'string') {
+    //        roles.push(auth.authority);
+    //     }
+    //   });
     // }
 
     return [...new Set(roles)];
