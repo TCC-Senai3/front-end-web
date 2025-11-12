@@ -1,24 +1,26 @@
 // src/pages/AdminUsers/index.js
-import React, { useState, useEffect, useCallback } from "react";
-import { Header } from "../../components";
-import UserManagementTable from "../../components/UsersComponents/UserManagementTable";
-import UserEditModal from "../../components/UsersComponents/UserEditModal";
-import { usePermissions } from "../../hooks/usePermissions";
-import userService from "../../services/userService";
-import "./style.css";
+import React, { useState, useEffect, useCallback } from 'react';
+import { Header } from '../../components';
+import UserManagementTable from '../../components/UsersComponents/UserManagementTable';
+import UserEditModal from '../../components/UsersComponents/UserEditModal';
+import { usePermissions } from '../../hooks/usePermissions';
+import userService from '../../services/userService';
+import './style.css';
 
 export default function AdminUsers() {
-  const { userData, isLoggedIn, loading: authLoading } = usePermissions(); // ✅ 1. A VERIFICAÇÃO "À PROVA DE BALA" // Checa se 'userData.roles' (array) inclui 'ROLE_ADMIN'
-  const hasRoleAdmin = userData?.roles?.includes("ROLE_ADMIN"); // Checa se 'userData.permissoes' (string) é 'ADM'
-  const hasPermAdmin =
-    userData?.permissoes === "ADM" || userData?.permissoes === "ADMINISTRADOR";
+  // ✅ 1. CORREÇÃO: Mudamos 'userData' para 'user'
+  // para bater com o que o 'usePermissions.js' realmente envia.
+  const { user, isLoggedIn, loading: authLoading } = usePermissions();
 
-  // Se QUALQUER UMA for verdadeira, o usuário é admin
+  // ✅ 2. A VERIFICAÇÃO (agora usando 'user')
+  // Vamos checar as duas formas, 'roles' (array) e 'permissoes' (string)
+  const hasRoleAdmin = user?.roles?.includes('ROLE_ADMIN');
+  const hasPermAdmin = user?.permissoes === 'ADM' || user?.permissoes === 'ADMINISTRADOR';
   const hasAdminPermission = hasRoleAdmin || hasPermAdmin;
 
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -30,29 +32,29 @@ export default function AdminUsers() {
       setUsers(apiUsers);
       setFilteredUsers(apiUsers);
     } catch (error) {
-      console.error("Erro ao carregar usuários da API:", error);
+      console.error('Erro ao carregar usuários da API:', error);
       setUsers([]);
       setFilteredUsers([]);
     } finally {
       setLoading(false);
     }
-  }, []); // Carregar usuários
+  }, []); 
 
+  // Carregar usuários
   useEffect(() => {
-    // Usamos a nova verificação
-    if (isLoggedIn && hasAdminPermission) {
+    if (isLoggedIn && hasAdminPermission) { 
       loadUsers();
     }
-  }, [isLoggedIn, hasAdminPermission, loadUsers]); // Filtrar usuários (sem alteração)
+  }, [isLoggedIn, hasAdminPermission, loadUsers]); 
 
+  // Filtrar usuários (sem alteração)
   useEffect(() => {
-    if (searchTerm.trim() === "") {
+    if (searchTerm.trim() === '') {
       setFilteredUsers(users);
     } else {
-      const filtered = users.filter(
-        (user) =>
-          user.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.email.toLowerCase().includes(searchTerm.toLowerCase())
+      const filtered = users.filter(userItem => // Renomeado para 'userItem' para evitar conflito
+        userItem.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        userItem.email.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setFilteredUsers(filtered);
     }
@@ -62,117 +64,101 @@ export default function AdminUsers() {
     setSearchTerm(term);
   };
 
-  const handleEditUser = (user) => {
-    setSelectedUser(user);
+  const handleEditUser = (userToEdit) => { // Renomeado para 'userToEdit'
+    setSelectedUser(userToEdit);
     setIsEditModalOpen(true);
-  }; // handleDeleteUser (sem alteração)
+  };
 
+  // handleDeleteUser (sem alteração)
   const handleDeleteUser = async (userId) => {
-    if (window.confirm("Tem certeza que deseja excluir este usuário?")) {
+    if (window.confirm('Tem certeza que deseja excluir este usuário?')) {
       try {
         await userService.deleteUser(userId);
-        loadUsers();
-        alert("Usuário excluído com sucesso!");
+        loadUsers(); 
+        alert('Usuário excluído com sucesso!');
       } catch (error) {
-        console.error("Erro ao excluir usuário:", error);
-        alert("Erro ao excluir usuário. Tente novamente.");
+        console.error('Erro ao excluir usuário:', error);
+        alert('Erro ao excluir usuário. Tente novamente.');
       }
     }
-  }; // handleSaveUser (sem alteração)
+  };
 
-  const handleSaveUser = async (userData) => {
+  // handleSaveUser (sem alteração)
+  const handleSaveUser = async (userDataToSave) => { // Renomeado para 'userDataToSave'
     try {
       if (selectedUser) {
-        const { roleIds, ...dadosBasicos } = userData;
+        const { roleIds, ...dadosBasicos } = userDataToSave; 
         await userService.updateUser(selectedUser.id, dadosBasicos);
         if (Array.isArray(roleIds)) {
           await userService.updateUserRoles(selectedUser.id, roleIds);
         }
-        alert("Usuário atualizado com sucesso!");
-        loadUsers();
+        alert('Usuário atualizado com sucesso!');
+        loadUsers(); 
       } else {
-        const newUser = await userService.createUser(userData);
-        setUsers((prevUsers) => [...prevUsers, newUser]);
-        alert("Usuário criado com sucesso!");
+        const newUser = await userService.createUser(userDataToSave);
+        setUsers(prevUsers => [...prevUsers, newUser]); 
+        alert('Usuário criado com sucesso!');
       }
       setIsEditModalOpen(false);
       setSelectedUser(null);
     } catch (error) {
-      console.error("Erro ao salvar usuário:", error);
-      alert("Erro ao salvar usuário. Tente novamente.");
+      console.error('Erro ao salvar usuário:', error);
+      alert('Erro ao salvar usuário. Tente novamente.');
     }
   };
 
   const handleCloseModal = () => {
     setIsEditModalOpen(false);
     setSelectedUser(null);
-  }; // handleViewProfile (sem alteração)
+  };
 
-  const handleViewProfile = (user) => {
-    // Tenta pegar 'roles' (array) ou 'permissoes' (string)
-    const rolesStr = Array.isArray(user.roles)
-      ? user.roles.join(", ")
-      : user.permissoes || "N/A";
-    alert(
-      `Perfil do usuário:\nNome: ${user.nome}\nEmail: ${
-        user.email
-      }\nPermissão: ${rolesStr}\nStatus: ${user.online ? "Online" : "Offline"}`
-    );
-  }; // --- Verificações de Renderização ---
+  // handleViewProfile (sem alteração)
+  const handleViewProfile = (userToView) => { // Renomeado para 'userToView'
+    const rolesStr = Array.isArray(userToView.roles) ? userToView.roles.join(', ') : (userToView.permissoes || 'N/A');
+    alert(`Perfil do usuário:\nNome: ${userToView.nome}\nEmail: ${userToView.email}\nPermissão: ${rolesStr}\nStatus: ${userToView.online ? 'Online' : 'Offline'}`);
+  };
+
+  // --- Verificações de Renderização ---
 
   if (authLoading) {
     return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          fontSize: "18px",
-        }}
-      >
-                Verificando permissões...      {" "}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        fontSize: '18px'
+      }}>
+        Verificando permissões...
       </div>
     );
-  } // A CHECAGEM DE ACESSO
+  }
 
+  // A CHECAGEM DE ACESSO
   if (!isLoggedIn || !hasAdminPermission) {
     return (
-      <div
-        style={{
-          padding: "40px",
-          textAlign: "center",
-          fontFamily: "Arial, sans-serif",
-          color: "#333",
-        }}
-      >
-                <h1>Acesso Negado</h1>       {" "}
-        <p>Você não tem as permissões de Administrador necessárias.</p>     {" "}
+      <div style={{ 
+        padding: '40px', 
+        textAlign: 'center', 
+        fontFamily: 'Arial, sans-serif', 
+        color: '#333' 
+      }}>
+        <h1>Acesso Negado</h1>
+        <p>Você não tem as permissões de Administrador necessárias.</p>
       </div>
     );
-  } // Se passou, renderiza a página
+  }
 
+  // Se passou, renderiza a página
   return (
     <>
-            <Header />     {" "}
+      <Header />
       <div className="admin-users-container">
-               {" "}
         <div className="admin-users-content">
-                   {" "}
-          <div
-            style={{
-              marginBottom: "20px",
-              padding: "10px",
-              background: "#e3f2fd",
-              borderRadius: "8px",
-            }}
-          >
-                        <strong>👤 Usuário logado:</strong>{" "}
-            {userData?.nome || "N/A"} |             <strong> Permissão:</strong>{" "}
-            {userData?.permissoes || userData?.roles?.join(", ") || "N/A"}     
-               {" "}
+          <div style={{ marginBottom: '20px', padding: '10px', background: '#e3f2fd', borderRadius: '8px' }}>
+            <strong>👤 Usuário logado:</strong> {user?.nome || 'N/A'} | 
+            <strong> Permissão:</strong> {user?.permissoes || user?.roles?.join(', ') || 'N/A'}
           </div>
-                   {" "}
           <UserManagementTable
             users={filteredUsers}
             searchTerm={searchTerm}
@@ -182,11 +168,9 @@ export default function AdminUsers() {
             onDeleteUser={handleDeleteUser}
             loading={loading}
           />
-                 {" "}
         </div>
-             {" "}
       </div>
-           {" "}
+
       {isEditModalOpen && (
         <UserEditModal
           user={selectedUser}
@@ -194,7 +178,6 @@ export default function AdminUsers() {
           onClose={handleCloseModal}
         />
       )}
-         {" "}
     </>
   );
 }
