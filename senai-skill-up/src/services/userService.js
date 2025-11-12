@@ -131,7 +131,7 @@ class UserService {
     
     try {
       const payload = { roleIds: roleIds };
-      const response = await api.put(`/usuarios/${userId}/roles`, payload);
+      const response = await api.put(`admin/usuarios/${userId}/roles`, payload);
       return response.data; // Retorna o usuário atualizado
     } catch (error) {
       console.error(`Erro ao atualizar roles do usuário ID ${userId}:`, error);
