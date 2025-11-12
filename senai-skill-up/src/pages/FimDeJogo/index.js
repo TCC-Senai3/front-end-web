@@ -1,16 +1,13 @@
-// pages/FimDeJogo/index.js
-
 import React, { useEffect, useState, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../../components/header";
-import { useAuth } from "../../hooks/useAuth"; 
-import Loader from "../../components/common/Loader"; 
+import { useAuth } from "../../hooks/useAuth";
+import Loader from "../../components/common/Loader";
 import image6 from "../../assets/images/image 6.svg"; // Troféu Prata
 import image7 from "../../assets/images/image 7.svg"; // Troféu Ouro
 import image8 from "../../assets/images/image 8.svg"; // Troféu Bronze
 import "./style.css";
-// ✅ 1. IMPORTAR O NOVO SERVIÇO
-import rankingService from "../../services/rankingService"; 
+import rankingService from "../../services/rankingService"; // Importe o service
 
 // Estilos (sem alteração)
 const pageStyle = {
@@ -24,64 +21,68 @@ const errorStyle = { color: "red", marginTop: "10px" };
 
 export default function FimDeJogo() {
   const location = useLocation();
-  const navigate = useNavigate(); 
-  const { user, refreshUserData, loading: authLoading } = useAuth(); 
+  const navigate = useNavigate();
+  const { user, refreshUserData, loading: authLoading } = useAuth();
 
-  // Dados do quiz (sem alteração)
   const pontuacaoQuiz = location.state?.pontuacao || 0;
-  const totalPerguntas = location.state?.totalPerguntas || 0; 
-  // ✅ 2. PEGAR O ID DA SALA
-  // (Removemos os rankings que vinham do state)
+  const totalPerguntas = location.state?.totalPerguntas || 0;
   const idSala = location.state?.idSala;
 
-  // ✅ 3. NOVOS ESTADOS PARA OS DADOS
-  // (Não usamos mais location.state para pódio e ranking)
   const [podiumData, setPodiumData] = useState([]);
-  const [ranking, setRanking] = useState([]); 
-  
-  // (Renomeei 'refreshingScore' para 'loadingPage' para mais clareza)
-  const [loadingPage, setLoadingPage] = useState(true); 
-  const [refreshError, setRefreshError] = useState(null); 
+  const [ranking, setRanking] = useState([]);
+
+  const [loadingPage, setLoadingPage] = useState(true);
+  const [refreshError, setRefreshError] = useState(null);
 
   const stableRefreshUserData = useCallback(refreshUserData, [refreshUserData]);
 
   // --- useEffect ATUALIZADO ---
   useEffect(() => {
-    let mounted = true; 
+    let mounted = true;
 
-    // Função única para buscar todos os dados da página
     const carregarDadosFimDeJogo = async () => {
       if (!idSala) {
-        console.error("FimDeJogo: ID da Sala não encontrado!");
         if (mounted) {
-          setRefreshError("Não foi possível carregar o ranking (ID da Sala não encontrado).");
+          setRefreshError(
+            "Não foi possível carregar o ranking (ID da Sala não encontrado)."
+          );
           setLoadingPage(false);
         }
         return;
       }
 
-      console.log("FimDeJogo: Buscando dados...");
-      setRefreshError(null); 
+      setRefreshError(null);
 
       try {
-        // ✅ 4. EXECUTAR OS DOIS FETCHES EM PARALELO
         const [rankingResult] = await Promise.all([
-          // Fetch 1: O ranking da partida
           rankingService.getRankingSala(idSala),
-          // Fetch 2: Atualizar a pontuação total do usuário (para o Header)
-          stableRefreshUserData() 
+          stableRefreshUserData(),
         ]);
 
-        // Se chegou aqui, os dois fetches funcionaram
         if (mounted) {
-          console.log("FimDeJogo: Ranking da partida recebido:", rankingResult);
-          
-          // Assumindo que o 'rankingResult' já vem ordenado
-          setRanking(rankingResult || []);
-          // Pegamos os 3 primeiros para o Pódio
-          setPodiumData((rankingResult || []).slice(0, 3));
-        }
+          console.log(
+            "FimDeJogo: Ranking recebido (JSON Original):",
+            rankingResult
+          );
 
+          const rankingMapeado = (rankingResult || []).map((jogador, index) => {
+            const posicao = index + 1; // Criamos a posição baseada no índice
+
+            return {
+              // Dados que o Front-End espera:
+              id: jogador.nomeUsuario, // Usamos o nome como ID (ou use o ID se o backend enviar)
+              nome: jogador.nomeUsuario, // Traduzindo 'nomeUsuario' para 'nome'
+              pontos: jogador.pontuacao, // Traduzindo 'pontuacao' para 'pontos'
+              posicao: posicao, // Adicionando a 'posicao' que faltava
+            };
+          });
+          // =======================================================
+
+          console.log("FimDeJogo: Ranking Mapeado (Tratado):", rankingMapeado);
+
+          setRanking(rankingMapeado); // Salva o ranking traduzido
+          setPodiumData(rankingMapeado.slice(0, 3)); // Salva o pódio traduzido
+        }
       } catch (err) {
         if (mounted) {
           console.error("FimDeJogo: Erro ao buscar dados:", err);
@@ -94,39 +95,30 @@ export default function FimDeJogo() {
       }
     };
 
-    // Só executa quando o Auth (usuário) estiver pronto
     if (!authLoading && user) {
       carregarDadosFimDeJogo();
     } else if (!authLoading && !user) {
-      // Caso não esteja logado, não faz nada
-      console.warn("FimDeJogo: Usuário não logado.");
       if (mounted) setLoadingPage(false);
     }
-    
+
     return () => {
       mounted = false;
     };
-    
-  }, [authLoading, user, idSala, stableRefreshUserData]); // 'idSala' agora é uma dependência
-
+  }, [authLoading, user, idSala, stableRefreshUserData]);
 
   const getTrophy = (pos) => {
-    // ✅ 5. LÓGICA DO PÓDIO AJUSTADA
-    // O backend deve retornar o 1º lugar com {posicao: 1}
-    // Se o seu backend não retornar a posição, você terá que ajustar aqui.
-    // Esta lógica assume que o 'podiumData' tem um campo 'posicao'
+    // Agora 'pos' (que vem de 'jogador.posicao') será 1, 2, ou 3
     const trophies = { 1: image7, 2: image6, 3: image8 };
-    return trophies[pos] || image8; 
-  }; 
+    return trophies[pos] || image8;
+  };
 
-  // --- Renderização --- 
-  // Mostra loader se o auth OU a página estiverem carregando
-  if (authLoading || loadingPage) { 
+  // --- Renderização ---
+  if (authLoading || loadingPage) {
     return (
       <>
-        <Header /> 
+        <Header />
         <div style={pageStyle}>
-          <Loader /> 
+          <Loader />
         </div>
       </>
     );
@@ -134,40 +126,42 @@ export default function FimDeJogo() {
 
   return (
     <>
-      <Header /> 
+      <Header />
       <div className="fim-container" style={pageStyle}>
-        <h1 className="fim-title">FIM DE JOGO</h1> 
+        <h1 className="fim-title">FIM DE JOGO</h1>
         <div className="resultado-quiz">
           <p>
-            Você acertou 
-            <span className="score-highlight">{pontuacaoQuiz}</span> de 
-            <span className="score-highlight">{totalPerguntas}</span> 
-            perguntas. 
+            Você acertou
+            <span className="score-highlight">{pontuacaoQuiz}</span> de
+            <span className="score-highlight">{totalPerguntas}</span>
+            perguntas.
           </p>
         </div>
-        
+
         <div className="pontuacao-total">
           <h2>
-            Sua Pontuação Total: 
-            {/* 'user.pontuacao' vem do useAuth (score total atualizado) */}
-            <span className="score-highlight">{user?.pontuacao ?? "..."}</span> 
+            Sua Pontuação Total:
+            <span className="score-highlight">{user?.pontuacao ?? "..."}</span>
           </h2>
         </div>
-        
+
         {refreshError && (
           <p className="error-message" style={errorStyle}>
-            {refreshError} 
+            {refreshError}
           </p>
         )}
-        
+
+        {/* O JSX do Pódio agora vai funcionar, pois 'podiumData' tem os nomes corretos */}
         {podiumData.length > 0 && (
           <div className="podium">
-            <h2>Pódio da Partida</h2> 
+            <h2>Pódio da Partida</h2>
             {podiumData.map((jogador, idx) => (
-              // Usamos 'jogador.id' ou 'idx' como chave
-              <div key={jogador.id || idx} className={`podium-col pos-${jogador.posicao}`}> 
+              <div
+                key={jogador.id || idx}
+                className={`podium-col pos-${jogador.posicao}`}
+              >
                 <img
-                  src={getTrophy(jogador.posicao)} // Usa a posição vinda do backend
+                  src={getTrophy(jogador.posicao)} // Agora 'jogador.posicao' existe
                   alt={`Troféu ${jogador.posicao}`}
                   className="trophy"
                 />
@@ -175,33 +169,34 @@ export default function FimDeJogo() {
                   <div
                     className="avatar"
                     style={
-                      jogador.avatar ? { backgroundImage: `url(${jogador.avatar})` } : {}
+                      jogador.avatar
+                        ? { backgroundImage: `url(${jogador.avatar})` }
+                        : {}
                     }
                   />
-                  <div className="user-name">{jogador.nome || "Jogador"}</div> 
+                  {/* Agora 'jogador.nome' existe */}
+                  <div className="user-name">{jogador.nome || "Jogador"}</div>
                 </div>
-                {/* 'jogador.pontos' deve ser a pontuação DA PARTIDA vinda do API */}
-                <div className="points">{jogador.pontos ?? 0} Pontos</div> 
+                {/* Agora 'jogador.pontos' existe */}
+                <div className="points">{jogador.pontos ?? 0} Pontos</div>
               </div>
             ))}
           </div>
         )}
-        
+
         <div className="fim-actions">
           <button className="btn-proximo" onClick={() => navigate("/game")}>
-            VOLTAR AO MENU 
+            VOLTAR AO MENU
           </button>
         </div>
-        
-        {/* ✅ 7. RENDERIZAÇÃO DO RANKING (SEM ALTERAÇÃO) */}
-        {/* O 'ranking' agora é o array completo vindo da API */}
+
+        {/* O JSX do Ranking agora vai funcionar */}
         {ranking.length > 0 && (
           <div className="lista-final">
-            <h2>Ranking da Partida</h2> 
+            <h2>Ranking da Partida</h2>
             {ranking.map((u, i) => (
               <div key={u.id || i} className="linha-user">
-                {/* Usamos a posição vinda do backend ou o índice */}
-                <div className="col-pos">#{u.posicao || i + 1}</div> 
+                <div className="col-pos">#{u.posicao || i + 1}</div>
                 <div className="col-nome">
                   <div
                     className="avatar small"
@@ -209,12 +204,13 @@ export default function FimDeJogo() {
                       u.avatar ? { backgroundImage: `url(${u.avatar})` } : {}
                     }
                   />
-                  <span>{u.nome || "Jogador"}</span> 
+                  <span>{u.nome || "Jogador"}</span>
                 </div>
                 <div className="col-ganho">
+                  {/* 'u.pontos' agora existe e é a pontuação da partida */}
                   {u.pontos !== undefined
                     ? `${u.pontos} pts`
-                    : u.ganho !== undefined // Fallback (se o backend mandar 'ganho' em vez de 'pontos')
+                    : u.ganho !== undefined
                     ? `+${u.ganho}`
                     : ""}
                 </div>
