@@ -1,3 +1,4 @@
+// src/pages/AdminUsers/index.js
 import React, { useState, useEffect, useCallback } from "react";
 import { Header } from "../../components";
 import UserManagementTable from "../../components/UsersComponents/UserManagementTable";
@@ -7,8 +8,13 @@ import userService from "../../services/userService";
 import "./style.css";
 
 export default function AdminUsers() {
-  const { userData, isLoggedIn, loading: authLoading } = usePermissions();
-  const hasAdminPermission = userData?.roles?.includes("ROLE_ADMIN");
+  const { userData, isLoggedIn, loading: authLoading } = usePermissions(); // ✅ 1. A VERIFICAÇÃO "À PROVA DE BALA" // Checa se 'userData.roles' (array) inclui 'ROLE_ADMIN'
+  const hasRoleAdmin = userData?.roles?.includes("ROLE_ADMIN"); // Checa se 'userData.permissoes' (string) é 'ADM'
+  const hasPermAdmin =
+    userData?.permissoes === "ADM" || userData?.permissoes === "ADMINISTRADOR";
+
+  // Se QUALQUER UMA for verdadeira, o usuário é admin
+  const hasAdminPermission = hasRoleAdmin || hasPermAdmin;
 
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
@@ -33,6 +39,7 @@ export default function AdminUsers() {
   }, []); // Carregar usuários
 
   useEffect(() => {
+    // Usamos a nova verificação
     if (isLoggedIn && hasAdminPermission) {
       loadUsers();
     }
@@ -102,17 +109,19 @@ export default function AdminUsers() {
   }; // handleViewProfile (sem alteração)
 
   const handleViewProfile = (user) => {
-    const rolesStr = Array.isArray(user.roles) ? user.roles.join(", ") : "N/A";
+    // Tenta pegar 'roles' (array) ou 'permissoes' (string)
+    const rolesStr = Array.isArray(user.roles)
+      ? user.roles.join(", ")
+      : user.permissoes || "N/A";
     alert(
       `Perfil do usuário:\nNome: ${user.nome}\nEmail: ${
         user.email
-      }\nRoles: ${rolesStr}\nStatus: ${user.online ? "Online" : "Offline"}`
+      }\nPermissão: ${rolesStr}\nStatus: ${user.online ? "Online" : "Offline"}`
     );
   }; // --- Verificações de Renderização ---
 
   if (authLoading) {
     return (
-      // ✅ CORREÇÃO: O 'style' foi preenchido com o código correto
       <div
         style={{
           display: "flex",
@@ -125,7 +134,7 @@ export default function AdminUsers() {
                 Verificando permissões...      {" "}
       </div>
     );
-  } // A CHECAGEM DE ACESSO (sem alteração)
+  } // A CHECAGEM DE ACESSO
 
   if (!isLoggedIn || !hasAdminPermission) {
     return (
@@ -138,10 +147,10 @@ export default function AdminUsers() {
         }}
       >
                 <h1>Acesso Negado</h1>       {" "}
-        <p>Você não tem permissão (ROLE_ADMIN) para ver esta página.</p>     {" "}
+        <p>Você não tem as permissões de Administrador necessárias.</p>     {" "}
       </div>
     );
-  } // Se passou, renderiza a página (sem alteração)
+  } // Se passou, renderiza a página
 
   return (
     <>
@@ -159,8 +168,9 @@ export default function AdminUsers() {
             }}
           >
                         <strong>👤 Usuário logado:</strong>{" "}
-            {userData?.nome || "N/A"} |             <strong> Roles:</strong>{" "}
-            {userData?.roles?.join(", ") || "N/A"}         {" "}
+            {userData?.nome || "N/A"} |             <strong> Permissão:</strong>{" "}
+            {userData?.permissoes || userData?.roles?.join(", ") || "N/A"}     
+               {" "}
           </div>
                    {" "}
           <UserManagementTable
