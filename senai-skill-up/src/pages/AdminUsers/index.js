@@ -8,10 +8,7 @@ import userService from '../../services/userService';
 import './style.css';
 
 export default function AdminUsers() {
-  // Pega o 'user' (para o nome) e o booleano 'isAdmin'
   const { user, isLoggedIn, loading: authLoading, isAdmin } = usePermissions();
-  
-  // 'isAdmin' já é true ou false, vindo do seu hook
   const hasAdminPermission = isAdmin;
 
   const [users, setUsers] = useState([]);
@@ -36,14 +33,12 @@ export default function AdminUsers() {
     }
   }, []); 
 
-  // Carregar usuários
   useEffect(() => {
     if (isLoggedIn && hasAdminPermission) { 
       loadUsers();
     }
   }, [isLoggedIn, hasAdminPermission, loadUsers]); 
 
-  // Filtrar usuários
   useEffect(() => {
     if (searchTerm.trim() === '') {
       setFilteredUsers(users);
@@ -65,7 +60,6 @@ export default function AdminUsers() {
     setIsEditModalOpen(true);
   };
 
-  // handleDeleteUser
   const handleDeleteUser = async (userId) => {
     if (window.confirm('Tem certeza que deseja excluir este usuário?')) {
       try {
@@ -79,27 +73,31 @@ export default function AdminUsers() {
     }
   };
 
-  // handleSaveUser
-  const handleSaveUser = async (userDataToSave) => { 
+  // ✅ 1. handleSaveUser ATUALIZADO
+  // O parâmetro 'roleIds' agora é o array (ex: ["ROLE_ADMIN"])
+  // vindo diretamente do 'onSave' do modal.
+  const handleSaveUser = async (roleIds) => { 
     try {
       if (selectedUser) {
-        const { roleIds, ...dadosBasicos } = userDataToSave; 
-        await userService.updateUser(selectedUser.id, dadosBasicos);
+        // Removemos as chamadas para 'updateUser'
+        // const { roleIds, ...dadosBasicos } = userDataToSave; // (Removido)
+        // await userService.updateUser(selectedUser.id, dadosBasicos); // (Removido)
+
+        // ✅ 2. Chamamos SÓ o endpoint de roles
         if (Array.isArray(roleIds)) {
           await userService.updateUserRoles(selectedUser.id, roleIds);
         }
-        alert('Usuário atualizado com sucesso!');
-        loadUsers(); 
-      } else {
-        const newUser = await userService.createUser(userDataToSave);
-        setUsers(prevUsers => [...prevUsers, newUser]); 
-        alert('Usuário criado com sucesso!');
-      }
+        alert('Permissões do usuário atualizadas com sucesso!');
+        loadUsers(); // Recarrega a lista
+      } 
+      // O 'else' (criar usuário) foi removido,
+      // pois este modal agora é apenas para edição de roles.
+      
       setIsEditModalOpen(false);
       setSelectedUser(null);
     } catch (error) {
-      console.error('Erro ao salvar usuário:', error);
-      alert('Erro ao salvar usuário. Tente novamente.');
+      console.error('Erro ao salvar permissões:', error);
+      alert('Erro ao salvar permissões. Tente novamente.');
     }
   };
 
@@ -108,13 +106,12 @@ export default function AdminUsers() {
     setSelectedUser(null);
   };
 
-  // handleViewProfile
   const handleViewProfile = (userToView) => { 
     const rolesStr = Array.isArray(userToView.roles) ? userToView.roles.join(', ') : (userToView.permissoes || 'N/A');
     alert(`Perfil do usuário:\nNome: ${userToView.nome}\nEmail: ${userToView.email}\nPermissão: ${rolesStr}\nStatus: ${userToView.online ? 'Online' : 'Offline'}`);
   };
 
-  // --- Verificações de Renderização ---
+  // --- Renderização (sem alteração) ---
 
   if (authLoading) {
     return (
@@ -130,7 +127,6 @@ export default function AdminUsers() {
     );
   }
 
-  // A CHECAGEM DE ACESSO
   if (!isLoggedIn || !hasAdminPermission) {
     return (
       <div style={{ 
@@ -145,7 +141,6 @@ export default function AdminUsers() {
     );
   }
 
-  // Se passou, renderiza a página
   return (
     <>
       <Header />
