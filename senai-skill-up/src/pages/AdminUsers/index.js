@@ -1,6 +1,6 @@
 // src/pages/AdminUsers/index.js
 import React, { useState, useEffect, useCallback } from 'react';
-import { Header } from '../../components';
+import { Header } from '../../components'; 
 import UserManagementTable from '../../components/UsersComponents/UserManagementTable';
 import UserEditModal from '../../components/UsersComponents/UserEditModal';
 import { usePermissions } from '../../hooks/usePermissions';
@@ -8,16 +8,16 @@ import userService from '../../services/userService';
 import './style.css';
 
 export default function AdminUsers() {
-  // ✅ 1. CORREÇÃO: Mudamos 'userData' para 'user'
-  // para bater com o que o 'usePermissions.js' realmente envia.
-  const { user, isLoggedIn, loading: authLoading } = usePermissions();
+  // ✅ 1. A CORREÇÃO FINAL:
+  // O seu hook 'usePermissions.js' já nos dá a resposta.
+  // Pegamos o 'user' (para o nome) e o booleano 'isAdmin'.
+  const { user, isLoggedIn, loading: authLoading, isAdmin } = usePermissions();
+  
+  // ✅ 2. A VERIFICAÇÃO (agora super simples)
+  // 'isAdmin' já é true ou false.
+  const hasAdminPermission = isAdmin;
 
-  // ✅ 2. A VERIFICAÇÃO (agora usando 'user')
-  // Vamos checar as duas formas, 'roles' (array) e 'permissoes' (string)
-  const hasRoleAdmin = user?.roles?.includes('ROLE_ADMIN');
-  const hasPermAdmin = user?.permissoes === 'ADM' || user?.permissoes === 'ADMINISTRADOR';
-  const hasAdminPermission = hasRoleAdmin || hasPermAdmin;
-
+  // (O resto do seu código não precisa de quase nenhuma mudança)
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -47,12 +47,12 @@ export default function AdminUsers() {
     }
   }, [isLoggedIn, hasAdminPermission, loadUsers]); 
 
-  // Filtrar usuários (sem alteração)
+  // Filtrar usuários
   useEffect(() => {
     if (searchTerm.trim() === '') {
       setFilteredUsers(users);
     } else {
-      const filtered = users.filter(userItem => // Renomeado para 'userItem' para evitar conflito
+      const filtered = users.filter(userItem => 
         userItem.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
         userItem.email.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -64,12 +64,12 @@ export default function AdminUsers() {
     setSearchTerm(term);
   };
 
-  const handleEditUser = (userToEdit) => { // Renomeado para 'userToEdit'
+  const handleEditUser = (userToEdit) => { 
     setSelectedUser(userToEdit);
     setIsEditModalOpen(true);
   };
 
-  // handleDeleteUser (sem alteração)
+  // handleDeleteUser
   const handleDeleteUser = async (userId) => {
     if (window.confirm('Tem certeza que deseja excluir este usuário?')) {
       try {
@@ -83,8 +83,8 @@ export default function AdminUsers() {
     }
   };
 
-  // handleSaveUser (sem alteração)
-  const handleSaveUser = async (userDataToSave) => { // Renomeado para 'userDataToSave'
+  // handleSaveUser
+  const handleSaveUser = async (userDataToSave) => { 
     try {
       if (selectedUser) {
         const { roleIds, ...dadosBasicos } = userDataToSave; 
@@ -112,8 +112,8 @@ export default function AdminUsers() {
     setSelectedUser(null);
   };
 
-  // handleViewProfile (sem alteração)
-  const handleViewProfile = (userToView) => { // Renomeado para 'userToView'
+  // handleViewProfile
+  const handleViewProfile = (userToView) => { 
     const rolesStr = Array.isArray(userToView.roles) ? userToView.roles.join(', ') : (userToView.permissoes || 'N/A');
     alert(`Perfil do usuário:\nNome: ${userToView.nome}\nEmail: ${userToView.email}\nPermissão: ${rolesStr}\nStatus: ${userToView.online ? 'Online' : 'Offline'}`);
   };
