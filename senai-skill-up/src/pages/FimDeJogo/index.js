@@ -160,8 +160,6 @@ export default function FimDeJogo() {
           </p>
         )}
         
-        {/* ✅ 6. RENDERIZAÇÃO DO PÓDIO (AJUSTADA) */}
-        {/* Agora usa o 'podiumData' buscado da API */}
         {podiumData.length > 0 && (
           <div className="podium">
             <h2>Pódio da Partida</h2> 
@@ -214,13 +212,6 @@ export default function FimDeJogo() {
                   <span>{u.nome || "Jogador"}</span> 
                 </div>
                 <div className="col-ganho">
-                  {/* ESTA É A PARTE MAIS IMPORTANTE (Linha 215 do seu original)
-                    'u.pontos' deve ser o score DAQUELA PARTIDA, vindo do seu 
-                    endpoint 'ranking/sala/{idSala}'.
-                    Se o seu endpoint retornar 'u.pontos' como o score da partida,
-                    seu desejo ("mostre somente a pontuação que o usuario ganhou")
-                    será atendido sem mudar o JSX.
-                  */}
                   {u.pontos !== undefined
                     ? `${u.pontos} pts`
                     : u.ganho !== undefined // Fallback (se o backend mandar 'ganho' em vez de 'pontos')
