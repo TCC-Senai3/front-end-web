@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Header } from '../../components'; 
 import UserManagementTable from '../../components/UsersComponents/UserManagementTable';
@@ -8,11 +7,12 @@ import userService from '../../services/userService';
 import './style.css';
 
 export default function AdminUsers() {
-  // ✅ 1. PEGAMOS O 'userData' COMPLETO
   const { userData, isLoggedIn, loading: authLoading } = usePermissions();
   
-  // ✅ 2. CRIAMOS NOSSA PRÓPRIA VERIFICAÇÃO (IGNORANDO 'canManageUsers')
-  const hasAdminPermission = userData?.roles?.includes('ROLE_ADMIN');
+  // ✅ A CORREÇÃO ESTÁ AQUI:
+  // Trocamos a checagem de 'roles' (array) para 'permissoes' (string)
+  // para bater com o resto do seu app (como o App.js e o UserEditModal).
+  const hasAdminPermission = userData?.permissoes === 'ADM' || userData?.permissoes === 'ADMINISTRADOR';
 
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
@@ -23,12 +23,12 @@ export default function AdminUsers() {
 
   // Carregar usuários
   useEffect(() => {
-    // ✅ 3. USAMOS A NOSSA NOVA VERIFICAÇÃO
+    // Usamos a nova verificação
     if (isLoggedIn && hasAdminPermission) { 
       loadUsers();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoggedIn, hasAdminPermission]); // Adicionada a dependência
+  }, [isLoggedIn, hasAdminPermission]); 
 
   // Filtrar usuários (sem alteração)
   useEffect(() => {
@@ -142,21 +142,22 @@ export default function AdminUsers() {
     );
   }
 
-  // ✅ 4. USAMOS A NOSSA NOVA VERIFICAÇÃO AQUI
-  // (Isso corrige a tela branca)
+  // Usamos a nova verificação
   if (!isLoggedIn || !hasAdminPermission) {
-    // Você pode renderizar 'null' (tela branca) ou um componente de "Não Autorizado"
-    // return null; 
     return (
-      <div style={{ padding: '20px', textAlign: 'center' }}>
+      <div style={{ 
+        padding: '40px', 
+        textAlign: 'center', 
+        fontFamily: 'Arial, sans-serif', 
+        color: '#333' 
+      }}>
         <h1>Acesso Negado</h1>
         <p>Você não tem permissão para ver esta página.</p>
       </div>
     );
   }
 
-  // ✅ 5. REMOVIDO O <ProtectedRoute> DUPLICADO
-  // A proteção da rota já foi feita pelo App.js (ou pela verificação acima)
+  // (O resto do JSX não muda)
   return (
     <>
       <Header />
@@ -164,7 +165,7 @@ export default function AdminUsers() {
         <div className="admin-users-content">
           <div style={{ marginBottom: '20px', padding: '10px', background: '#e3f2fd', borderRadius: '8px' }}>
             <strong>👤 Usuário logado:</strong> {userData?.nome || 'N/A'} | 
-            <strong> Roles:</strong> {userData?.roles?.join(', ') || 'N/A'}
+            <strong> Permissões:</strong> {userData?.permissoes || 'N/A'}
           </div>
           <UserManagementTable
             users={filteredUsers}
