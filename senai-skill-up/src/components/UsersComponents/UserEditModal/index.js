@@ -11,41 +11,39 @@ export default function UserEditModal({ user, onSave, onClose }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPermissionModalOpen, setIsPermissionModalOpen] = useState(false);
 
-  // ✅ 1. 'useEffect' CORRIGIDO
-  // Agora ele procura por 'ROLE_CRIADOR_FORMULARIO'
+  // useEffect (Esta parte está correta, ela lê as strings)
   useEffect(() => {
     if (user) {
       let userPerm = 'USER';
       if (Array.isArray(user.roles) && user.roles.length > 0) {
         if (user.roles.includes('ROLE_ADMIN')) {
           userPerm = 'ADM';
-        } else if (user.roles.includes('ROLE_CRIADOR_FORMULARIO')) { // <-- CORREÇÃO
+        } else if (user.roles.includes('ROLE_CRIADOR_FORMULARIO')) {
           userPerm = 'CRIADOR';
         }
       }
-      
-      setFormData({
-        permissoes: userPerm,
-      });
+      setFormData({ permissoes: userPerm });
     }
   }, [user]);
 
 
-  // ✅ 2. 'handleSubmit' CORRIGIDO
-  // Agora ele envia 'ROLE_CRIADOR_FORMULARIO'
+  // ✅ A CORREÇÃO FINAL ESTÁ AQUI
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    let rolesParaEnviar = ["ROLE_USER"]; // Default
+    // Converte a string (ex: "ADM") para o ID NÚMERICO que o backend espera.
+    let roleIdsParaEnviar = [2]; // Default: ID 2 (ROLE_USER)
+    
     if (formData.permissoes === 'ADM') {
-      rolesParaEnviar = ["ROLE_ADMIN"];
+      roleIdsParaEnviar = [1]; // ID 1 (ROLE_ADMIN)
     } else if (formData.permissoes === 'CRIADOR') {
-      rolesParaEnviar = ["ROLE_CRIADOR_FORMULARIO"]; // <-- CORREÇÃO
+      roleIdsParaEnviar = [3]; // ID 3 (ROLE_CRIADOR_FORMULARIO)
     }
     
     try {
-      await onSave(rolesParaEnviar);
+      // Envia o array de IDs (ex: [3]) para o 'onSave'
+      await onSave(roleIdsParaEnviar);
     } catch (error) {
       console.error('Erro ao salvar usuário:', error);
     } finally {
@@ -101,8 +99,7 @@ export default function UserEditModal({ user, onSave, onClose }) {
               <span className="preview-name">{user?.nome || '...'}</span>
               <span className="preview-email">{user?.email || '...'}</span>
               <span className={`preview-permission ${formData.permissoes?.toLowerCase()}-badge`}>
-                {/* Agora 'formData.permissoes' será 'CRIADOR' para o "editor" */}
-                {formData.permissoes || 'USER'}
+                {getPermissionLabel(formData.permissoes)}
               </span>
             </div>
           </div>
