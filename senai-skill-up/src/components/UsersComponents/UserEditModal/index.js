@@ -4,7 +4,6 @@ import PermissionTypeModal from '../PermissionTypeModal';
 import './style.css';
 
 export default function UserEditModal({ user, onSave, onClose }) {
-  // ✅ 1. O formulário agora SÓ se preocupa com as 'permissoes'
   const [formData, setFormData] = useState({
     permissoes: 'USER',
   });
@@ -12,17 +11,17 @@ export default function UserEditModal({ user, onSave, onClose }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPermissionModalOpen, setIsPermissionModalOpen] = useState(false);
 
-  // ✅ 2. useEffect simplificado
-  // Ele lê as roles do 'user' e define a string de permissão
+  // ✅ 1. 'useEffect' CORRIGIDO
+  // Agora ele procura por 'ROLE_CRIADOR_FORMULARIO'
   useEffect(() => {
     if (user) {
       let userPerm = 'USER';
       if (Array.isArray(user.roles) && user.roles.length > 0) {
-        if (user.roles.includes('ROLE_ADMIN')) userPerm = 'ADM';
-        else if (user.roles.includes('ROLE_CRIADOR')) userPerm = 'CRIADOR';
-      } else if (typeof user.permissoes === 'string') {
-        if (user.permissoes === 'ADM' || user.permissoes === 'ADMINISTRADOR') userPerm = 'ADM';
-        else if (user.permissoes === 'CRIADOR') userPerm = 'CRIADOR';
+        if (user.roles.includes('ROLE_ADMIN')) {
+          userPerm = 'ADM';
+        } else if (user.roles.includes('ROLE_CRIADOR_FORMULARIO')) { // <-- CORREÇÃO
+          userPerm = 'CRIADOR';
+        }
       }
       
       setFormData({
@@ -32,21 +31,20 @@ export default function UserEditModal({ user, onSave, onClose }) {
   }, [user]);
 
 
-  // ✅ 3. handleSubmit ATUALIZADO
+  // ✅ 2. 'handleSubmit' CORRIGIDO
+  // Agora ele envia 'ROLE_CRIADOR_FORMULARIO'
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Converte a string (ex: "ADM") para o array (ex: ["ROLE_ADMIN"])
     let rolesParaEnviar = ["ROLE_USER"]; // Default
     if (formData.permissoes === 'ADM') {
       rolesParaEnviar = ["ROLE_ADMIN"];
     } else if (formData.permissoes === 'CRIADOR') {
-      rolesParaEnviar = ["ROLE_CRIADOR"];
+      rolesParaEnviar = ["ROLE_CRIADOR_FORMULARIO"]; // <-- CORREÇÃO
     }
     
     try {
-      // Envia SÓ O ARRAY de roles para o 'onSave'
       await onSave(rolesParaEnviar);
     } catch (error) {
       console.error('Erro ao salvar usuário:', error);
@@ -81,17 +79,17 @@ export default function UserEditModal({ user, onSave, onClose }) {
     }
   };
 
+  // --- O JSX (render) não muda ---
   return (
     <div className="modern-modal-overlay" onClick={handleOverlayClick}>
       <div className="modern-modal-container">
         <div className="modern-modal-header">
-          <h2>Editar Permissões</h2> {/* Título mudou */}
+          <h2>Editar Permissões</h2> 
           <button className="modern-close-btn" onClick={onClose}>×</button>
         </div>
 
         <form onSubmit={handleSubmit} className="modern-modal-content">
           
-          {/* ✅ 4. Preview simplificado (mostra dados estáticos) */}
           <div className="user-preview-section">
             <div className="preview-header">
               <span>Nome</span>
@@ -103,12 +101,12 @@ export default function UserEditModal({ user, onSave, onClose }) {
               <span className="preview-name">{user?.nome || '...'}</span>
               <span className="preview-email">{user?.email || '...'}</span>
               <span className={`preview-permission ${formData.permissoes?.toLowerCase()}-badge`}>
+                {/* Agora 'formData.permissoes' será 'CRIADOR' para o "editor" */}
                 {formData.permissoes || 'USER'}
               </span>
             </div>
           </div>
 
-          {/* ✅ 5. Formulário simplificado (SÓ o botão de permissões) */}
           <div className="lateral-edit-section">
             <div className="edit-form-lateral">
               <div className="form-field-lateral">
