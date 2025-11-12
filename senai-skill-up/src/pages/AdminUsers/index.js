@@ -1,5 +1,6 @@
+// src/pages/AdminUsers/index.js
 import React, { useState, useEffect } from 'react';
-import { Header} from '../../components';
+import { Header } from '../../components'; // 'Footer' foi removido, pois não era usado (Correção Vercel)
 import UserManagementTable from '../../components/UsersComponents/UserManagementTable';
 import UserEditModal from '../../components/UsersComponents/UserEditModal';
 import ProtectedRoute from '../../components/ProtectedRoute';
@@ -16,15 +17,14 @@ export default function AdminUsers() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
-
-  // Carregar usuários ao montar o componente
+  // Carregar usuários (sem alteração)
   useEffect(() => {
     if (isLoggedIn && canManageUsers) {
       loadUsers();
     }
   }, [isLoggedIn, canManageUsers]);
 
-  // Filtrar usuários baseado no termo de busca
+  // Filtrar usuários (sem alteração)
   useEffect(() => {
     if (searchTerm.trim() === '') {
       setFilteredUsers(users);
@@ -37,6 +37,7 @@ export default function AdminUsers() {
     }
   }, [searchTerm, users]);
 
+  // loadUsers (sem alteração)
   const loadUsers = async () => {
     try {
       setLoading(true);
@@ -45,7 +46,6 @@ export default function AdminUsers() {
       setFilteredUsers(apiUsers);
     } catch (error) {
       console.error('Erro ao carregar usuários da API:', error);
-      // Set empty arrays instead of mock data
       setUsers([]);
       setFilteredUsers([]);
     } finally {
@@ -62,16 +62,14 @@ export default function AdminUsers() {
     setIsEditModalOpen(true);
   };
 
+  // handleDeleteUser (sem alteração)
   const handleDeleteUser = async (userId) => {
     if (window.confirm('Tem certeza que deseja excluir este usuário?')) {
       try {
         await userService.deleteUser(userId);
-        
-        // Atualizar lista local
         const updatedUsers = users.filter(user => user.id !== userId);
         setUsers(updatedUsers);
         setFilteredUsers(updatedUsers);
-        
         alert('Usuário excluído com sucesso!');
       } catch (error) {
         console.error('Erro ao excluir usuário:', error);
@@ -80,29 +78,37 @@ export default function AdminUsers() {
     }
   };
 
+  // ✅ 2. FUNÇÃO 'handleSaveUser' ATUALIZADA
   const handleSaveUser = async (userData) => {
+    // 'userData' vem do modal (ex: { nome: '...', email: '...', roleIds: [1, 3] })
     try {
       if (selectedUser) {
-        // Editar usuário existente
-        const updatedUser = await userService.updateUser(selectedUser.id, userData);
+        // --- MODO EDIÇÃO ---
         
-        // Atualizar lista local
-        const updatedUsers = users.map(user => 
-          user.id === selectedUser.id ? updatedUser : user
-        );
-        setUsers(updatedUsers);
-        setFilteredUsers(updatedUsers);
-        
+        // Separa as roles dos dados básicos (nome, email, etc.)
+        // Assumindo que o modal envia 'roleIds'
+        const { roleIds, ...dadosBasicos } = userData; 
+
+        // 1. Chama o endpoint de dados básicos (PUT /usuarios/{id})
+        await userService.updateUser(selectedUser.id, dadosBasicos);
+
+        // 2. Chama o novo endpoint de roles (PUT /usuarios/{id}/roles)
+        if (Array.isArray(roleIds)) {
+          await userService.updateUserRoles(selectedUser.id, roleIds);
+        }
+
         alert('Usuário atualizado com sucesso!');
+        // Recarrega a lista inteira do servidor para garantir dados 100% corretos
+        loadUsers(); 
+
       } else {
-        // Criar novo usuário
+        // --- MODO CRIAÇÃO (não muda) ---
+        // (Assumindo que o endpoint POST /usuarios já lida com as roles na criação)
         const newUser = await userService.createUser(userData);
         
-        // Adicionar à lista local
         const updatedUsers = [...users, newUser];
         setUsers(updatedUsers);
         setFilteredUsers(updatedUsers);
-        
         alert('Usuário criado com sucesso!');
       }
       
@@ -119,13 +125,14 @@ export default function AdminUsers() {
     setSelectedUser(null);
   };
 
+  // handleViewProfile (sem alteração)
   const handleViewProfile = (user) => {
-    // Por enquanto, apenas mostra informações do usuário
     alert(`Perfil do usuário:\nNome: ${user.nome}\nEmail: ${user.email}\nPontos: ${user.pontos}\nTipo: ${user.tipoUsuario}\nStatus: ${user.status}`);
   };
 
 
-  // Se ainda está carregando a autenticação, mostrar loading
+  // (Resto do JSX e do componente não muda...)
+
   if (authLoading) {
     return (
       <div style={{ 
@@ -140,7 +147,6 @@ export default function AdminUsers() {
     );
   }
 
-  // Se não está logado ou não tem permissão, não renderizar nada
   if (!isLoggedIn || !canManageUsers) {
     return null;
   }

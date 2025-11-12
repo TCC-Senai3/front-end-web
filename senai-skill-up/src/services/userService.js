@@ -117,6 +117,28 @@ class UserService {
       throw error;
     }
   }
+
+// ✅ 1. ADICIONE ESTA NOVA FUNÇÃO
+  /**
+   * Atualiza APENAS as roles de um usuário.
+   * (Chama o endpoint PUT /usuarios/{id}/roles)
+   * @param {number} userId - O ID do usuário.
+   * @param {Array<number>} roleIds - Um array de IDs das novas roles (ex: [1, 3]).
+   */
+  async updateUserRoles(userId, roleIds) {
+    if (!userId) throw new Error("ID do usuário é obrigatório.");
+    if (!Array.isArray(roleIds)) throw new Error("roleIds deve ser um array.");
+    
+    try {
+      const payload = { roleIds: roleIds };
+      const response = await api.put(`/usuarios/${userId}/roles`, payload);
+      return response.data; // Retorna o usuário atualizado
+    } catch (error) {
+      console.error(`Erro ao atualizar roles do usuário ID ${userId}:`, error);
+      throw error;
+    }
+  }
+
 }
 
 const userService = new UserService();

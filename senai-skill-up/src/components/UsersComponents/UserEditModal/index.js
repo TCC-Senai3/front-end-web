@@ -6,104 +6,105 @@ export default function UserEditModal({ user, onSave, onClose }) {
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
-    status: 'online',
-    permissoes: 'USER',
-    tipoUsuario: 'USUARIO',
-    pontos: 0,
-    nivel: 'Bronze',
-    jogosJogados: 0,
-    precisao: 0
+    // (Campos como status, pontos, etc., não são mais necessários no form
+    // pois o backend não está atualizando eles por aqui)
+    permissoes: 'USER', // Esta será nossa "string de controle" interna
   });
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPermissionModalOpen, setIsPermissionModalOpen] = useState(false);
 
+  // ✅ 1. useEffect ATUALIZADO
   useEffect(() => {
     if (user) {
+      // Lógica para extrair a permissão principal,
+      // não importa se 'user.permissoes' é uma string ("ADM")
+      // ou um array (["ROLE_ADMIN"])
+      let userPerm = 'USER';
+      if (Array.isArray(user.permissoes) && user.permissoes.length > 0) {
+        // Se for array: ["ROLE_ADMIN"] -> "ADM"
+        if (user.permissoes.includes('ROLE_ADMIN')) userPerm = 'ADM';
+        else if (user.permissoes.includes('ROLE_CRIADOR')) userPerm = 'CRIADOR';
+      } else if (typeof user.permissoes === 'string') {
+        // Se for string: "ADM" -> "ADM"
+        if (user.permissoes === 'ADM' || user.permissoes === 'ADMINISTRADOR') userPerm = 'ADM';
+        else if (user.permissoes === 'CRIADOR') userPerm = 'CRIADOR';
+      }
+      
       setFormData({
         nome: user.nome || '',
         email: user.email || '',
-        status: user.status || 'online',
-        permissoes: user.permissoes || 'USER',
-        tipoUsuario: user.tipoUsuario || 'USUARIO',
-        pontos: user.pontos || 0,
-        nivel: user.nivel || 'Bronze',
-        jogosJogados: user.jogosJogados || 0,
-        precisao: user.precisao || 0
+        permissoes: userPerm, // Seta a string de controle (ex: "ADM")
       });
     } else {
+      // Modo "Criar Novo Usuário" (não muda)
       setFormData({
         nome: '',
         email: '',
-        status: 'online',
         permissoes: 'USER',
-        tipoUsuario: 'USUARIO',
-        pontos: 0,
-        nivel: 'Bronze',
-        jogosJogados: 0,
-        precisao: 0
       });
     }
     setErrors({});
   }, [user]);
 
+  // validateForm (Removido campos desnecessários)
   const validateForm = () => {
     const newErrors = {};
-
     if (!formData.nome.trim()) {
       newErrors.nome = 'Nome é obrigatório';
     }
-
     if (!formData.email.trim()) {
       newErrors.email = 'Email é obrigatório';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email inválido';
     }
-
-    if (formData.pontos < 0) {
-      newErrors.pontos = 'Pontos não podem ser negativos';
-    }
-
-    if (formData.jogosJogados < 0) {
-      newErrors.jogosJogados = 'Jogos jogados não podem ser negativos';
-    }
-
-    if (formData.precisao < 0 || formData.precisao > 100) {
-      newErrors.precisao = 'Precisão deve estar entre 0 e 100';
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  // handleInputChange (Removido campos desnecessários)
   const handleInputChange = (e) => {
-    const { name, value, type } = e.target;
-    const newValue = type === 'number' ? parseInt(value) || 0 : value;
-    
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: newValue
+      [name]: value
     }));
-
     if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
+      setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
+  // ✅ 2. handleSubmit ATUALIZADO (A Mágica do "Tradutor")
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!validateForm()) {
       return;
     }
 
     setIsSubmitting(true);
+    
+    // --- O Tradutor ---
+    // 1. Converte a string de permissão (ex: "ADM")
+    //    para o formato de array que o backend espera (ex: ["ROLE_ADMIN"])
+    let rolesParaEnviar = ["ROLE_USER"]; // Default
+    if (formData.permissoes === 'ADM') {
+      rolesParaEnviar = ["ROLE_ADMIN"];
+    } else if (formData.permissoes === 'CRIADOR') {
+      rolesParaEnviar = ["ROLE_CRIADOR"];
+    }
+    
+    // 2. Cria o payload que o 'AdminUsers.js' espera
+    const payload = {
+      nome: formData.nome,
+      email: formData.email,
+      roleIds: rolesParaEnviar // Este é o array que o 'userService' vai usar
+    };
+    // --------------------
+
     try {
-      await onSave(formData);
+      // 3. Envia o payload traduzido
+      await onSave(payload);
     } catch (error) {
       console.error('Erro ao salvar usuário:', error);
     } finally {
@@ -121,12 +122,11 @@ export default function UserEditModal({ user, onSave, onClose }) {
     setIsPermissionModalOpen(true);
   };
 
+  // handlePermissionSelect (Atualizado para lidar só com a string 'permissoes')
   const handlePermissionSelect = (permission) => {
     setFormData(prev => ({
       ...prev,
-      permissoes: permission,
-      tipoUsuario: permission === 'ADM' ? 'ADMINISTRADOR' : 
-                   permission === 'CRIADOR' ? 'CRIADOR' : 'USUARIO'
+      permissoes: permission, // 'permission' é "ADM", "CRIADOR", ou "USER"
     }));
   };
 
@@ -160,7 +160,9 @@ export default function UserEditModal({ user, onSave, onClose }) {
               <span className="preview-name">{formData.nome || 'NOME DO USUÁRIO'}</span>
               <span className="preview-email">{formData.email || 'email@exemplo.com'}</span>
               <div className="preview-status">
-                <div className={`status-dot ${formData.status === 'offline' ? 'offline' : ''}`}></div>
+                 {/* O status (online/offline) será atualizado pelo WebSocket, 
+                     não precisamos mais editá-lo manualmente aqui */}
+                <div className={`status-dot ${user?.status === 'offline' ? 'offline' : ''}`}></div>
               </div>
               <span className={`preview-permission ${formData.permissoes?.toLowerCase()}-badge`}>
                 {formData.permissoes || 'USER'}
