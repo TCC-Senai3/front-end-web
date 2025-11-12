@@ -8,16 +8,12 @@ import userService from '../../services/userService';
 import './style.css';
 
 export default function AdminUsers() {
-  // ✅ 1. A CORREÇÃO FINAL:
-  // O seu hook 'usePermissions.js' já nos dá a resposta.
-  // Pegamos o 'user' (para o nome) e o booleano 'isAdmin'.
+  // Pega o 'user' (para o nome) e o booleano 'isAdmin'
   const { user, isLoggedIn, loading: authLoading, isAdmin } = usePermissions();
   
-  // ✅ 2. A VERIFICAÇÃO (agora super simples)
-  // 'isAdmin' já é true ou false.
+  // 'isAdmin' já é true ou false, vindo do seu hook
   const hasAdminPermission = isAdmin;
 
-  // (O resto do seu código não precisa de quase nenhuma mudança)
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
