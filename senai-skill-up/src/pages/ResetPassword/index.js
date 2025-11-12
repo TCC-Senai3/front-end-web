@@ -27,8 +27,8 @@ export default function ResetPassword() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        if (newPassword.length < 6) {
-            setMessage('A senha deve ter no mínimo 6 caracteres!');
+        if (newPassword.length < 8) {
+            setMessage('A senha deve ter no mínimo 8 caracteres!');
             return;
         }
 
@@ -66,11 +66,11 @@ export default function ResetPassword() {
                 <form onSubmit={handleSubmit} className="reset-password-form">
                     <input
                         type="password"
-                        placeholder="Nova senha (mínimo 6)"
+                        placeholder="Nova senha (mínimo 8)"
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                         required
-                        minLength="6"
+                        minLength="8"
                         className="reset-input"
                     />
 
