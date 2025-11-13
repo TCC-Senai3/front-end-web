@@ -4,14 +4,19 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
 // Importações de imagens
-import userProfileImage from '../../assets/images/user-profile 1.png';
+import userProfileImage from "../../assets/images/user-profile1.png";
 import medalIcon from '../../assets/images/image 33.png';
 import settingsIcon from '../../assets/images/settings 1.png';
+import bodeIcon from "../../assets/images/bode.svg";
+import canetaIcon from "../../assets/images/Caneta bic.svg";
+import patoIcon from "../../assets/images/Pato.svg";
 
-// Logs para depuração
-console.log('userProfileImage:', userProfileImage);
-console.log('medalIcon:', medalIcon);
-console.log('settingsIcon:', settingsIcon);
+// Mapeamento de avatares
+const avatarMap = {
+  "bode.svg": bodeIcon,
+  "caneta": canetaIcon,
+  "pato": patoIcon,
+};
 
 export default function Header() {
     const navigate = useNavigate();
@@ -25,10 +30,6 @@ export default function Header() {
     const [isUserProfileOpen, setIsUserProfileOpen] = useState(false);
     const userProfileDropdownRef = useRef(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-    // Todas as suas funções (toggleMobileMenu, toggleSettings, handleSettingsClick, etc.)
-    // permanecem EXATAMENTE IGUAIS. Não precisam de alteração.
-    // ... (suas funções aqui) ...
 
     const toggleMobileMenu = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -140,6 +141,8 @@ export default function Header() {
         };
     }, [isMobileMenuOpen]);
 
+    // Verifica se o avatar existe e se existe no mapa
+    const avatarSrc = user?.avatar ? avatarMap[user.avatar] : userProfileImage;
 
     return (
         <header>
@@ -150,13 +153,11 @@ export default function Header() {
                     </Link>
                 </div>
 
-                {/* Botão Hamburger (sem alterações) */}
                 <button
                     className="hamburger-btn"
                     onClick={toggleMobileMenu}
                     aria-label="Menu"
                 >
-                    {/* ... spans do hamburger ... */}
                     <span className={`hamburger-line ${isMobileMenuOpen ? 'active' : ''}`}></span>
                     <span className={`hamburger-line ${isMobileMenuOpen ? 'active' : ''}`}></span>
                     <span className={`hamburger-line ${isMobileMenuOpen ? 'active' : ''}`}></span>
@@ -170,24 +171,19 @@ export default function Header() {
                     {/* Perfil do Usuário */}
                     <div className="user-profile" ref={userProfileDropdownRef} onClick={toggleUserProfile}>
                         <img
-                            src={userProfileImage}
+                            src={avatarSrc}  // Usando o avatar correto aqui
                             alt="Avatar"
                             className="avatar"
                         />
-                        {/* ****** CORREÇÃO AQUI ****** */}
-                        {/* Usar 'user' em vez de 'userData' */}
                         <span className="username">{user?.nome || 'USUARIO'}</span>
 
                         {/* Dropdown Menu do Perfil */}
                         {isUserProfileOpen && (
                             <div className="user-profile-dropdown">
-                                {/* ... (conteúdo do dropdown, sem alterações, mas a condição abaixo agora usa 'user') ... */}
                                 <div className="user-dropdown-arrow"></div>
                                 <div className="user-dropdown-content">
                                     <div className="user-dropdown-item" onClick={() => handleUserProfileClick('MINHA CONTA')}>MINHA CONTA</div>
                                     <div className="user-dropdown-item" onClick={() => handleUserProfileClick('USUÁRIOS')}>USUÁRIOS</div>
-                                    {/* ****** CORREÇÃO AQUI (se aplicável) ****** */}
-                                    {/* Usar 'user' para verificar permissões */}
                                     {(user?.permissoes === 'ADM' || user?.tipoUsuario === 'ADM') && (
                                         <div className="user-dropdown-item admin-item" onClick={() => handleUserProfileClick('ADMIN USUÁRIOS')}>ADMIN USUÁRIOS</div>
                                     )}
@@ -204,14 +200,11 @@ export default function Header() {
                             alt="Medalha"
                             className="medal-icon"
                         />
-                        {/* ****** CORREÇÃO AQUI ****** */}
-                        {/* Usar 'user' em vez de 'userData' */}
                         <span className="points-number">{user ? user.pontuacao : '0'}</span>
                     </div>
 
-                    {/* Seção de Configurações (sem alterações na lógica de dados) */}
+                    {/* Seção de Configurações */}
                     <div className="settings-section" ref={settingsDropdownRef} onClick={toggleSettings}>
-                        {/* ... (ícone e dropdown de configurações) ... */}
                         <img src={settingsIcon} alt="Configurações" className="settings-icon" />
                         {isSettingsOpen && (
                             <div className="settings-dropdown">
@@ -227,11 +220,10 @@ export default function Header() {
                 </div>
             </div>
 
-            {/* Menu Mobile Overlay (sem alterações na lógica de dados, mas a condição abaixo usa 'user') */}
+            {/* Menu Mobile Overlay */}
             {isMobileMenuOpen && (
                 <div className="mobile-menu-overlay" onClick={toggleMobileMenu}>
                     <div className="mobile-menu" onClick={(e) => e.stopPropagation()}>
-                        {/* ... (Header do menu mobile) ... */}
                         <div className="mobile-menu-header">
                             <span className="mobile-menu-title">MENU</span>
                         </div>
@@ -239,24 +231,19 @@ export default function Header() {
                         {/* Perfil no Menu Mobile */}
                         <div className="mobile-user-profile">
                             <div className="mobile-user-info">
-                                <img src={userProfileImage} alt="Avatar" className="mobile-avatar" />
+                                <img src={avatarSrc} alt="Avatar" className="mobile-avatar" />
                                 <div className="mobile-user-details">
-                                    {/* ****** CORREÇÃO AQUI ****** */}
-                                    {/* Usar 'user' */}
                                     <span className="mobile-username">{user ? user.nome : 'USUARIO'}</span>
                                     <div className="mobile-points">
                                         <img src={medalIcon} alt="Medalha" className="mobile-medal" />
-                                        {/* ****** CORREÇÃO AQUI ****** */}
-                                        {/* Usar 'user' */}
                                         <span className="mobile-points-number">{user ? user.pontuacao : '0'}</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Opções do Menu Mobile (sem alterações na lógica de dados) */}
+                        {/* Opções do Menu Mobile */}
                         <div className="mobile-menu-options">
-                            {/* ... (itens do menu mobile) ... */}
                             <div className="mobile-menu-item" onClick={() => handleMobileMenuClick('INICIO')}>INICIO</div>
                             <div className="mobile-menu-item" onClick={() => handleMobileMenuClick('TERMOS')}>TERMOS</div>
                             <div className="mobile-menu-item" onClick={() => handleMobileMenuClick('CONTATO')}>CONTATO</div>

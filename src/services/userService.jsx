@@ -143,6 +143,17 @@ class UserService {
     }
   }
 
+ async updateAvatar(userId, avatarData) {
+    if (!userId) throw new Error("ID do usuário é obrigatório.");
+    try {
+      const response = await api.put(`/usuarios/${userId}/avatar`, avatarData);
+      return response.data; // Retorna o usuário atualizado
+    } catch (error) {
+      console.error(`Erro ao atualizar avatar do usuário ID ${userId}:`, error);
+      throw error;
+    }
+  }
+
 // ✅ 1. ADICIONE ESTA NOVA FUNÇÃO
   /**
    * Atualiza APENAS as roles de um usuário.
