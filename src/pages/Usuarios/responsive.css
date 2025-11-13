@@ -1,0 +1,330 @@
+/* ========================================
+   RESPONSIVIDADE - PÁGINA USUÁRIOS
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* Container principal */
+    .usuarios-container {
+        min-height: 100vh;
+        background: #3498db;
+        padding: 0;
+    }
+
+    .usuarios-content {
+        max-width: 100%;
+        margin: 0;
+        padding: 20px;
+        min-height: calc(100vh - 80px);
+    }
+
+    /* Header da página */
+    .usuarios-header {
+        display: block;
+        text-align: center;
+        margin-bottom: 25px;
+        padding: 0 10px;
+    }
+
+    .usuarios-header h1 {
+        color: white;
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .usuarios-header p {
+        color: rgba(255,255,255,0.9);
+        font-size: 16px;
+        margin: 0;
+        font-weight: 400;
+    }
+
+    /* Container da tabela de ranking */
+    .users-ranking-container {
+        width: 100%;
+        max-width: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    /* Barra de pesquisa responsiva */
+    .search-container {
+        margin-bottom: 16px;
+        padding: 0 4px;
+    }
+
+    .search-input-wrapper {
+        max-width: 100%;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    .search-input {
+        width: 100%;
+        font-size: 16px;
+        padding: 14px 20px 14px 50px;
+        border-radius: 25px;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        background: white;
+        color: #666;
+        font-weight: 400;
+        box-sizing: border-box;
+    }
+
+    .search-input::placeholder {
+        color: #999;
+        font-weight: 400;
+    }
+
+    .search-input:focus {
+        outline: none;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+        font-size: 16px;
+        pointer-events: none;
+    }
+
+    /* Cabeçalho da tabela mobile - SEM PERFIL */
+    .table-header {
+        display: flex;
+        background: white;
+        border-radius: 15px;
+        padding: 12px 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        align-items: center;
+        gap: 20px;
+    }
+
+    .table-header .header-pontos {
+        flex-shrink: 0;
+        min-width: 60px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #666;
+        text-transform: uppercase;
+    }
+
+    .table-header .header-nome {
+        flex: 1;
+        font-size: 12px;
+        font-weight: 600;
+        color: #666;
+        text-transform: uppercase;
+    }
+
+    .table-header .header-posicao {
+        flex-shrink: 0;
+        min-width: 50px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #666;
+        text-transform: uppercase;
+        text-align: center;
+    }
+
+    .table-header .header-status {
+        flex-shrink: 0;
+        min-width: 50px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #666;
+        text-transform: uppercase;
+        text-align: center;
+    }
+
+    /* Ocultar coluna PERFIL completamente */
+    .table-header .header-perfil,
+    .table-header .header-actions {
+        display: none !important;
+    }
+
+    /* Lista de usuários mobile */
+    .users-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 16px;
+    }
+
+    /* Card de usuário mobile - Layout espalhado sem botão */
+    .user-card {
+        background: white;
+        border-radius: 15px;
+        padding: 16px 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        margin-bottom: 0;
+    }
+
+    .user-card:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    /* Pontuação à esquerda - número grande */
+    .user-points {
+        flex-shrink: 0;
+        min-width: 60px;
+        text-align: left;
+    }
+
+    .points-value {
+        font-size: 20px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0;
+        line-height: 1;
+    }
+
+    .points-label {
+        display: none;
+    }
+
+    /* Nome do usuário expandido */
+    .user-info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .user-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+    }
+
+    /* Posição com mais espaço */
+    .user-rank {
+        width: 24px;
+        height: 24px;
+        background: #95a5a6;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 12px;
+        flex-shrink: 0;
+        margin-right: 20px;
+    }
+
+    .user-rank.top-3 {
+        background: #27ae60;
+    }
+
+    .user-rank.rank-1 {
+        background: #f39c12;
+    }
+
+    /* Status online/offline com mais espaço */
+    .user-status {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #27ae60;
+        flex-shrink: 0;
+    }
+
+    .user-status.offline {
+        background: #95a5a6;
+    }
+
+    /* Ocultar TODOS os botões - toda div é clicável */
+    .view-profile-btn,
+    .user-actions,
+    .actions-cell,
+    .btn,
+    button[class*="profile"],
+    button[class*="visualizar"],
+    .visualizar-btn {
+        display: none !important;
+    }
+
+    /* Ocultar elementos não necessários */
+    .user-avatar,
+    .user-email,
+    .user-level,
+    .user-details {
+        display: none;
+    }
+
+    /* Ocultar containers não usados */
+    .user-rank-container,
+    .user-status-container,
+    .user-rank-number {
+        display: none;
+    }
+}
+
+/* Mobile Grande (576px - 768px) */
+@media (max-width: 768px) {
+    .usuarios-container {
+        padding: 20px 10px;
+    }
+    
+    .usuarios-content {
+        padding: 20px;
+        border-radius: 16px;
+    }
+
+    .users-list {
+        gap: 8px;
+        margin-top: 15px;
+    }
+}
+
+/* Mobile Médio (480px - 576px) */
+@media (max-width: 576px) {
+    .usuarios-container {
+        padding: 15px 8px;
+    }
+    
+    .usuarios-content {
+        padding: 15px;
+        border-radius: 12px;
+    }
+
+    .users-list {
+        gap: 6px;
+        margin-top: 12px;
+    }
+}
+
+/* Mobile Pequeno (até 480px) */
+@media (max-width: 480px) {
+    .usuarios-container {
+        padding: 10px 5px;
+    }
+    
+    .usuarios-content {
+        padding: 12px;
+        border-radius: 8px;
+    }
+
+    .users-list {
+        gap: 5px;
+        margin-top: 10px;
+    }
+}

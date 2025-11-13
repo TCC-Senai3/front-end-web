@@ -1,0 +1,49 @@
+{
+  "hash": "be2b1a81",
+  "configHash": "9ed93123",
+  "lockfileHash": "8e35ed13",
+  "browserHash": "9d3585af",
+  "optimized": {
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "365c2f3a",
+      "needsInterop": true
+    },
+    "react-dom": {
+      "src": "../../node_modules/react-dom/index.js",
+      "file": "react-dom.js",
+      "fileHash": "2da284e3",
+      "needsInterop": true
+    },
+    "react-router-dom": {
+      "src": "../../node_modules/react-router-dom/dist/index.mjs",
+      "file": "react-router-dom.js",
+      "fileHash": "46f9e3e2",
+      "needsInterop": false
+    },
+    "@emotion/react/jsx-dev-runtime": {
+      "src": "../../node_modules/@emotion/react/jsx-dev-runtime/dist/emotion-react-jsx-dev-runtime.browser.development.esm.js",
+      "file": "@emotion_react_jsx-dev-runtime.js",
+      "fileHash": "5b2a32df",
+      "needsInterop": false
+    },
+    "@emotion/react/jsx-runtime": {
+      "src": "../../node_modules/@emotion/react/jsx-runtime/dist/emotion-react-jsx-runtime.browser.development.esm.js",
+      "file": "@emotion_react_jsx-runtime.js",
+      "fileHash": "54a6505e",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-N6O67YEL": {
+      "file": "chunk-N6O67YEL.js"
+    },
+    "chunk-7DF5H2GK": {
+      "file": "chunk-7DF5H2GK.js"
+    },
+    "chunk-3PPUDOJL": {
+      "file": "chunk-3PPUDOJL.js"
+    }
+  }
+}

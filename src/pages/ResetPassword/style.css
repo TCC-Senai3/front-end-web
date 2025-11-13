@@ -1,0 +1,90 @@
+.reset-password-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #f5f5f5;
+    text-align: center;
+    padding: 0 20px; /* remove padding-top */
+    box-sizing: border-box;
+}
+
+/* Header fixo no topo */
+.reset-password-container > header {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+}
+
+/* Conteúdo abaixo do header */
+.reset-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: 80px; /* altura do header para não sobrepor */
+}
+
+.lock-icon {
+    width: 300px;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+.form-title {
+    color: #333;
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+}
+
+.reset-password-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.reset-input {
+    width: 320px;
+    padding: 24px 30px;
+    border: 2px solid #000000;
+    border-radius: 50px;
+    font-size: 20px;
+    font-weight: 500;
+    color: #333;
+    background: white;
+    box-sizing: border-box;
+}
+
+.reset-btn {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 16px 9px;
+    border-radius: 100px;
+    font-size: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 120px;
+    align-self: center;
+}
+
+.message {
+    margin-top: 10px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    color: #721c24;
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+}

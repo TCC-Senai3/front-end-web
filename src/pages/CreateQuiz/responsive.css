@@ -1,0 +1,178 @@
+/* ========================================
+   RESPONSIVIDADE - PÁGINA CREATE QUIZ
+   ======================================== */
+
+/* ========================================
+   LAYOUT PRINCIPAL
+   ======================================== */
+
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) {
+    .sidebar-left, .sidebar-right {
+        width: 180px;
+    }
+
+    .question-card {
+        min-width: 500px;
+        min-height: 600px;
+        padding: 35px 25px;
+    }
+
+    .question-input {
+        font-size: 1.05em;
+    }
+
+    .answer-input {
+        width: 350px;
+        height: 45px;
+    }
+
+    .question-thumb {
+        min-height: 100px;
+    }
+}
+
+/* Mobile Grande (576px - 768px) */
+@media (max-width: 768px) {
+    .sidebar-left, .sidebar-right {
+        width: 150px;
+    }
+
+    .question-card {
+        min-width: 450px;
+        min-height: 550px;
+        padding: 30px 20px;
+    }
+
+    .question-input {
+        font-size: 1em;
+    }
+
+    .answer-input {
+        width: 320px;
+        height: 42px;
+    }
+
+    .question-thumb {
+        min-height: 90px;
+    }
+
+    .mini-question-text {
+        font-size: 0.65em;
+    }
+
+    .mini-answer {
+        font-size: 0.55em;
+    }
+}
+
+/* Mobile Médio (480px - 576px) */
+@media (max-width: 576px) {
+    .sidebar-left, .sidebar-right {
+        width: 120px;
+    }
+
+    .question-card {
+        min-width: 400px;
+        min-height: 500px;
+        padding: 25px 15px;
+    }
+
+    .question-input {
+        font-size: 0.95em;
+    }
+
+    .answer-input {
+        width: 280px;
+        height: 40px;
+    }
+
+    .question-thumb {
+        min-height: 80px;
+    }
+
+    .mini-question-text {
+        font-size: 0.6em;
+    }
+
+    .mini-answer {
+        font-size: 0.5em;
+    }
+
+    .finalize-quiz-btn {
+        padding: 6px 15px;
+        font-size: 0.9em;
+    }
+}
+
+/* Mobile Pequeno (até 480px) */
+@media (max-width: 480px) {
+    .sidebar-left, .sidebar-right {
+        width: 100px;
+    }
+
+    .question-card {
+        min-width: 350px;
+        min-height: 450px;
+        padding: 20px 12px;
+    }
+
+    .question-input {
+        font-size: 0.9em;
+    }
+
+    .answer-input {
+        width: 250px;
+        height: 38px;
+    }
+
+    .question-thumb {
+        min-height: 70px;
+    }
+
+    .mini-question-text {
+        font-size: 0.55em;
+    }
+
+    .mini-answer {
+        font-size: 0.45em;
+    }
+
+    .finalize-quiz-btn {
+        padding: 5px 12px;
+        font-size: 0.8em;
+    }
+
+    .add-question {
+        height: 50px;
+        font-size: 1.5rem;
+    }
+}
+
+/* ========================================
+   LAYOUT MOBILE COMPLETO
+   ======================================== */
+
+@media (max-width: 900px) {
+    .sidebar-left, .sidebar-right {
+        display: none;
+        position: static;
+        width: 100%;
+        height: auto;
+        box-shadow: none;
+    }
+    
+    .quiz-container {
+        padding: 0;
+    }
+    
+    .main-content {
+        min-width: 100vw;
+        padding: 0;
+    }
+    
+    .question-card {
+        min-width: 90vw;
+        max-width: 98vw;
+    }
+}

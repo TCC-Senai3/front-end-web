@@ -1,0 +1,17 @@
+.recomp-container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0a76a8 0%, #1b9ad2 100%);
+  padding-top: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.fim-title { color: #fff; font-weight: 900; margin: 24px 0 8px; }
+.recomp-sub { color: #cfeaff; font-weight: 800; font-size: 12px; letter-spacing: .5px; }
+.recomp-box { display: inline-flex; gap: 8px; align-items: center; margin: 12px 0 16px; }
+.recomp-box img { width: 26px; height: 26px; }
+.recomp-box span { color: #fff; font-weight: 900; font-size: 22px; }
+.recomp-sair { background: #43c6ff; color: #043c54; border: none; font-weight: 900; padding: 10px 28px; border-radius: 8px; box-shadow: 0 4px 0 rgba(0,0,0,.25); cursor: pointer; }
+
+

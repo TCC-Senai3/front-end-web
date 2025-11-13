@@ -1,0 +1,174 @@
+/* ========================================
+   RESPONSIVIDADE - PÁGINA SUPORTE
+   ======================================== */
+
+/* Mobile (768px e abaixo) */
+@media (max-width: 768px) {
+    .support-wrapper {
+        flex-direction: column;
+        padding: 0;
+        margin: 0;
+        background: #fff;
+        min-height: 100vh;
+        align-items: stretch;
+    }
+
+    /* Header responsivo */
+    header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        width: 100%;
+    }
+
+    /* Ocultar sidebar e botões */
+    .contact-sidebar {
+        display: none !important;
+    }
+
+    .contact-sidebar-btn {
+        display: none !important;
+    }
+
+    /* Ocultar imagens dos balões */
+    .contact-image,
+    .support-image {
+        display: none !important;
+    }
+
+    /* Conteúdo principal do suporte */
+    .support-main,
+    .contact-main {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 20px !important;
+        background-color: #fff !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+    /* Formulário de suporte responsivo */
+    .support-content,
+    .contact-content {
+        flex-direction: column !important;
+        gap: 20px !important;
+    }
+
+    .support-form-wrapper,
+    .contact-form-wrapper {
+        width: 100% !important;
+        padding: 0 !important;
+    }
+
+    .support-form,
+    .contact-form {
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* Inputs do suporte responsivos */
+    .support-form-input,
+    .support-form-textarea,
+    .contact-form-input,
+    .contact-form-textarea {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        font-size: 16px !important;
+        -webkit-appearance: none !important;
+        appearance: none !important;
+        border-radius: 8px !important;
+        border: 1px solid #ddd !important;
+        padding: 12px !important;
+    }
+
+    .support-form-input,
+    .contact-form-input {
+        height: 48px !important;
+    }
+
+    .support-form-textarea,
+    .contact-form-textarea {
+        height: 120px !important;
+        resize: vertical !important;
+    }
+
+    /* Botão do suporte responsivo */
+    .support-form-button,
+    .contact-form-button {
+        width: 100% !important;
+        padding: 15px 0 !important;
+        font-size: 16px !important;
+        margin-top: 20px !important;
+        border-radius: 8px !important;
+        background-color: #1cb0fc !important;
+        border: none !important;
+        color: white !important;
+        font-weight: 600 !important;
+    }
+
+    /* Título do suporte responsivo */
+    .support-title,
+    .contact-title {
+        font-size: 20px !important;
+        margin-bottom: 8px !important;
+        padding-left: 15px !important;
+    }
+
+    .support-title::before,
+    .contact-title::before {
+        width: 4px !important;
+        height: 20px !important;
+    }
+
+    /* Descrição do suporte responsiva */
+    .support-description,
+    .contact-description {
+        font-size: 14px !important;
+        line-height: 1.5 !important;
+        margin-bottom: 25px !important;
+        color: #666 !important;
+    }
+
+    /* Labels do suporte responsivos */
+    .support-form-label,
+    .contact-form-label {
+        font-size: 14px !important;
+        margin-bottom: 8px !important;
+        margin-top: 15px !important;
+        font-weight: 500 !important;
+        color: #333 !important;
+    }
+}
+
+/* Mobile pequeno (480px e abaixo) */
+@media (max-width: 480px) {
+    .support-main,
+    .contact-main {
+        padding: 15px !important;
+    }
+
+    .support-title,
+    .contact-title {
+        font-size: 18px !important;
+    }
+
+    .support-description,
+    .contact-description {
+        font-size: 13px !important;
+    }
+
+    .support-form-input,
+    .support-form-textarea,
+    .contact-form-input,
+    .contact-form-textarea {
+        font-size: 14px !important;
+        padding: 10px !important;
+    }
+
+    .support-form-button,
+    .contact-form-button {
+        font-size: 15px !important;
+    }
+}

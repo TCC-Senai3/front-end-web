@@ -1,0 +1,235 @@
+.game-background {
+    width: 100%;
+    display: block;
+}
+
+.jogue-agora-container {
+    background: #D8E6FB;
+    border-radius: 18px;
+    padding: 50px 40px 40px 40px;
+    margin: 40px auto 60px auto;
+    width: fit-content;
+    position: relative;
+    box-shadow: 0 4px 24px #0001;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.jogue-agora-slogan {
+    position: absolute;
+    top: -40px;
+    left: 25px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.opcoes-container {
+    display: flex;
+    gap: 35px;
+    margin-top: 5px;
+    justify-content: center;
+}
+
+.opcao-card {
+    background: #e9dddd;
+    width: 240px;
+    height: 240px;
+    border-radius: 20px 50px 20px 50px;
+    padding: 10px 10px 5px 10px;
+    text-align: center;
+    box-shadow: 0 4px 16px #0002;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 0;
+    transition: box-shadow 0.2s;
+}
+
+.opcao-card:hover {
+    box-shadow: 0 8px 32px #0003;
+}
+
+.btn-container {
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.2s;
+    margin-top: auto;
+    margin-bottom: 2px;
+}
+
+.btn-container:hover {
+    transform: scale(1.05);
+}
+
+.card-btn {
+    width: 200px;
+    height: 60px;
+    cursor: pointer;
+    transition: filter 0.2s;
+}
+
+.card-btn:hover {
+    filter: brightness(1.1);
+}
+
+.btn-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.4em;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    pointer-events: none;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.card-img {
+    width: 70px;
+    height: 70px;
+    margin: 5px 0;
+}
+
+.opcao-card h3 {
+    margin: 0 0 3px 0;
+    color: #333;
+    font-size: 1.2em;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.opcao-card p {
+    font-size: 0.8em;
+    margin: 0 0 10px 0;
+    color: #555;
+    line-height: 1.2;
+}
+.opcoes-container {
+    display: flex;
+    gap: 120px;
+    margin-top: 5px;
+    justify-content: center;
+    position: relative;
+}
+
+.middle-add-icon {
+    transform: rotate(45deg);
+   width: 140px;  
+    height: auto; 
+}
+
+/* ========== RESPONSIVIDADE MOBILE ========== */
+
+/* Mobile - Fundo branco e esconder slogan */
+@media (max-width: 768px) {
+    .jogue-agora-container {
+        background: #ffffff;
+        padding: 30px 20px 40px 20px;
+        margin: 20px auto 0 auto;
+        width: 100%;
+        max-width: 450px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .jogue-agora-slogan {
+        display: none;
+    }
+    
+    /* Carrossel mobile - 1 card por vez */
+    .carousel-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+        gap: 0px;
+        padding: 0 15px;
+        min-height: 320px;
+    }
+    
+    .slides-wrapper {
+        flex: 1;
+        overflow: visible;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        max-width: 300px;
+        position: relative;
+        min-height: 280px;
+        padding: 20px 0;
+    }
+    
+    .slides-container {
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+        width: 200%;
+        justify-content: flex-start;
+    }
+    
+    .mobile-slide {
+        width: 100%;
+        flex-shrink: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .mobile-slide .opcao-card {
+        margin: 0 auto;
+        width: 250px;
+        height: 240px;
+        flex-shrink: 0;
+        padding: 15px 10px 10px 10px;
+        border-radius: 20px 50px 20px 50px;
+    }
+    
+    .nav-arrow {
+        background: white;
+        color: #333;
+        border: none;
+        border-radius: 50%;
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 10;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+    
+    .nav-arrow:hover:not(:disabled) {
+        background: #f0f0f0;
+        transform: scale(1.1);
+    }
+    
+    .nav-arrow:disabled {
+        background: #f5f5f5;
+        color: #ccc;
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+    
+    .slide-indicators {
+        display: none;
+    }
+    
+    .indicator {
+        display: none;
+    }
+    
+    .indicator.active {
+        display: none;
+    }
+}

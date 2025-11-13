@@ -1,0 +1,171 @@
+/* ========================================
+   RESPONSIVIDADE - PÁGINA CRIAR SALA
+   ======================================== */
+
+@media screen and (max-width: 768px) {
+  /* Container principal com fundo azul */
+  .criar-sala-container {
+    background: #1DA1F2 !important;
+    padding-top: 0 !important;
+    min-height: 100vh !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* Conteúdo centralizado */
+  .criar-sala-content {
+    width: 100% !important;
+    max-width: 400px !important;
+    padding: 40px 20px !important;
+    min-height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* Título CRIAR SALA */
+  .criar-sala-title {
+    color: white !important;
+    font-size: 28px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 2px !important;
+    margin-bottom: 40px !important;
+    text-align: center !important;
+  }
+
+  /* Card branco simples */
+  .sala-card {
+    background: white !important;
+    border-radius: 20px !important;
+    padding: 30px 25px !important;
+    width: 100% !important;
+    max-width: 350px !important;
+    box-shadow: none !important;
+    position: relative !important;
+  }
+
+  /* Ocultar botão fechar */
+  .close-btn {
+    display: none !important;
+  }
+
+  /* Form group simples */
+  .form-group {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    margin-bottom: 25px !important;
+  }
+
+  /* Label simples */
+  .form-label {
+    display: block !important;
+    font-size: 14px !important;
+    color: #333 !important;
+    font-weight: 500 !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    margin-bottom: 10px !important;
+  }
+
+  /* Select com fundo cinza e border azul */
+  .form-select {
+    width: 100% !important;
+    padding: 15px !important;
+    background: #f0f0f0 !important;
+    border: 3px solid #1DA1F2 !important;
+    border-radius: 8px !important;
+    font-size: 16px !important;
+    min-height: 60px !important;
+    color: #666 !important;
+    font-family: inherit !important;
+    box-sizing: border-box !important;
+    cursor: pointer !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 15px center !important;
+    background-size: 20px !important;
+    padding-right: 45px !important;
+  }
+
+  .form-select:focus {
+    border-color: #1DA1F2 !important;
+    background: #f0f0f0 !important;
+    outline: none !important;
+  }
+
+  .form-select:disabled {
+    opacity: 0.7 !important;
+    cursor: not-allowed !important;
+  }
+
+  .form-select option {
+    background: white !important;
+    color: #333 !important;
+    padding: 10px !important;
+  }
+
+  /* Botão CRIAR sempre verde */
+  .criar-btn {
+    width: 100% !important;
+    background: #00C851 !important;
+    color: white !important;
+    border: none !important;
+    padding: 18px 0 !important;
+    border-radius: 5px !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    box-shadow: none !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+  }
+
+  .criar-btn:hover {
+    background: #00A843 !important;
+  }
+
+  .criar-btn:disabled {
+    background: #00C851 !important;
+    color: white !important;
+    cursor: pointer !important;
+    opacity: 1 !important;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .criar-sala-content {
+    max-width: 280px !important;
+    padding: 20px 15px !important;
+  }
+
+  .criar-sala-title {
+    font-size: 24px !important;
+    margin-bottom: 30px !important;
+  }
+
+  .sala-card {
+    padding: 20px 15px !important;
+    max-width: 260px !important;
+  }
+
+  .form-textarea {
+    min-height: 70px !important;
+    padding: 10px 12px !important;
+    font-size: 13px !important;
+  }
+
+  .criar-btn {
+    padding: 12px 0 !important;
+    font-size: 14px !important;
+  }
+}

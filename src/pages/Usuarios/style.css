@@ -1,0 +1,52 @@
+@import './responsive.css';
+
+.usuarios-container {
+  min-height: 100vh;
+  background: #3498db;
+  padding: 0;
+}
+
+.usuarios-header {
+  display: none;
+}
+
+.usuarios-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: calc(100vh - 80px);
+  padding: 32px;
+}
+
+
+.users-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* Animações */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.users-list > * {
+  animation: fadeInUp 0.6s ease-out;
+  animation-fill-mode: both;
+}
+
+.users-list > *:nth-child(1) { animation-delay: 0.1s; }
+.users-list > *:nth-child(2) { animation-delay: 0.2s; }
+.users-list > *:nth-child(3) { animation-delay: 0.3s; }
+.users-list > *:nth-child(4) { animation-delay: 0.4s; }
+.users-list > *:nth-child(5) { animation-delay: 0.5s; }
+.users-list > *:nth-child(6) { animation-delay: 0.6s; }
+
+/* Responsividade removida */

@@ -1,0 +1,59 @@
+/* ========================================
+   RESPONSIVIDADE - COMPONENTE ERRADO
+   ======================================== */
+
+/* ========================================
+   LAYOUT PRINCIPAL
+   ======================================== */
+
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) {
+    .corretopage-bg {
+        padding: 20px;
+    }
+
+    .cancel-icon {
+        width: 90px;
+        height: 90px;
+        margin-bottom: 18px;
+    }
+}
+
+/* Mobile Grande (576px - 768px) */
+@media (max-width: 768px) {
+    .corretopage-bg {
+        padding: 15px;
+    }
+
+    .cancel-icon {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 15px;
+    }
+}
+
+/* Mobile Médio (480px - 576px) */
+@media (max-width: 576px) {
+    .corretopage-bg {
+        padding: 12px;
+    }
+
+    .cancel-icon {
+        width: 70px;
+        height: 70px;
+        margin-bottom: 12px;
+    }
+}
+
+/* Mobile Pequeno (até 480px) */
+@media (max-width: 480px) {
+    .corretopage-bg {
+        padding: 10px;
+    }
+
+    .cancel-icon {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 10px;
+    }
+}
