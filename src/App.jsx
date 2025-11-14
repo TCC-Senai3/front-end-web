@@ -28,7 +28,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import DevRoutes from './pages/DevRoutes';
 import Unauthorized from './pages/Unauthorized';
-// Proteção de rotas removida
+
 
 import './assets/font/imports.css';
 
