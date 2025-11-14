@@ -32,7 +32,7 @@ import Unauthorized from './pages/Unauthorized';
 
 import './assets/font/imports.css';
 
-
+// scroll suave
 function ScrollToHashElement() {
   const location = useLocation();
 
