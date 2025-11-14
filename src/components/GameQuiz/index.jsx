@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Correto from "../correto"; 
 import Errado from "../errado";   
 import Loader from "../../components/common/Loader";
-import CountdownOverlay from "../../components/GameComponents/CountdownOverlay/CountdownOverlay"; // <--- 1. IMPORT NOVO
+import CountdownOverlay from "../../components/GameComponents/CountdownOverlay/CountdownOverlay";
+import WaitingOverlay from "../../components/GameComponents/WaitingOverlay/WaitingOverlay"; 
 import "./style.css";
 
 import { enviarResposta } from "../../services/respostaService"; 
@@ -15,7 +16,7 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
 
   // --- Estados do Componente ---
   const [timeLeft, setTimeLeft] = useState(20); 
-  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [selectedAnswer, setSelectedAnswer] = useState(null); // Agora controla o "Aguardando"
   const [showResultScreen, setShowResultScreen] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
@@ -25,31 +26,23 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [score, setScore] = useState(0);
-
-  // <--- 2. NOVO ESTADO: Começa true para contagem inicial
   const [showCountdown, setShowCountdown] = useState(true); 
 
   // --- Efeito: Inicializa o quiz ---
   useEffect(() => {
     setLoading(true);
     setError(null);
-    console.log("GameQuiz: Props recebidas:", { quizData, codigoSala, idSala });
 
     if (quizData && quizData.perguntas && quizData.perguntas.length > 0) {
       setQuiz(quizData);
       setCurrentQuestionIndex(0);
       setCurrentQuestion(quizData.perguntas[0]);
       setScore(0);
-      
       const tempoSegundos = quizData.tempoLimite ? quizData.tempoLimite * 60 : 20; 
       setTimeLeft(tempoSegundos);
-      
-      // Garante que a contagem apareça na primeira carga
-      setShowCountdown(true); 
-      
+      setShowCountdown(true); // Ativa contagem para primeira pergunta
       setLoading(false);
     } else {
-      console.error("GameQuiz: Erro - Prop 'quizData' inválida.");
       setError("Não foi possível carregar as perguntas.");
       setLoading(false);
     }
@@ -59,27 +52,31 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
   useEffect(() => {
     let timerId;
     
-    // <--- 3. TRAVA DE SEGURANÇA: Adicionado !showCountdown
-    // O timer do jogo SÓ roda se a contagem regressiva NÃO estiver na tela
+    // O timer SÓ roda se a contagem 3,2,1 NÃO estiver na tela E o resultado não estiver sendo mostrado
     if (!loading && !error && currentQuestion && timeLeft > 0 && !showResultScreen && !showCountdown) {
       timerId = setInterval(() => {
         setTimeLeft((prevTime) => {
           if (prevTime <= 1) {
             clearInterval(timerId);
-            setIsCorrect(false);
+            
+            // --- 3. MUDANÇA CRÍTICA ---
+            // Se o tempo acabou e NENHUMA resposta foi selecionada, marca como errado.
+            // Se uma resposta JÁ FOI selecionada, o 'isCorrect' já está salvo.
+            if (selectedAnswer === null) {
+              setIsCorrect(false);
+            }
+            // O Timer (ao chegar em 0) agora MOSTRA o resultado
             setShowResultScreen(true); 
+            
             return 0;
           }
           return prevTime - 1;
         });
       }, 1000);
     }
-    else if (timeLeft === 0 && !showResultScreen && !loading && !error && currentQuestion && !showCountdown) {
-      setIsCorrect(false);
-      setShowResultScreen(true);
-    }
+    
     return () => clearInterval(timerId);
-  }, [timeLeft, currentQuestion, loading, error, showResultScreen, showCountdown]); // <--- Dependência adicionada
+  }, [timeLeft, currentQuestion, loading, error, showResultScreen, showCountdown, selectedAnswer]); // <--- selectedAnswer foi adicionado
 
   // --- Efeito: Bloqueia scroll ---
   useEffect(() => {
@@ -89,24 +86,18 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
 
   // --- Função: Clique na Alternativa ---
   const handleAnswerSelect = async (alternativa) => {
-    // Bloqueia clique se estiver na contagem
-    if (showResultScreen || loading || error || !currentQuestion || !user || showCountdown) return;
+    // Bloqueia clique se já respondeu, ou se estiver na contagem/resultado
+    if (selectedAnswer || showResultScreen || loading || error || !currentQuestion || !user || showCountdown) return;
 
     const idUsuario = user?.id;
     const idPergunta = currentQuestion?.idPergunta;
     const idAlternativaSelecionada = alternativa?.idAlternativa;
     const idSalaNumerico = idSala;
 
-    if (!idUsuario || !idPergunta || !idAlternativaSelecionada || !idSalaNumerico) {
-      console.error("Erro: IDs faltando para enviar resposta.", { idUsuario, idPergunta, idAlternativaSelecionada, idSalaNumerico });
-      setError("Ocorreu um erro ao processar sua resposta (IDs faltando).");
-      return;
-    }
-
     // --- Lógica de Resposta ---
-    setSelectedAnswer(idAlternativaSelecionada);
+    setSelectedAnswer(idAlternativaSelecionada); // <--- Trava a resposta
     const acertou = alternativa.correta === true;
-    setIsCorrect(acertou);
+    setIsCorrect(acertou); // Guarda o resultado para DEPOIS
 
     const tempoLimitePergunta = currentQuestion.tempo || quiz.tempoLimite * 60 || 20; 
     const tempoGasto = tempoLimitePergunta - timeLeft;
@@ -115,9 +106,10 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
       setScore((prevScore) => prevScore + 1);
     }
 
-    setShowResultScreen(true);
+    // <--- 2. MUDANÇA: A LINHA ABAIXO FOI REMOVIDA ---
+    // setShowResultScreen(true); // <--- REMOVIDO!
 
-    // --- Envia Resposta API ---
+    // --- Envia Resposta API (Continua enviando na hora) ---
     try {
       const respostaPayload = {
         idUsuario: idUsuario,
@@ -135,7 +127,7 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
   // --- Função: Próxima Pergunta / Fim ---
   const handleNext = useCallback(() => {
     setShowResultScreen(false);
-    setSelectedAnswer(null);
+    setSelectedAnswer(null); // <--- Limpa a resposta travada
     const proximoIndex = currentQuestionIndex + 1;
 
     if (quiz && proximoIndex < quiz.perguntas.length) {
@@ -144,13 +136,10 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
       
       const tempoSegundos = quiz.perguntas[proximoIndex].tempo || quiz.tempoLimite * 60 || 20; 
       setTimeLeft(tempoSegundos);
-
-      // <--- 4. ATIVA CONTAGEM PARA A PRÓXIMA PERGUNTA
-      setShowCountdown(true);
-
+      
+      setShowCountdown(true); // Ativa o "3, 2, 1..."
     } else {
-      console.log("Fim do Quiz! Navegando para /fim");
-      navigate("/fim", {
+      navigate("/fim", { // Vai para a tela de Fim de Jogo
         state: {
           quizId: quiz?.idFormulario || quiz?.id,
           pontuacao: score,
@@ -165,7 +154,8 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
   // --- Efeito: Timer Tela Resultado ---
   useEffect(() => {
     if (showResultScreen) {
-      const tempoDeEspera = timeLeft > 0 ? timeLeft * 1000 : 1000;
+      // <--- 4. MUDANÇA: O tempo de espera agora é FIXO (3 segundos)
+      const tempoDeEspera = 3000; // 3 segundos
 
       const timer = setTimeout(() => {
         handleNext();
@@ -173,14 +163,12 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
 
       return () => clearTimeout(timer);
     }
-  }, [showResultScreen, handleNext, timeLeft]);
+  }, [showResultScreen, handleNext]); // timeLeft foi removido daqui
 
-  // --- Funções Modal Saída ---
+  // --- Funções Modal Saída (Sem mudança) ---
   const handleExit = () => setShowExitModal(true);
   const closeExitModal = () => setShowExitModal(false);
-  const confirmExit = async () => {
-    navigate("/game");
-  };
+  const confirmExit = async () => { navigate("/game"); };
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -190,6 +178,7 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
 
   // --- RENDERIZAÇÃO ---
 
+  // Loading / Erro / Quiz inválido
   if (loading) {
     return (
       <div className="game-quiz-container"><div className="quiz-wrapper"><div className="quiz-paper-container"><Loader /></div></div></div>
@@ -206,23 +195,32 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
     );
   }
 
+  // Tela Correto/Errado (Agora só aparece quando o timer chega a 0)
   if (showResultScreen) {
     return isCorrect ? <Correto /> : <Errado />;
   }
 
+  // --- Renderização Principal ---
   return (
     <div className="game-quiz-container">
       
-      {/* <--- 5. RENDERIZAÇÃO DA CONTAGEM */}
+      {/* Contagem "3, 2, 1..." (antes da pergunta) */}
       {showCountdown && (
         <CountdownOverlay 
-          segundos={3} // Tempo do "3, 2, 1..."
-          onComplete={() => setShowCountdown(false)} // Libera o jogo
+          segundos={3} 
+          onComplete={() => setShowCountdown(false)}
         />
       )}
 
       <div className="quiz-wrapper">
         <div className="quiz-paper-container">
+
+          {/* <--- 5. RENDERIZAÇÃO: Overlay de "Aguardando..." */}
+          {/* Aparece se uma resposta foi selecionada E a tela de resultado NÃO está ativa */}
+          {selectedAnswer && !showResultScreen && (
+            <WaitingOverlay />
+          )}
+
           {/* Header */}
           <div className="quiz-header-info">
             <span className="question-theme">{quiz.titulo || "Quiz"}</span>
@@ -236,10 +234,9 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
               currentQuestion.alternativas.map((alt) => (
                 <button
                   key={alt.idAlternativa}
-                  className={`alternative-btn ${selectedAnswer === alt.idAlternativa ? "selected" : ""}`}
+                  className={`alternative-btn ${selectedAnswer === alt.idAlternativa ? "selected" : ""}`} // Mostra a selecionada
                   onClick={() => handleAnswerSelect(alt)}
-                  // Botões desativados se estiver contando
-                  disabled={selectedAnswer !== null || showResultScreen || showCountdown}
+                  disabled={selectedAnswer !== null || showResultScreen || showCountdown} // Desativa se já respondeu
                 >
                   {alt.textoAlternativa || "-"}
                 </button>

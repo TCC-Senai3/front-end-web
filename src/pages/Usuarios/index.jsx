@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Header, Footer } from "../../components";
 import UsersRankingTable from "../../components/UsersComponents/UsersRankingTable";
 import PerfilModal from "../PerfilModal";
-import userService from "../../services/userService";
+import rankingService from "../../services/rankingService"; 
 import "./style.css";
 
 export default function Usuarios() {
@@ -13,37 +13,31 @@ export default function Usuarios() {
   const [error, setError] = useState(null);
   const [retryCount, setRetryCount] = useState(0);
 
-  // Carregar usuários ao montar o componente ou quando retryCount mudar
   useEffect(() => {
     let isMounted = true;
     
     const loadUsers = async () => {
       if (!isMounted) return;
-      
       setLoading(true);
       setError(null);
       
       try {
-        const apiUsers = await userService.getAllUsers();
+        const apiUsers = await rankingService.getRankingGlobal(); 
         
         if (!isMounted) return;
         
-        // Ordena por pontuação (maior para menor)
-        const sortedUsers = [...apiUsers].sort((a, b) => 
-          (b.pontuacao || 0) - (a.pontuacao || 0)
-        );
-        
-        // Adiciona ranking
-        const usersWithRank = sortedUsers.map((user, index) => ({
+        const usersWithRank = apiUsers.map((user, index) => ({
           ...user,
+          nome: user.nomeUsuario, 
+          pontuacao: user.pontuacao,
           rank: index + 1,
         }));
         
         setUsers(usersWithRank);
       } catch (error) {
-        console.error("Erro ao carregar usuários:", error);
+        console.error("Erro ao carregar ranking:", error);
         if (isMounted) {
-          setError(error.message || 'Erro ao carregar a lista de usuários');
+          setError(error.message || 'Erro ao carregar o ranking');
           setUsers([]);
         }
       } finally {
@@ -55,29 +49,21 @@ export default function Usuarios() {
     
     loadUsers();
     
-    // Cleanup function
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, [retryCount]);
   
-  // Função para tentar recarregar os usuários
   const handleRetry = () => {
     setRetryCount(prev => prev + 1);
   };
 
-  // Filtra os usuários
   const filteredUsers = useMemo(() => {
     if (!searchTerm?.trim()) return users;
-    
     const term = (searchTerm || '').toLowerCase();
     
     return users.filter((user) => {
       if (!user) return false;
-      
-      const nome = (user.nome || '').toLowerCase();
+      const nome = (user.nome || user.nomeUsuario || '').toLowerCase();
       const email = (user.email || '').toLowerCase();
-      
       return nome.includes(term) || email.includes(term);
     });
   }, [searchTerm, users]);
@@ -86,42 +72,30 @@ export default function Usuarios() {
     setSearchTerm(term);
   };
 
-  // --- handleViewProfile (CORRIGIDO) ---
+  // --- CORREÇÃO AQUI ---
   const handleViewProfile = (user) => {
-    // 'user' é o objeto do DTO (com 'biografia', 'pontuacao', etc.)
+    // 'user' é o DTO de Ranking (com nomeUsuario, pontuacao, avatar, idUsuario)
+    
     const profileData = {
       ...user, 
-      name: user.nome,
+      
+      // ✅ A LINHA QUE FALTAVA:
+      // O Modal espera 'id', mas o rankingService manda 'idUsuario'
+      id: user.idUsuario || user.id, // Garante que o ID seja passado
+      
+      name: user.nomeUsuario,
       email: user.email,
       points: user.pontuacao, 
       position: user.rank,
-      
-      // ✅ A CORREÇÃO ESTÁ AQUI:
-      // Mapeia 'biografia' (do DTO) para 'bio' (que o Modal espera)
       bio: user.biografia || 'Sem biografia.', 
-      
       memberSince: user.dataCriacao 
         ? new Date(user.dataCriacao).getFullYear() 
         : "N/A",
-        
-      gamesPlayed: user.jogosJogados || 0,
-      accuracy: user.precisao || 0,
-      
-      achievements: [
-        { icon: "🏆", name: "Primeiro Quiz Completado" },
-        {
-          icon: "⭐",
-          name: `${
-            Math.floor((user.pontuacao || 0) / 1000) * 1000
-          } Pontos Alcançados`,
-        },
-        { icon: "🎯", name: `Precisão de ${user.precisao || 0}%` },
-        { icon: "🏅", name: `Nível ${user.nivel || 1}` },
-      ],
     };
+    
+    console.log("Abrindo modal com estes dados:", profileData); // Log para debug
     setSelectedUser(profileData);
   };
-  // --- FIM DA CORREÇÃO ---
 
   const handleCloseProfile = () => {
     setSelectedUser(null);
@@ -151,7 +125,7 @@ export default function Usuarios() {
 
       {selectedUser && (
         <PerfilModal
-          user={selectedUser} // Agora 'selectedUser' contém o campo 'bio'
+          user={selectedUser} 
           isMyProfile={false}
           onClose={handleCloseProfile}
         />
