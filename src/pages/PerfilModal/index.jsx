@@ -6,7 +6,7 @@ import pointsIcon from "../../assets/images/image 33.png";
 
 import userProfileImage from "../../assets/images/user-profile1.png"; // Corrigido aqui!
 import bodeIcon from "../../assets/images/bode.svg";
-import canetaIcon from "../../assets/images/Caneta bic.svg";
+import canetaIcon from "../../assets/images/Canetabic.svg";
 import patoIcon from "../../assets/images/Pato.svg";
 
 import { useAuth } from "../../hooks/useAuth";
@@ -33,7 +33,7 @@ export default function PerfilModal({
   const avatarMap = {
     "bode.svg": bodeIcon,
     "bode": bodeIcon,
-    "Caneta bic.svg": canetaIcon,
+    "Canetabic.svg": canetaIcon,
     "caneta": canetaIcon,
     "Pato.svg": patoIcon,
     "pato": patoIcon,

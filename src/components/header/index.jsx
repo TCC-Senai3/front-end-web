@@ -8,15 +8,18 @@ import userProfileImage from "../../assets/images/user-profile1.png";
 import medalIcon from '../../assets/images/image 33.png';
 import settingsIcon from '../../assets/images/settings 1.png';
 import bodeIcon from "../../assets/images/bode.svg";
-import canetaIcon from "../../assets/images/Caneta bic.svg";
+import canetaIcon from "../../assets/images/Canetabic.svg";
 import patoIcon from "../../assets/images/Pato.svg";
 
 // Mapeamento de avatares
-const avatarMap = {
-  "bode.svg": bodeIcon,
-  "caneta": canetaIcon,
-  "pato": patoIcon,
-};
+  const avatarMap = {
+    "bode.svg": bodeIcon,
+    "bode": bodeIcon,
+    "Canetabic.svg": canetaIcon,
+    "caneta": canetaIcon,
+    "Pato.svg": patoIcon,
+    "pato": patoIcon,
+  };
 
 export default function Header() {
     const navigate = useNavigate();

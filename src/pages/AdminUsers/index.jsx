@@ -18,12 +18,46 @@ export default function AdminUsers() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // ✅ FUNÇÃO DE CARREGAMENTO COM CORREÇÃO VISUAL
   const loadUsers = useCallback(async () => {
     try {
       setLoading(true);
       const apiUsers = await userService.getAllUsers();
-      setUsers(apiUsers);
-      setFilteredUsers(apiUsers);
+
+      // --- TRATAMENTO DE DADOS ---
+      const formattedUsers = apiUsers.map(user => {
+        
+        // 1. Formatar Permissões
+        let roleDisplay = 'Usuário'; // Padrão
+        
+        if (user.roles && Array.isArray(user.roles) && user.roles.length > 0) {
+          // Mapeia o array para extrair os nomes e remover o prefixo 'ROLE_'
+          const roleNames = user.roles.map(r => {
+            if (typeof r === 'object' && (r.name || r.authority)) {
+              return (r.name || r.authority).replace('ROLE_', '');
+            }
+            return String(r).replace('ROLE_', '');
+          });
+          
+          roleDisplay = roleNames.join(', '); 
+        } else if (user.permissoes) {
+          roleDisplay = user.permissoes;
+        }
+
+        // 2. Formatar Status Online
+        const isOnline = !!user.online;
+
+        return {
+          ...user,
+          permissoes: roleDisplay, 
+          role: roleDisplay,       
+          online: isOnline
+        };
+      });
+      // ---------------------------
+
+      setUsers(formattedUsers);
+      setFilteredUsers(formattedUsers);
     } catch (error) {
       console.error('Erro ao carregar usuários da API:', error);
       setUsers([]);
@@ -44,8 +78,8 @@ export default function AdminUsers() {
       setFilteredUsers(users);
     } else {
       const filtered = users.filter(userItem => 
-        userItem.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        userItem.email.toLowerCase().includes(searchTerm.toLowerCase())
+        (userItem.nome && userItem.nome.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (userItem.email && userItem.email.toLowerCase().includes(searchTerm.toLowerCase()))
       );
       setFilteredUsers(filtered);
     }
@@ -60,38 +94,18 @@ export default function AdminUsers() {
     setIsEditModalOpen(true);
   };
 
-  const handleDeleteUser = async (userId) => {
-    if (window.confirm('Tem certeza que deseja excluir este usuário?')) {
-      try {
-        await userService.deleteUser(userId);
-        loadUsers(); 
-        alert('Usuário excluído com sucesso!');
-      } catch (error) {
-        console.error('Erro ao excluir usuário:', error);
-        alert('Erro ao excluir usuário. Tente novamente.');
-      }
-    }
-  };
+  // ❌ A função handleDeleteUser foi removida daqui
 
-  // ✅ 1. handleSaveUser ATUALIZADO
-  // O parâmetro 'roleIds' agora é o array (ex: ["ROLE_ADMIN"])
-  // vindo diretamente do 'onSave' do modal.
   const handleSaveUser = async (roleIds) => { 
     try {
       if (selectedUser) {
-        // Removemos as chamadas para 'updateUser'
-        // const { roleIds, ...dadosBasicos } = userDataToSave; // (Removido)
-        // await userService.updateUser(selectedUser.id, dadosBasicos); // (Removido)
-
-        // ✅ 2. Chamamos SÓ o endpoint de roles
+        // Atualiza apenas as ROLES chamando o endpoint específico
         if (Array.isArray(roleIds)) {
           await userService.updateUserRoles(selectedUser.id, roleIds);
         }
         alert('Permissões do usuário atualizadas com sucesso!');
-        loadUsers(); // Recarrega a lista
+        loadUsers(); 
       } 
-      // O 'else' (criar usuário) foi removido,
-      // pois este modal agora é apenas para edição de roles.
       
       setIsEditModalOpen(false);
       setSelectedUser(null);
@@ -107,11 +121,11 @@ export default function AdminUsers() {
   };
 
   const handleViewProfile = (userToView) => { 
-    const rolesStr = Array.isArray(userToView.roles) ? userToView.roles.join(', ') : (userToView.permissoes || 'N/A');
+    const rolesStr = userToView.permissoes || 'N/A';
     alert(`Perfil do usuário:\nNome: ${userToView.nome}\nEmail: ${userToView.email}\nPermissão: ${rolesStr}\nStatus: ${userToView.online ? 'Online' : 'Offline'}`);
   };
 
-  // --- Renderização (sem alteração) ---
+  // --- Renderização ---
 
   if (authLoading) {
     return (
@@ -148,16 +162,21 @@ export default function AdminUsers() {
         <div className="admin-users-content">
           <div style={{ marginBottom: '20px', padding: '10px', background: '#e3f2fd', borderRadius: '8px' }}>
             <strong>👤 Usuário logado:</strong> {user?.nome || 'N/A'} | 
-            <strong> Permissão:</strong> {user?.permissoes || user?.roles?.join(', ') || 'N/A'}
+            <strong> Permissão:</strong> {
+              Array.isArray(user?.roles) 
+                ? user.roles.map(r => (typeof r === 'string' ? r : r.name)).join(', ').replace(/ROLE_/g, '') 
+                : (user?.permissoes || 'N/A')
+            }
           </div>
+          
           <UserManagementTable
             users={filteredUsers}
             searchTerm={searchTerm}
             onSearch={handleSearch}
             onViewProfile={handleViewProfile}
             onEditUser={handleEditUser}
-            onDeleteUser={handleDeleteUser}
             loading={loading}
+            // ❌ A prop onDeleteUser foi removida daqui
           />
         </div>
       </div>

@@ -1,19 +1,20 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import Correto from "../correto"; // Componente para tela de acerto
-import Errado from "../errado";   // Componente para tela de erro
+import Correto from "../correto"; 
+import Errado from "../errado";   
 import Loader from "../../components/common/Loader";
+import CountdownOverlay from "../../components/GameComponents/CountdownOverlay/CountdownOverlay"; // <--- 1. IMPORT NOVO
 import "./style.css";
 
-import { enviarResposta } from "../../services/respostaService"; // Serviço para enviar resposta
-import { useAuth } from "../../hooks/useAuth"; // Hook de autenticação
+import { enviarResposta } from "../../services/respostaService"; 
+import { useAuth } from "../../hooks/useAuth"; 
 
 export default function GameQuiz({ quizData, codigoSala, idSala }) {
   const navigate = useNavigate();
   const { user } = useAuth(); 
 
   // --- Estados do Componente ---
-  const [timeLeft, setTimeLeft] = useState(20); // <<< MUDANÇA 1 (10 -> 20)
+  const [timeLeft, setTimeLeft] = useState(20); 
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [showResultScreen, setShowResultScreen] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -24,6 +25,9 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [score, setScore] = useState(0);
+
+  // <--- 2. NOVO ESTADO: Começa true para contagem inicial
+  const [showCountdown, setShowCountdown] = useState(true); 
 
   // --- Efeito: Inicializa o quiz ---
   useEffect(() => {
@@ -36,9 +40,13 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
       setCurrentQuestionIndex(0);
       setCurrentQuestion(quizData.perguntas[0]);
       setScore(0);
-      // Prioriza o tempo do quizData, senão usa 20s
-      const tempoSegundos = quizData.tempoLimite ? quizData.tempoLimite * 60 : 20; // <<< MUDANÇA 2 (10 -> 20)
+      
+      const tempoSegundos = quizData.tempoLimite ? quizData.tempoLimite * 60 : 20; 
       setTimeLeft(tempoSegundos);
+      
+      // Garante que a contagem apareça na primeira carga
+      setShowCountdown(true); 
+      
       setLoading(false);
     } else {
       console.error("GameQuiz: Erro - Prop 'quizData' inválida.");
@@ -50,25 +58,28 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
   // --- Efeito: Timer ---
   useEffect(() => {
     let timerId;
-    if (!loading && !error && currentQuestion && timeLeft > 0 && !showResultScreen) {
+    
+    // <--- 3. TRAVA DE SEGURANÇA: Adicionado !showCountdown
+    // O timer do jogo SÓ roda se a contagem regressiva NÃO estiver na tela
+    if (!loading && !error && currentQuestion && timeLeft > 0 && !showResultScreen && !showCountdown) {
       timerId = setInterval(() => {
         setTimeLeft((prevTime) => {
           if (prevTime <= 1) {
             clearInterval(timerId);
             setIsCorrect(false);
-            setShowResultScreen(true); // Mostra tela de "Errado" (tempo esgotou)
+            setShowResultScreen(true); 
             return 0;
           }
           return prevTime - 1;
         });
       }, 1000);
     }
-    else if (timeLeft === 0 && !showResultScreen && !loading && !error && currentQuestion) {
+    else if (timeLeft === 0 && !showResultScreen && !loading && !error && currentQuestion && !showCountdown) {
       setIsCorrect(false);
       setShowResultScreen(true);
     }
     return () => clearInterval(timerId);
-  }, [timeLeft, currentQuestion, loading, error, showResultScreen]);
+  }, [timeLeft, currentQuestion, loading, error, showResultScreen, showCountdown]); // <--- Dependência adicionada
 
   // --- Efeito: Bloqueia scroll ---
   useEffect(() => {
@@ -78,7 +89,8 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
 
   // --- Função: Clique na Alternativa ---
   const handleAnswerSelect = async (alternativa) => {
-    if (showResultScreen || loading || error || !currentQuestion || !user) return;
+    // Bloqueia clique se estiver na contagem
+    if (showResultScreen || loading || error || !currentQuestion || !user || showCountdown) return;
 
     const idUsuario = user?.id;
     const idPergunta = currentQuestion?.idPergunta;
@@ -96,8 +108,7 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
     const acertou = alternativa.correta === true;
     setIsCorrect(acertou);
 
-    // Calcula o tempo gasto baseado no tempo limite (prioriza pergunta, quiz, ou 20s)
-    const tempoLimitePergunta = currentQuestion.tempo || quiz.tempoLimite * 60 || 20; // <<< MUDANÇA 3 (10 -> 20)
+    const tempoLimitePergunta = currentQuestion.tempo || quiz.tempoLimite * 60 || 20; 
     const tempoGasto = tempoLimitePergunta - timeLeft;
 
     if (acertou) {
@@ -115,12 +126,9 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
         tempoGasto: tempoGasto > 0 ? tempoGasto : 1,
         idSala: idSalaNumerico
       };
-      console.log("Enviando resposta para API:", respostaPayload);
       await enviarResposta(respostaPayload);
-      console.log("Resposta enviada com sucesso!");
     } catch (apiError) {
       console.error("Erro ao enviar resposta para API:", apiError);
-      setError("Não foi possível salvar sua resposta no servidor.");
     }
   };
 
@@ -133,9 +141,13 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
     if (quiz && proximoIndex < quiz.perguntas.length) {
       setCurrentQuestionIndex(proximoIndex);
       setCurrentQuestion(quiz.perguntas[proximoIndex]);
-      // Reseta o tempo para a próxima pergunta (prioriza pergunta, quiz, ou 20s)
-      const tempoSegundos = quiz.perguntas[proximoIndex].tempo || quiz.tempoLimite * 60 || 20; // <<< MUDANÇA 4 (10 -> 20)
+      
+      const tempoSegundos = quiz.perguntas[proximoIndex].tempo || quiz.tempoLimite * 60 || 20; 
       setTimeLeft(tempoSegundos);
+
+      // <--- 4. ATIVA CONTAGEM PARA A PRÓXIMA PERGUNTA
+      setShowCountdown(true);
+
     } else {
       console.log("Fim do Quiz! Navegando para /fim");
       navigate("/fim", {
@@ -150,30 +162,26 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
     }
   }, [currentQuestionIndex, quiz, navigate, score, codigoSala, idSala]);
 
-  // --- Efeito: Timer Tela Resultado (LÓGICA ATUALIZADA) ---
+  // --- Efeito: Timer Tela Resultado ---
   useEffect(() => {
     if (showResultScreen) {
-      // Se o usuário respondeu (timeLeft > 0), esperamos o tempo que sobrou.
-      // Se o tempo esgotou (timeLeft === 0), esperamos 1 segundo (para mostrar "Errado!")
       const tempoDeEspera = timeLeft > 0 ? timeLeft * 1000 : 1000;
 
       const timer = setTimeout(() => {
         handleNext();
-      }, tempoDeEspera); // Usa o tempo de espera calculado
+      }, tempoDeEspera);
 
       return () => clearTimeout(timer);
     }
-  }, [showResultScreen, handleNext, timeLeft]); // Adicionado 'timeLeft' às dependências
+  }, [showResultScreen, handleNext, timeLeft]);
 
   // --- Funções Modal Saída ---
   const handleExit = () => setShowExitModal(true);
   const closeExitModal = () => setShowExitModal(false);
   const confirmExit = async () => {
-    // TODO: salaService.sairDaSala(codigoSala, user.id);
     navigate("/game");
   };
 
-  // --- Função: Formata Tempo ---
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -182,7 +190,6 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
 
   // --- RENDERIZAÇÃO ---
 
-  // Loading / Erro / Quiz inválido
   if (loading) {
     return (
       <div className="game-quiz-container"><div className="quiz-wrapper"><div className="quiz-paper-container"><Loader /></div></div></div>
@@ -199,14 +206,21 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
     );
   }
 
-  // Tela Correto/Errado
   if (showResultScreen) {
     return isCorrect ? <Correto /> : <Errado />;
   }
 
-  // --- Renderização Principal ---
   return (
     <div className="game-quiz-container">
+      
+      {/* <--- 5. RENDERIZAÇÃO DA CONTAGEM */}
+      {showCountdown && (
+        <CountdownOverlay 
+          segundos={3} // Tempo do "3, 2, 1..."
+          onComplete={() => setShowCountdown(false)} // Libera o jogo
+        />
+      )}
+
       <div className="quiz-wrapper">
         <div className="quiz-paper-container">
           {/* Header */}
@@ -224,7 +238,8 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
                   key={alt.idAlternativa}
                   className={`alternative-btn ${selectedAnswer === alt.idAlternativa ? "selected" : ""}`}
                   onClick={() => handleAnswerSelect(alt)}
-                  disabled={selectedAnswer !== null || showResultScreen}
+                  // Botões desativados se estiver contando
+                  disabled={selectedAnswer !== null || showResultScreen || showCountdown}
                 >
                   {alt.textoAlternativa || "-"}
                 </button>

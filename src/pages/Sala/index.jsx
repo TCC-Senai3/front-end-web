@@ -8,32 +8,52 @@ import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import "./style.css";
 
+// --- 1. IMPORTAÇÃO DAS IMAGENS ---
+import userProfileImage from "../../assets/images/user-profile1.png"; // Imagem padrão
+import bodeIcon from "../../assets/images/bode.svg";
+import canetaIcon from "../../assets/images/Canetabic.svg";
+import patoIcon from "../../assets/images/Pato.svg";
+
 export default function Sala() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
 
   const codigo = location.state?.codigo || null;
-  const [usuarios, setUsuarios] = useState([]); // Detalhes dos usuários (objetos)
-  const [loading, setLoading] = useState(true); // Loading principal da tela
+  const [usuarios, setUsuarios] = useState([]); 
+  const [loading, setLoading] = useState(true); 
   const [actionLoading, setActionLoading] = useState(false);
-  const [salaInfo, setSalaInfo] = useState(null); // Dados brutos da sala (inclui lista de IDs)
+  const [salaInfo, setSalaInfo] = useState(null); 
   const [isDonoDaSala, setIsDonoDaSala] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const stompClientRef = useRef(null);
   const [isConnected, setIsConnected] = useState(false);
 
-  // Ref para controle de montagem
-  const isMountedRef = useRef(true); // Definido como true na inicialização
+  const isMountedRef = useRef(true);
 
-  // --- 1. FUNÇÃO DE CARGA INICIAL ---
-  // Busca a sala E os detalhes dos usuários iniciais (APENAS UMA VEZ)
+  // --- 2. MAPA DE AVATARES ---
+  const avatarMap = {
+    "bode.svg": bodeIcon, "bode": bodeIcon,
+    "Canetabic.svg": canetaIcon, "caneta": canetaIcon,
+    "Pato.svg": patoIcon, "pato": patoIcon,
+  };
+
+  // --- FUNÇÃO AUXILIAR PARA PEGAR O SRC CORRETO ---
+  const getAvatarSrc = (avatarString) => {
+    if (!avatarString) return userProfileImage;
+    const cleanName = avatarString.trim();
+    // Verifica se é Base64/URL ou nome mapeado
+    if (cleanName.startsWith("data:") || cleanName.startsWith("http")) {
+      return cleanName;
+    }
+    return avatarMap[cleanName] || userProfileImage;
+  };
+
+  // --- 3. CARGA INICIAL DA SALA ---
   const carregarDadosIniciais = useCallback(async () => {
     if (!codigo || !user?.id) return;
-    
-    // Garante que o componente ainda está montado
     if (!isMountedRef.current) return;
-    setLoading(true); // Inicia o loading
+    setLoading(true);
 
     try {
       const sala = await salaService.getSalaByPin(codigo);
@@ -42,11 +62,12 @@ export default function Sala() {
       setSalaInfo(sala);
       setIsDonoDaSala(sala.idUsuario === user.id);
 
-      // Processa a lista inicial de participantes
       const participantesIds = sala.participantes || sala.idParticipantes || [];
       if (participantesIds.length > 0) {
+        // Busca os dados completos (incluindo avatar) de cada ID
         const userPromises = participantesIds.map((id) => userService.getUserById(id));
         const results = await Promise.allSettled(userPromises);
+        
         if (!isMountedRef.current) return;
 
         const validUsers = results
@@ -54,26 +75,23 @@ export default function Sala() {
           .map((r) => r.value);
         setUsuarios(validUsers);
       } else {
-        setUsuarios([]); // Lista vazia se não houver ninguém
+        setUsuarios([]);
       }
 
     } catch (err) {
       console.error("Erro ao carregar dados iniciais:", err);
-      if (isMountedRef.current) {
-        setErrorMsg("Falha ao carregar informações da sala.");
-      }
+      if (isMountedRef.current) setErrorMsg("Falha ao carregar informações da sala.");
     } finally {
-      if (isMountedRef.current) {
-        setLoading(false); // Para o loading
-      }
+      if (isMountedRef.current) setLoading(false);
     }
-  }, [codigo, user?.id]); // Depende apenas do código e do usuário
+  }, [codigo, user?.id]);
 
-  // --- 2. Conexão WebSocket (LÓGICA ATUALIZADA) ---
+  // --- 4. WEBSOCKET (AQUI ESTÁ A MÁGICA) ---
   useEffect(() => {
     if (!codigo || !user?.id) return;
 
     isMountedRef.current = true;
+    // Ajuste a URL se necessário (http vs https)
     const socketUrl = "https://tccdrakes.azurewebsites.net/ws";
 
     const client = new Client({
@@ -84,53 +102,51 @@ export default function Sala() {
       onConnect: () => {
         if (!isMountedRef.current) return;
         setIsConnected(true);
-        console.log("WebSocket Conectado.");
+        console.log("WebSocket Conectado na Sala:", codigo);
+      
         const topic = `/topic/sala/${codigo}`;
         client.subscribe(topic, (message) => {
           if (!isMountedRef.current) return;
           try {
             const payload = JSON.parse(message.body);
-            console.log("Mensagem WS recebida:", payload.type);
-            
+            console.log("WS Message:", payload);
+          
             if (payload.type === "JOGO_INICIADO") {
               const { idFormulario, idSala, codigoSala } = payload;
               navigate("/jogo", { state: { idFormulario, idSala, codigoSala } });
             
-            // --- PARTE 2: ATUALIZA O ESTADO LOCALMENTE ---
             } else if (payload.type === "USUARIO_ENTROU") {
-              // Adiciona o novo usuário (que veio no payload) ao estado
-              console.log("WS: Usuário entrou", payload.usuario);
-              setUsuarios(prevUsuarios => {
-                // Previne duplicados
-                if (prevUsuarios.find(u => u.id === payload.usuario.id)) {
-                  return prevUsuarios;
-                }
-                return [...prevUsuarios, payload.usuario];
+              // =====================================================
+              // CORREÇÃO AQUI:
+              // 1. Adiciona o usuário imediatamente (pode vir sem avatar do socket)
+              const novoUsuario = payload.usuario;
+              
+              setUsuarios(prev => {
+                if (prev.find(u => u.id === novoUsuario.id)) return prev;
+                return [...prev, novoUsuario];
               });
+
+              // 2. FORÇA UMA ATUALIZAÇÃO: Busca o usuário completo na API
+              // Isso garante que o avatar correto apareça mesmo se o Socket falhar nisso.
+              userService.getUserById(novoUsuario.id).then(fullUser => {
+                 if (isMountedRef.current && fullUser) {
+                    setUsuarios(prev => prev.map(u => 
+                        u.id === fullUser.id ? fullUser : u // Substitui pelo completo
+                    ));
+                 }
+              }).catch(err => console.error("Erro ao atualizar avatar via API:", err));
+              // =====================================================
             
             } else if (payload.type === "USUARIO_SAIU") {
-              // Remove o usuário (pelo ID) do estado
-              console.log("WS: Usuário saiu", payload.idUsuario);
-              setUsuarios(prevUsuarios => 
-                prevUsuarios.filter(u => u.id !== payload.idUsuario)
-              );
+              setUsuarios(prev => prev.filter(u => u.id !== payload.idUsuario));
             }
           } catch (e) {
-            console.error("Erro ao processar mensagem WebSocket:", e);
+            console.error("Erro no WebSocket:", e);
           }
         });
       },
-      onStompError: (frame) => {
-        console.error("Erro STOMP:", frame.headers["message"]);
-        if (isMountedRef.current) setIsConnected(false);
-      },
-      onWebSocketError: (error) => {
-        console.error("Erro WebSocket:", error);
-        if (isMountedRef.current) setIsConnected(false);
-      },
-      onDisconnect: () => {
-        if (isMountedRef.current) setIsConnected(false);
-      },
+      onStompError: (frame) => console.error("Erro STOMP:", frame.headers["message"]),
+      onWebSocketError: (err) => console.error("Erro WebSocket:", err),
     });
 
     client.activate();
@@ -141,136 +157,103 @@ export default function Sala() {
       if (stompClientRef.current?.active) stompClientRef.current.deactivate();
       setIsConnected(false);
     };
-  }, [codigo, navigate, user?.id]); // Removido 'carregarSala' daqui
+  }, [codigo, navigate, user?.id]);
 
-  // --- 3. Carga Inicial (POLLING REMOVIDO) ---
+  // Trigger Carga Inicial
   useEffect(() => {
     if (!codigo || !user?.id) {
       navigate("/game");
       return;
     }
-
     isMountedRef.current = true;
-    
-    // Chama a função de carga inicial (que agora busca sala E usuários)
     carregarDadosIniciais(); 
+    return () => { isMountedRef.current = false; };
+  }, [codigo, user?.id, carregarDadosIniciais, navigate]);
 
-    // O setInterval(carregarSala, 5000) foi REMOVIDO.
-    
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, [codigo, user?.id, carregarDadosIniciais, navigate]); // Roda apenas uma vez
-
-  // --- 4. useEffect para ATUALIZAR USUÁRIOS (REMOVIDO) ---
-  // Não é mais necessário.
-
-  // --- 5. Iniciar jogo (Sem alteração) ---
+  // Actions
   const handleIniciar = async () => {
-    if (!salaInfo || !isDonoDaSala || actionLoading || !isConnected) {
-      setErrorMsg("Não é possível iniciar agora.");
-      return;
-    }
+    if (!salaInfo || !isDonoDaSala || actionLoading || !isConnected) return;
     setActionLoading(true);
     try {
-      if (!stompClientRef.current?.connected) { 
-        throw new Error("Cliente STOMP não conectado.");
-      }
       const destination = `/app/sala/${codigo}/iniciar`;
       stompClientRef.current.publish({
         destination,
         body: JSON.stringify({ idUsuario: user.id }),
       });
     } catch (err) {
-      console.error("Erro ao iniciar jogo:", err);
-      setErrorMsg("Falha ao enviar comando de início.");
+      console.error("Erro ao iniciar:", err);
     } finally {
       setActionLoading(false);
     }
   };
 
-  // --- 6. Sair ou desmanchar sala (Lógica de ID Corrigida) ---
   const handleDesmanchar = async () => {
     if (!salaInfo || !user) return;
-    const confirmMessage = isDonoDaSala
-      ? "Deseja desmanchar esta sala?"
-      : "Deseja sair desta sala?";
-    if (!window.confirm(confirmMessage)) return;
+    if (!window.confirm(isDonoDaSala ? "Desmanchar sala?" : "Sair da sala?")) return;
 
     setActionLoading(true);
     try {
-      // Usa salaInfo.idSala (que vem do DTO do backend)
       if (isDonoDaSala) await salaService.fecharSala(salaInfo.idSala);
       else await salaService.sairDaSala(codigo, user.id);
       navigate("/game");
     } catch (err) {
-      console.error("Erro ao sair/desmanchar sala:", err);
-      const backendError = err.response?.data?.message || err.response?.data;
-      setErrorMsg(`Erro: ${backendError || err.message || "Ação falhou."}`);
+      setErrorMsg("Erro ao sair.");
     } finally {
       setActionLoading(false);
     }
   };
 
-  // === 7. Renderização (JSX 100% LIMPO) ===
+  // --- 5. RENDERIZAÇÃO ---
   return (
     <>
       <Header />
       <div className="sala-container">
         <div className="sala-content">
           <div className="sala-codigo">CODE: {codigo || "ERRO"}</div>
-
           {errorMsg && <div className="sala-mensagem error">{errorMsg}</div>}
 
           <div className="sala-actions">
-            <button
-              className="btn btn-danger"
-              onClick={handleDesmanchar}
-              disabled={actionLoading || !salaInfo}
-            >
+            <button className="btn btn-danger" onClick={handleDesmanchar} disabled={actionLoading || !salaInfo}>
               {isDonoDaSala ? "DESMANCHAR SALA" : "SAIR DA SALA"}
             </button>
-
             {isDonoDaSala && (
-              <button
-                className="btn btn-warning"
-                onClick={handleIniciar}
-                disabled={loading || actionLoading || usuarios.length < 1 || !isConnected}
-              >
+              <button className="btn btn-warning" onClick={handleIniciar} disabled={loading || actionLoading || usuarios.length < 1 || !isConnected}>
                 INICIAR
               </button>
             )}
           </div>
 
           <div className="sala-grid">
-            {/* Lógica de Loading/Vazio Corrigida */}
             {loading ? (
               <div className="sala-mensagem">Carregando...</div>
             ) : usuarios.length === 0 ? (
               <div className="sala-mensagem">Aguardando jogadores...</div>
             ) : (
-              // Se tiver usuários
-              usuarios.map((participante) => (
-                <div key={participante.id} className="sala-user">
-                  <div
-                    className="sala-avatar"
-                    style={{
-                      backgroundImage: participante.avatar
-                        ? `url(${participante.avatar})`
-                        : undefined,
-                    }}
-                  />
-                  <div
-                    className="nome"
-                    style={{
-                      fontWeight:
-                        user && participante.id === user.id ? "bold" : "normal",
-                    }}
-                  >
-                    {participante.nome || "Nome não encontrado"}
+              usuarios.map((participante) => {
+                const avatarSrc = getAvatarSrc(participante.avatar);
+                
+                return (
+                  <div key={participante.id} className="sala-user">
+                    {/* Container do Avatar */}
+                    <div className="sala-avatar">
+                        <img 
+                          src={avatarSrc} 
+                          alt={participante.nome} 
+                          style={{ 
+                            width: '100%', 
+                            height: '100%', 
+                            borderRadius: '50%', 
+                            objectFit: 'cover' 
+                          }} 
+                        />
+                    </div>
+
+                    <div className="nome" style={{ fontWeight: user && participante.id === user.id ? "bold" : "normal", marginTop: '8px' }}>
+                      {participante.nome || "Jogador"}
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>
