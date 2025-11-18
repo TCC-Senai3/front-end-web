@@ -19,6 +19,9 @@ export default function Login() {
     const [cadastroEmail, setCadastroEmail] = useState('');
     const [cadastroSenha, setCadastroSenha] = useState('');
 
+    const [isLoginLoading, setIsLoginLoading] = useState(false);
+    const [isSignUpLoading, setIsSignUpLoading] = useState(false);
+
     const handleSignUpClick = () => {
         setIsSignUpMode(true);
     };
@@ -29,6 +32,8 @@ export default function Login() {
 
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
+        if (isLoginLoading) return;
+        setIsLoginLoading(true);
         try {
             await login(loginEmail, loginSenha);
             console.log("Login realizado com sucesso");
@@ -36,11 +41,15 @@ export default function Login() {
         } catch (error) {
             console.error("Erro no login:", error);
             alert("Erro no login. Verifique suas credenciais.");
+        } finally {
+            setIsLoginLoading(false);
         }
     };
     
     const handleSignUpSubmit = async (e) => {
         e.preventDefault();
+        if (isSignUpLoading) return;
+        setIsSignUpLoading(true);
         try {
             const result = await authService.register({ nome: cadastroNome, email: cadastroEmail, senha: cadastroSenha });
             console.log("Cadastro realizado com sucesso:", result.data);
@@ -76,10 +85,13 @@ export default function Login() {
             
             alert(mensagemErro);
         }
+        finally {
+            setIsSignUpLoading(false);
+        }
     };
 
     return (
-        <div className="no-scroll">
+        <div className="login-page no-scroll">
             <Header />
             <div className={`container ${isSignUpMode ? 'sign-up-mode' : ''}`}>
                 <div className="forms-container">
@@ -107,11 +119,24 @@ export default function Login() {
                             <button 
                                 type="button" 
                                 className="forgot-password-btn"
-                                onClick={() => navigate('/ForgotPassword')}
+                                onClick={() => navigate('/forgot-password')}
                             >
                                 Esqueceu senha?
                             </button>
-                            <input type="submit" value="Login" className="primary-button solid" />
+                            <button 
+                                type="submit" 
+                                className={`primary-button solid ${isLoginLoading ? 'loading' : ''}`}
+                                disabled={isLoginLoading}
+                            >
+                                {isLoginLoading ? (
+                                    <>
+                                        <span className="button-spinner" aria-hidden="true"></span>
+                                        <span>Entrando...</span>
+                                    </>
+                                ) : (
+                                    'Login'
+                                )}
+                            </button>
                         </form>
 
                         <form className="sign-up-form" onSubmit={handleSignUpSubmit}>
@@ -144,7 +169,20 @@ export default function Login() {
                                 required
                                 minLength="6"
                             />
-                            <input type="submit" className="primary-button" value="Cadastrar" />
+                            <button 
+                                type="submit" 
+                                className={`primary-button ${isSignUpLoading ? 'loading' : ''}`}
+                                disabled={isSignUpLoading}
+                            >
+                                {isSignUpLoading ? (
+                                    <>
+                                        <span className="button-spinner" aria-hidden="true"></span>
+                                        <span>Cadastrando...</span>
+                                    </>
+                                ) : (
+                                    'Cadastrar'
+                                )}
+                            </button>
                         </form>
                     </div>
                 </div>

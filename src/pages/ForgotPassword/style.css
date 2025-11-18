@@ -1,35 +1,48 @@
 @import './responsive.css';
 
+.forgot-password-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #fff;
+}
+
+.forgot-password-page.no-scroll {
+  overflow: hidden;
+}
+
 .forgot-password-container {
   min-height: calc(100vh - 80px);
   display: flex;
   flex-direction: column;
   position: relative;
+  padding: 20px 0 40px;
 }
 
 .forgot-password-content {
   flex: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 20px;
+  padding: 0 60px;
   gap: 60px;
   min-height: 0;
+  overflow: hidden;
 }
 
 .illustration-section {
   flex: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  max-width: 50%;
+  max-width: 45%;
   min-height: 0;
 }
 
 .recovery-image {
-  max-width: 60%;
-  max-height: 60%;
+  max-width: 50%;
+  height: auto;
   object-fit: contain;
+  transform: scale(0.85);
 }
 
 .form-section {
@@ -50,6 +63,9 @@
   align-items: center;
   text-align: center;
   background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
 }
 
 .form-title {
@@ -141,18 +157,16 @@
   font-weight: 500;
   margin: 15px 0;
   text-align: center;
+  background: transparent;
+  border: 0;
 }
 
 .message.success {
-  background: #d4edda;
   color: #155724;
-  border: 1px solid #c3e6cb;
 }
 
 .message.error {
-  background: #f8d7da;
   color: #721c24;
-  border: 1px solid #f5c6cb;
 }
 
 .footer {
@@ -171,7 +185,7 @@
   width: 100%;
   max-width: 350px;
   padding: 22px 16px;
-  border: 2px solid #000000ff;
+  border: 2px solid #000;
   border-radius: 50px;
   font-size: 14px;
   font-weight: 500;
@@ -180,6 +194,13 @@
   box-sizing: border-box;
   margin-bottom: 15px;
   transition: all 0.3s ease;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.email-input:focus {
+  outline: none;
+  border-color: #3498db;
 }
 .form-title {
   font-size: 18px;

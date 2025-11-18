@@ -45,19 +45,28 @@ header {
     margin-right: 30%;
 }
 
-.container {
+.login-page {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #fff;
+}
+
+.login-page .container {
     position: relative;
     width: 100%;
+    max-width: none;
     background-color: #fff;
     min-height: 100vh;
     height: 100vh;
+    margin: 0;
+    padding: 0;
     overflow: hidden;
 }
 
 .forms-container {
     display:flex;
     width: 100%;
-   
+    max-width: none;
 }
 
 
@@ -216,10 +225,41 @@ form.sign-in-form {
     margin: 10px 0;
     cursor: pointer;
     transition: 0.5s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .primary-button:hover {
     background-color: #4d84e2;
+}
+
+.primary-button.loading {
+    cursor: wait;
+    opacity: 0.8;
+}
+
+.primary-button:disabled {
+    pointer-events: none;
+}
+
+.button-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: button-spin 0.8s linear infinite;
+}
+
+@keyframes button-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .forgot-password-btn {
@@ -253,6 +293,7 @@ form.sign-in-form {
     position: absolute;
     height: 100%;
     width: 100%;
+    max-width: none;
     top: 0;
     left: 0;
     display: grid;
