@@ -1,19 +1,12 @@
 header {
-  background-color: #00A2FF;
-  padding: 10px 20px;
+  background-color: #00ABFF;
+  padding: 25px;
   width: 100%;
   box-sizing: border-box;
-}
-
-header {
   margin: 0;
-  padding: 0;
-  /* position: fixed; garante que fique no topo sempre */
   top: 0;
   left: 0;
-  width: 100%;
   z-index: 1000;
-  background-color: #00ABFF; /* a cor azul do header */
 }
 
 .header-container {

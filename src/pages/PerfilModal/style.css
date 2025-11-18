@@ -419,6 +419,62 @@
   min-height: 40px;
 }
 
+/* Seção de Biografia */
+.perfil-bio-section {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 0 20px 20px;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.perfil-bio-section:hover {
+  background: #e3f2fd;
+  border-color: #007bff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+}
+
+.perfil-bio-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  display: block;
+  text-align: center;
+}
+
+.perfil-bio-text {
+  font-size: 14px;
+  color: #333;
+  line-height: 1.5;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+.perfil-bio-section textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 100px;
+  transition: all 0.3s ease;
+  background-color: #fff;
+}
+
+.perfil-bio-section textarea:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+}
+
 /* Botões de ação */
 .perfil-actions {
   display: flex;
