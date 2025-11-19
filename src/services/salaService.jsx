@@ -105,15 +105,34 @@ export const fecharSala = async (idSala) => {
   }
 };
 
-const salaService = {
-  getSalas,
-  getSalaById,
-  getSalaByPin,
-  createSala,
-  entrarNaSala,
-  sairDaSala,
-  fecharSala,
+export const expulsarUsuario = async (codigoSala, idUsuarioExpulso) => {
+  if (!codigoSala || !idUsuarioExpulso) {
+    throw new Error("Código da sala e ID do usuário a expulsar são necessários.");
+  }
+  try {
+    const response = await api.delete(
+      `/salas/${codigoSala}/expulsar/${idUsuarioExpulso}`
+    );
+    return response.data; 
+  } catch (error) {
+    console.error(
+      `Erro ao expulsar usuário ${idUsuarioExpulso} da sala ${codigoSala}:`,
+      error
+    );
+    throw error;
+  }
 };
 
-// 2. Exportamos a constante
+
+const salaService = {
+  getSalas,
+  getSalaById,
+  getSalaByPin,
+  createSala,
+  entrarNaSala,
+  sairDaSala,
+  fecharSala,
+  expulsarUsuario,
+};
+
 export default salaService;

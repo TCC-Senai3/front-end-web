@@ -106,10 +106,6 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
       setScore((prevScore) => prevScore + 1);
     }
 
-    // <--- 2. MUDANÇA: A LINHA ABAIXO FOI REMOVIDA ---
-    // setShowResultScreen(true); // <--- REMOVIDO!
-
-    // --- Envia Resposta API (Continua enviando na hora) ---
     try {
       const respostaPayload = {
         idUsuario: idUsuario,
