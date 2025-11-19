@@ -105,7 +105,7 @@ export default function Sala() {
     try {
       await salaService.expulsarUsuario(codigo, idUsuarioExpulso);
 
-      // ✅ Remove o usuário da lista local do dono
+      // Remove o usuário da lista local do dono
       setUsuarios((prev) => prev.filter((u) => u.id !== idUsuarioExpulso)); 
 
       setUsuarioSelecionado(null); // Fecha o pop-up
@@ -119,7 +119,7 @@ export default function Sala() {
       setActionLoading(false);
     }
   };
-// ... O RESTO DO CÓDIGO PERMANECE O MESMO ...
+
   const carregarDadosIniciais = useCallback(async () => {
     if (!codigo || !user?.id) return;
     if (!isMountedRef.current) return;
@@ -170,6 +170,12 @@ export default function Sala() {
       reconnectDelay: 10000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
+      
+      // ✅ ESSENCIAL: Configura o Principal Name para o canal privado /user/queue/...
+      connectHeaders: {
+          login: String(user.id),
+      },
+      
       onConnect: () => {
         if (!isMountedRef.current) return;
         setIsConnected(true);
@@ -209,18 +215,10 @@ export default function Sala() {
                   console.error("Erro ao atualizar avatar via API:", err)
                 );
             } else if (payload.type === "USUARIO_SAIU") {
-              setUsuarios((prev) =>
-                prev.filter((u) => u.id !== payload.idUsuario)
-              );
-              // Fechar o pop-up se o usuário que saiu/foi expulso era o selecionado
-              // Nota: O estado `usuarioSelecionado` é atualizado fora deste closure
-              // Para garantir que o pop-up feche, você pode refinar o uso do estado
-              // ou confiar na atualização do estado no `handleExpulsar` para o dono.
-              // Para não-donos, a lista de usuários será atualizada.
-              // if (usuarioSelecionado?.id === payload.idUsuario)
-              //   setUsuarioSelecionado(null);
-            
-            // ✅ NOVO TRATAMENTO: Fechamento da Sala
+                setUsuarios((prev) =>
+                  prev.filter((u) => u.id !== payload.idUsuario)
+                );
+                setUsuarioSelecionado(null);
             } else if (payload.type === "SALA_FECHADA") {
                 console.log(`Sala ${payload.codigoSala} foi fechada. Redirecionando.`);
                 navigate("/game", { replace: true });
@@ -240,9 +238,9 @@ export default function Sala() {
             
                 
                 if (payload.type === "EXPULSO") {
-                    console.warn("Notificação privada recebida: Você foi expulso! Redirecionando...");
+                    console.warn("Notificação privada recebida: Você foi expulso/saiu! Redirecionando...");
                     
-                    // ESTA LINHA DEVE REDIRECIONAR O USUÁRIO EXPULSO
+                    // O WebSocket está responsável por redirecionar.
                     navigate("/game", { replace: true });
                 }
             } catch (e) {
@@ -265,7 +263,7 @@ export default function Sala() {
       if (stompClientRef.current?.active) stompClientRef.current.deactivate();
       setIsConnected(false);
     };
-    // ✅ Ajuste: 'usuarioSelecionado' foi removido das dependências para evitar problemas de closure/reconexão.
+    // As dependências estão corretas, incluindo 'navigate'
   }, [codigo, navigate, user?.id]);
 
   // Trigger Carga Inicial (Mantido)
@@ -280,6 +278,26 @@ export default function Sala() {
       isMountedRef.current = false;
     };
   }, [codigo, user?.id, carregarDadosIniciais, navigate]);
+
+
+// 🚀 NOVO: Efeito de Contingência para Expulsão/Saída
+useEffect(() => {
+    // Esta lógica monitora se o usuário logado desapareceu da lista de participantes.
+    // Se ele desaparecer da lista (via mensagem USUARIO_SAIU) mas o redirecionamento 
+    // privado do WebSocket (EXPULSO) falhou, nós forçamos a navegação.
+    if (loading || !user || !salaInfo) return;
+
+    const userIsStillInList = usuarios.some(p => p.id === user.id);
+
+    // Se o usuário logado NÃO é o dono E NÃO está mais na lista, ele foi expulso/saiu.
+    if (!isDonoDaSala && !userIsStillInList && !actionLoading) {
+        console.warn("Contingência: Usuário logado não encontrado na lista. Redirecionando por expulsão/saída via API.");
+        // Navega de volta, garantindo que o cliente não fique preso na sala.
+        navigate("/game", { replace: true });
+    }
+    
+}, [usuarios, user, isDonoDaSala, loading, navigate, salaInfo, actionLoading]);
+
 
   // Actions (Mantidas)
   const handleIniciar = async () => {
@@ -299,6 +317,7 @@ export default function Sala() {
     }
   };
 
+// ✅ CORREÇÃO APLICADA: Redirecionamento forçado no sucesso da API (para saída voluntária)
   const handleDesmanchar = async () => {
     if (!salaInfo || !user) return;
     if (!window.confirm(isDonoDaSala ? "Tem certeza que deseja desmanchar a sala e remover todos os participantes?" : "Tem certeza que deseja sair da sala?"))
@@ -312,7 +331,9 @@ export default function Sala() {
       }
       else {
         await salaService.sairDaSala(codigo, user.id);
-        navigate("/game");
+        
+        // Redireciona imediatamente, corrigindo o bug onde o WS falhava
+        navigate("/game", { replace: true });
       }
     } catch (err) {
       setErrorMsg("Erro ao sair/desmanchar. Tente novamente.");
