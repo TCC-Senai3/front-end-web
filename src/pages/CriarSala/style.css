@@ -7,8 +7,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-top: 80px;
+  padding: 0;
+  margin: 0;
+  margin-top: 0 !important;
   box-sizing: border-box;
+  position: relative;
+  width: 100%;
 }
 
 /* Mobile First - Sobrescrever para mobile */

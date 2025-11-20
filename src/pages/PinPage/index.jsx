@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import slogan from "../../assets/images/slogan com brilhos.svg";
+import slogan from "../../assets/images/slogan (3).svg";
 import "./style.css";
 import Header from "../../components/header";
 import salaService from "../../services/salaService";

@@ -31,10 +31,7 @@ class ErrorHandler {
       this.errorQueue.pop();
     }
 
-    // Log no console em desenvolvimento
-    if (CONSTANTS.DEBUG.ENABLED) {
-      console.error('🚨 Error logged:', errorInfo);
-    }
+    // Log no console em desenvolvimento - removido para produção
 
     // Enviar para serviço de monitoramento (Sentry, etc.) em produção
     if (CONSTANTS.config.SENTRY_DSN && window.Sentry) {
@@ -206,9 +203,7 @@ class ErrorHandler {
         // Calcular delay com jitter para evitar thundering herd
         const delay = baseDelay * Math.pow(2, attempt - 1) + Math.random() * 1000;
 
-        if (CONSTANTS.DEBUG.ENABLED) {
-          console.log(`⏳ Retry attempt ${attempt}/${maxAttempts} in ${delay}ms`);
-        }
+        // Retry attempt - log removido
 
         await new Promise(resolve => setTimeout(resolve, delay));
       }

@@ -49,12 +49,15 @@ export const usePermissions = () => {
 
   // ****** CORREÇÃO 2: Passar 'user' para extractRoles ******
   const userRoles = extractRoles(user);
-  // Adiciona um log para depuração
-  console.log("usePermissions - User:", user);
-  console.log("usePermissions - Extracted Roles:", userRoles); // --- Funções de verificação (sem alterações na lógica interna) ---
+  // Logs removidos para produção
 
   const isAdmin = () => {
-    return userRoles.includes("ROLE_ADMIN");
+    // Verifica se é admin por roles, permissoes ou tipoUsuario
+    return userRoles.includes("ROLE_ADMIN") || 
+           user?.permissoes === 'ADM' || 
+           user?.tipoUsuario === 'ADM' ||
+           user?.permissoes === 'ADMIN' ||
+           user?.tipoUsuario === 'ADMIN';
   };
 
   const canCreateQuiz = () => {
@@ -70,6 +73,18 @@ export const usePermissions = () => {
   const hasPermission = (permission) => {
     if (!isLoggedIn) return false;
     if (!permission) return true; // Permite se nenhuma permissão for exigida
+    
+    // Verifica permissões específicas
+    if (permission === 'ADM' || permission === 'ADMIN') {
+      return isAdmin();
+    }
+    
+    if (permission === 'CRIADOR') {
+      return userRoles.includes('ROLE_CRIADOR_FORMULARIO') || 
+             user?.permissoes === 'CRIADOR' || 
+             user?.tipoUsuario === 'CRIADOR';
+    }
+    
     // Verifica se userRoles não está vazio antes de checar
     return userRoles.length > 0 && userRoles.includes(permission);
   };

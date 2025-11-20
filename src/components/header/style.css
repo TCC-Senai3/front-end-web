@@ -225,15 +225,6 @@ header {
   background-color: rgba(255, 255, 255, 0.2);
 }
 
-.user-dropdown-item.admin-item {
-  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-  border-left: 3px solid #fff;
-  font-weight: 700;
-}
-
-.user-dropdown-item.admin-item:hover {
-  background: linear-gradient(135deg, #ff5252, #d63031);
-}
 
 /* ========================================
    MENU HAMBURGER

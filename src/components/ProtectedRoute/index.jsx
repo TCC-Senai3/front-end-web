@@ -15,30 +15,39 @@ const Loader = () => (
     </div>
 );
 
-export default function ProtectedRoute({ children, requiredRole }) {
-  // Pega os dados do hook de permissões
-  const { isLoggedIn, loading, hasPermission } = usePermissions();
-  const location = useLocation();
+export default function ProtectedRoute({ children, requiredRole, requiredPermission }) {
+  // Pega os dados do hook de permissões
+  const { isLoggedIn, loading, hasPermission, isAdmin } = usePermissions();
+  const location = useLocation();
 
-  // 1. Se o hook 'useAuth' ainda está carregando, mostra o loader
-  if (loading) {
-    return <Loader />;
-  }
+  // 1. Se o hook 'useAuth' ainda está carregando, mostra o loader
+  if (loading) {
+    return <Loader />;
+  }
 
-  // 2. Se não estiver logado, redireciona para o login
-  if (!isLoggedIn) {
-    // Salva a página que o usuário tentou acessar
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
+  // 2. Se não estiver logado, redireciona para o login
+  if (!isLoggedIn) {
+    // Salva a página que o usuário tentou acessar
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
 
-  // 3. Se estiver logado, mas não tiver a 'requiredRole'
-  // A função 'hasPermission' agora está correta
-  if (requiredRole && !hasPermission(requiredRole)) {
-    // Redireciona para a página de "Não Autorizado"
-    console.warn(`ProtectedRoute: Acesso negado. Rota [${location.pathname}] requer [${requiredRole}]`);
-    return <Navigate to="/unauthorized" replace />; 
-  }
+  // 3. Verifica permissão específica (ADM, CRIADOR, etc.)
+  const permission = requiredPermission || requiredRole;
+  
+  if (permission) {
+    // Se for ADM, verifica se é admin
+    if (permission === 'ADM' || permission === 'ADMIN') {
+      if (!isAdmin) {
+        return <Navigate to="/unauthorized" replace />;
+      }
+    } else {
+      // Para outras permissões, usa hasPermission
+      if (!hasPermission(permission)) {
+        return <Navigate to="/unauthorized" replace />;
+      }
+    }
+  }
 
-  // 4. Se passou em tudo (logado e com permissão), renderiza a página
-  return children;
+  // 4. Se passou em tudo (logado e com permissão), renderiza a página
+  return children;
 }

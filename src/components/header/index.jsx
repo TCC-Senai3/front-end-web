@@ -79,6 +79,7 @@ export default function Header() {
 
         switch (option) {
             case 'MINHA CONTA': navigate('/perfil'); break;
+            case 'CRIAR QUIZ': navigate('/createquiz'); break;
             case 'USUÁRIOS': navigate('/usuarios'); break;
             case 'ADMIN USUÁRIOS': navigate('/admin/usuarios'); break;
             case 'SAIR':
@@ -103,6 +104,7 @@ export default function Header() {
             case 'TERMOS': navigate('/termos'); break;
             case 'CONTATO': navigate('/contato'); break;
             case 'MINHA CONTA': navigate('/perfil'); break;
+            case 'CRIAR QUIZ': navigate('/createquiz'); break;
             case 'USUÁRIOS': navigate('/usuarios'); break;
             case 'SAIR':
                 logout();
@@ -186,9 +188,16 @@ export default function Header() {
                                 <div className="user-dropdown-arrow"></div>
                                 <div className="user-dropdown-content">
                                     <div className="user-dropdown-item" onClick={() => handleUserProfileClick('MINHA CONTA')}>MINHA CONTA</div>
+                                    {((user?.permissoes === 'CRIADOR' || user?.tipoUsuario === 'CRIADOR') || 
+                                      (Array.isArray(user?.roles) && user.roles.includes('ROLE_CRIADOR_FORMULARIO'))) && 
+                                      !(user?.permissoes === 'ADM' || user?.tipoUsuario === 'ADM' || 
+                                        (Array.isArray(user?.roles) && user.roles.includes('ROLE_ADMIN'))) && (
+                                        <div className="user-dropdown-item" onClick={() => handleUserProfileClick('CRIAR QUIZ')}>CRIAR QUIZ</div>
+                                    )}
                                     <div className="user-dropdown-item" onClick={() => handleUserProfileClick('USUÁRIOS')}>USUÁRIOS</div>
-                                    {(user?.permissoes === 'ADM' || user?.tipoUsuario === 'ADM') && (
-                                        <div className="user-dropdown-item admin-item" onClick={() => handleUserProfileClick('ADMIN USUÁRIOS')}>ADMIN USUÁRIOS</div>
+                                    {(user?.permissoes === 'ADM' || user?.tipoUsuario === 'ADM' || 
+                                      (Array.isArray(user?.roles) && user.roles.includes('ROLE_ADMIN'))) && (
+                                        <div className="user-dropdown-item" onClick={() => handleUserProfileClick('ADMIN USUÁRIOS')}>ADMIN USUÁRIOS</div>
                                     )}
                                     <div className="user-dropdown-item" onClick={() => handleUserProfileClick('SAIR')}>SAIR</div>
                                 </div>
@@ -251,6 +260,12 @@ export default function Header() {
                             <div className="mobile-menu-item" onClick={() => handleMobileMenuClick('TERMOS')}>TERMOS</div>
                             <div className="mobile-menu-item" onClick={() => handleMobileMenuClick('CONTATO')}>CONTATO</div>
                             <div className="mobile-menu-item" onClick={() => handleMobileMenuClick('MINHA CONTA')}>MINHA CONTA</div>
+                            {((user?.permissoes === 'CRIADOR' || user?.tipoUsuario === 'CRIADOR') || 
+                              (Array.isArray(user?.roles) && user.roles.includes('ROLE_CRIADOR_FORMULARIO'))) && 
+                              !(user?.permissoes === 'ADM' || user?.tipoUsuario === 'ADM' || 
+                                (Array.isArray(user?.roles) && user.roles.includes('ROLE_ADMIN'))) && (
+                                <div className="mobile-menu-item" onClick={() => handleMobileMenuClick('CRIAR QUIZ')}>CRIAR QUIZ</div>
+                            )}
                             <div className="mobile-menu-item" onClick={() => handleMobileMenuClick('USUÁRIOS')}>USUÁRIOS</div>
                             <div className="mobile-menu-item mobile-menu-item-logout" onClick={() => handleMobileMenuClick('SAIR')}>SAIR</div>
                         </div>

@@ -36,10 +36,8 @@ export default function Login() {
         setIsLoginLoading(true);
         try {
             await login(loginEmail, loginSenha);
-            console.log("Login realizado com sucesso");
             navigate('/game');
         } catch (error) {
-            console.error("Erro no login:", error);
             alert("Erro no login. Verifique suas credenciais.");
         } finally {
             setIsLoginLoading(false);
@@ -52,15 +50,12 @@ export default function Login() {
         setIsSignUpLoading(true);
         try {
             const result = await authService.register({ nome: cadastroNome, email: cadastroEmail, senha: cadastroSenha });
-            console.log("Cadastro realizado com sucesso:", result.data);
             alert("Cadastro realizado com sucesso! Faça login para continuar.");
             setIsSignUpMode(false);
             setCadastroNome('');
             setCadastroEmail('');
             setCadastroSenha('');
         } catch (error) {
-            console.error("Erro no cadastro:", error);
-            
             let mensagemErro = "Erro no cadastro. ";
             
             if (error.response?.data) {

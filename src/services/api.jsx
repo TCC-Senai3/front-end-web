@@ -126,28 +126,13 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response) {
-      // MANTIDO: Log de erro útil
-      console.error(
-        `Erro na resposta da API: ${error.response.status} para ${error.config.url}`,
-        error.response.data || "(Sem dados)"
-      );
       if (error.response.status === 401) {
-        // MANTIDO: Log importante
-        console.warn(
-          "Sessão expirada ou inválida. Redirecionando para login..."
-        );
         sessionStorage.removeItem("authToken");
         sessionStorage.removeItem("userData");
         if (window.location.pathname !== "/login") {
           window.location.href = "/login";
         }
       }
-    } else if (error.request) {
-      // MANTIDO: Erro importante
-      console.error("Sem resposta do servidor:", error.request);
-    } else {
-      // MANTIDO: Erro importante
-      console.error("Erro ao configurar requisição:", error.message);
     }
     return Promise.reject(error);
   }

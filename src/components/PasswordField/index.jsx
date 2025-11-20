@@ -91,7 +91,7 @@ const PasswordField = ({
                     Mínimo {minLength} caracteres
                 </div>
             )}
-            <style jsx global>{`
+            <style>{`
                 @keyframes fadeIn {
                     from { opacity: 0; transform: translateY(-5px); }
                     to { opacity: 1; transform: translateY(0); }

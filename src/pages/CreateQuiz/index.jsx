@@ -40,8 +40,9 @@ function MiniCard({ selected, onClick, index, pergunta, onDelete }) {
           onDelete(index);
         }}
         title="Deletar pergunta"
+        aria-label="Deletar pergunta"
       >
-                ×      {" "}
+        ×
       </button>
            {" "}
       <div className="mini-question-content" onClick={onClick}>
@@ -262,7 +263,7 @@ export default function CreateQuiz() {
 
   return (
     <ProtectedRoute requiredRole="ROLE_CRIADOR_FORMULARIO">
-            <Header />     {" "}
+      <Header />
       <div className="quiz-container">
                {" "}
         <div

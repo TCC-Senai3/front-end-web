@@ -14,12 +14,14 @@ import patoIcon from "../../../assets/images/Pato.svg";
 
 import rankingService from "../../../services/rankingService";
 import Loader from "../../common/Loader";
+import PerfilModal from "../../../pages/PerfilModal";
 import "./style.css";
 
 export default function RankingSection() {
   const [ranking, setRanking] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const podiumIcons = useMemo(() => [image6, image7, image8], []);
 
@@ -43,13 +45,20 @@ export default function RankingSection() {
           const transformedData = response.map((user, index) => {
             const position = index + 1;
             return {
-              id: user.nomeUsuario || index, 
+              id: user.idUsuario || user.id || index, 
+              idUsuario: user.idUsuario || user.id,
               nome: user.nomeUsuario,
+              nomeUsuario: user.nomeUsuario,
               pontos: user.pontuacao,
+              pontuacao: user.pontuacao,
               posicao: position,
+              rank: position,
               rankIcon: index < 3 ? podiumIcons[index] : null,
               // Salva o avatar cru para processar depois
-              avatarString: user.avatar 
+              avatarString: user.avatar,
+              avatar: user.avatar,
+              // Mantém outros campos que possam vir da API
+              ...user
             };
           });
           setRanking(transformedData);
@@ -72,7 +81,27 @@ export default function RankingSection() {
   );
 
   const handleViewProfile = (user) => {
-    alert(`Usuário: ${user.nome}\nPontos: ${user.pontos}`);
+    // Prepara os dados no formato esperado pelo PerfilModal
+    const profileData = {
+      ...user,
+      // Garante que o ID seja passado corretamente
+      id: user.idUsuario || user.id,
+      // Mapeia os campos para o formato esperado pelo modal
+      name: user.nomeUsuario || user.nome,
+      email: user.email,
+      points: user.pontuacao || user.pontos,
+      position: user.rank || user.posicao,
+      bio: user.biografia || 'Sem biografia.',
+      memberSince: user.dataCriacao 
+        ? new Date(user.dataCriacao).getFullYear() 
+        : "N/A",
+    };
+    
+    setSelectedUser(profileData);
+  };
+
+  const handleCloseProfile = () => {
+    setSelectedUser(null);
   };
 
   return (
@@ -156,6 +185,14 @@ export default function RankingSection() {
           </p>
         )}
       </div>
+
+      {selectedUser && (
+        <PerfilModal
+          user={selectedUser}
+          isMyProfile={false}
+          onClose={handleCloseProfile}
+        />
+      )}
     </div>
   );
 }

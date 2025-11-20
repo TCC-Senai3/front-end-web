@@ -27,14 +27,9 @@ export default function CriarSala() {
         if (Array.isArray(data)) {
           setFormularios(data);
         } else {
-          console.warn(
-            "API de formulários não retornou um array. Recebido:",
-            data
-          );
           setFormularios([]); // Garante que é um array
         }
       } catch (err) {
-        console.error("Erro ao carregar formulários:", err);
         setError("Erro ao carregar questionários");
       } finally {
         setLoading(false);
@@ -68,9 +63,7 @@ export default function CriarSala() {
         idTema: 1, // Usando idTema fixo 1, conforme discutimos
       }; // 1. Chama a API para CRIAR a sala
 
-      console.log("Enviando dados para criar sala:", salaData);
       const salaCriada = await salaService.createSala(salaData);
-      console.log("Resposta da API (Sala criada):", salaCriada); // Pega o CÓDIGO (String, ex: "972229") da resposta
 
       const pinDaSala = salaCriada.codigoSala; // Valida se a API retornou o código
 
@@ -80,15 +73,11 @@ export default function CriarSala() {
         );
       } // 2. Chama a API para ENTRAR na sala recém-criada (usando o CÓDIGO)
 
-      console.log(
-        `Registrando criador (Usuário ${idUsuarioLogado}) na Sala ${pinDaSala}...`
-      );
       await salaService.entrarNaSala(pinDaSala, idUsuarioLogado);
-      console.log("Criador registrado com sucesso."); // 3. Navega para o Lobby, passando o CÓDIGO
+      // 3. Navega para o Lobby, passando o CÓDIGO
 
       navigate("/sala", { state: { codigo: pinDaSala } });
     } catch (err) {
-      console.error("Erro no processo de criar/entrar na sala:", err);
       const apiErrorMessage =
         err.response?.data?.message || err.response?.data || err.message;
       alert(
@@ -108,92 +97,71 @@ export default function CriarSala() {
 
   return (
     <>
-            <Header />     {" "}
+      <Header />
       <div className="criar-sala-container">
-               {" "}
         <div className="criar-sala-content">
-                    <h1 className="criar-sala-title">CRIAR SALA</h1>         {" "}
+          <h1 className="criar-sala-title">CRIAR SALA</h1>
           <div className="sala-card">
-                       {" "}
             <button className="close-btn" onClick={handleFechar}>
               ×
             </button>
-                        {/* Input para o Nome da Sala */}           {" "}
+            {/* Input para o Nome da Sala */}
             <div className="form-group">
-                            <label className="form-label">Nome da Sala</label>
-                           {" "}
+              <label className="form-label">Nome da Sala</label>
               <input
                 type="text"
                 value={nomeSala}
                 onChange={(e) => setNomeSala(e.target.value)}
-                className="form-select" // Pode ajustar a classe se necessário
+                className="form-select"
                 placeholder="Ex: Sala da Turma X"
-                disabled={criandoSala} // Desabilita durante o loading
+                disabled={criandoSala}
               />
-                         {" "}
             </div>
-                        {/* Select para o Formulário (Questionário) */}         
-             {" "}
+            {/* Select para o Formulário (Questionário) */}
             <div className="form-group">
-                           {" "}
-              <label className="form-label">Título do questionário</label>     
-                     {" "}
+              <label className="form-label">Título do questionário</label>
               <select
                 value={idFormularioSelecionado}
                 onChange={(e) => setIdFormularioSelecionado(e.target.value)}
                 className="form-select"
-                disabled={loading || criandoSala} // Desabilita nos dois loadings
+                disabled={loading || criandoSala}
               >
-                               {" "}
                 <option value="">
-                                   {" "}
-                  {loading ? "Carregando..." : "Selecione o Questionário"}     
-                           {" "}
+                  {loading ? "Carregando..." : "Selecione o Questionário"}
                 </option>
-                                {/* Mapeia a lista de FORMULÁRIOS */}           
-                   {" "}
+                {/* Mapeia a lista de FORMULÁRIOS */}
                 {!loading &&
                   !error &&
-                  formularios.map(
-                    (
-                      form // Usa idFormulario e titulo (conforme vimos na API)
-                    ) => (
-                      <option key={form.idFormulario} value={form.idFormulario}>
-                                            {form.titulo}                 {" "}
-                      </option>
-                    )
-                  )}
-                                {/* Mostra erro se houver */}               {" "}
+                  formularios.map((form) => (
+                    <option key={form.idFormulario} value={form.idFormulario}>
+                      {form.titulo}
+                    </option>
+                  ))}
+                {/* Mostra erro se houver */}
                 {error && (
                   <option value="" disabled>
                     {error}
                   </option>
                 )}
-                             {" "}
               </select>
-                         {" "}
             </div>
-                        {/* Mensagem se não encontrar formulários */}           {" "}
+            {/* Mensagem se não encontrar formulários */}
             {!loading && !error && formularios.length === 0 && (
               <p style={{ textAlign: "center", color: "red" }}>
-                                Nenhum questionário encontrado.              {" "}
+                Nenhum questionário encontrado.
               </p>
             )}
-                        {/* Botão Criar */}           {" "}
+            {/* Botão Criar */}
             <button
               className="criar-btn"
               onClick={handleCriar}
-              disabled={loading || criandoSala} // Desabilita nos dois loadings
+              disabled={loading || criandoSala}
             >
-                            {criandoSala ? "CRIANDO..." : "CRIAR"}           {" "}
+              {criandoSala ? "CRIANDO..." : "CRIAR"}
             </button>
-                     {" "}
           </div>
-                 {" "}
         </div>
-             {" "}
       </div>
-         {" "}
     </>
   );
 }

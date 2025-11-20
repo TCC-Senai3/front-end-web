@@ -26,9 +26,7 @@ class CacheManager {
 
     this.cache.set(key, cacheItem);
 
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`💾 Cache SET: ${key} (TTL: ${ttl}ms)`);
-    }
+    // Cache definido silenciosamente
 
     return cacheItem;
   }
@@ -46,9 +44,7 @@ class CacheManager {
     if (isExpired) {
       this.cache.delete(key);
 
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`⏰ Cache EXPIRED: ${key}`);
-      }
+      // Cache expirado removido silenciosamente
 
       return null;
     }
@@ -57,9 +53,7 @@ class CacheManager {
     cacheItem.accessCount++;
     cacheItem.lastAccess = Date.now();
 
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`📖 Cache HIT: ${key} (acessos: ${cacheItem.accessCount})`);
-    }
+    // Cache hit silencioso
 
     return cacheItem.data;
   }
@@ -77,9 +71,7 @@ class CacheManager {
   delete(key) {
     const deleted = this.cache.delete(key);
 
-    if (process.env.NODE_ENV === 'development' && deleted) {
-      console.log(`🗑️ Cache DELETE: ${key}`);
-    }
+    // Cache deletado silenciosamente
 
     return deleted;
   }
@@ -89,9 +81,7 @@ class CacheManager {
     const size = this.cache.size;
     this.cache.clear();
 
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`🧹 Cache CLEARED: ${size} itens removidos`);
-    }
+    // Cache limpo silenciosamente
   }
 
   // Obter estatísticas do cache
@@ -135,9 +125,7 @@ class CacheManager {
     if (oldestKey) {
       this.cache.delete(oldestKey);
 
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`🚮 Cache EVICT LRU: ${oldestKey}`);
-      }
+      // Cache LRU removido silenciosamente
     }
   }
 
@@ -154,9 +142,7 @@ class CacheManager {
 
     keysToDelete.forEach(key => this.cache.delete(key));
 
-    if (keysToDelete.length > 0 && process.env.NODE_ENV === 'development') {
-      console.log(`🧽 Cache CLEANUP: ${keysToDelete.length} itens expirados removidos`);
-    }
+    // Limpeza de cache concluída silenciosamente
   }
 
   // Iniciar timer de limpeza automática

@@ -35,7 +35,6 @@ const useCache = (cacheKey, {
       setError(null);
       return data;
     } catch (err) {
-      console.error(`Erro ao carregar do cache (${cacheKey}):`, err);
       setError(err);
       return null;
     } finally {
@@ -70,7 +69,6 @@ const useCache = (cacheKey, {
       setError(null);
       return true;
     } catch (err) {
-      console.error(`Erro ao salvar no cache (${cacheKey}):`, err);
       setError(err);
       return false;
     }
@@ -87,7 +85,6 @@ const useCache = (cacheKey, {
       setError(null);
       return true;
     } catch (err) {
-      console.error(`Erro ao remover do cache (${cacheKey}):`, err);
       setError(err);
       return false;
     }
