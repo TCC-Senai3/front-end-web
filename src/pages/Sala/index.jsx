@@ -31,12 +31,12 @@ export default function Sala() {
 
   const isMountedRef = useRef(true);
 
-  const [usuarioSelecionado, setUsuarioSelecionado] = useState(null);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const userCardRefs = useRef({}); 
+  const [usuarioSelecionado, setUsuarioSelecionado] = useState(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const userCardRefs = useRef({}); 
 
-  // Referência para o contêiner principal da sala para fechar o pop-up ao clicar fora
-  const salaContainerRef = useRef(null);
+  // Referência para o contêiner principal da sala para fechar o pop-up ao clicar fora
+  const salaContainerRef = useRef(null);
 
   // --- 2. MAPA DE AVATARES ---
   const avatarMap = {
@@ -57,66 +57,71 @@ export default function Sala() {
     return avatarMap[cleanName] || userProfileImage;
   };
 
-  const handleUserClick = (participanteId) => {
-    if (!isDonoDaSala) return;
+  const handleUserClick = (participanteId) => {
+    if (!isDonoDaSala) return;
+    
+    // Se clicar em si mesmo, deseleciona e sai
+    if (participanteId === user.id) {
+      setUsuarioSelecionado(null);
+      return;
+    }
 
-    if (participanteId === user.id) {
-      setUsuarioSelecionado(null); // Desseleciona se já estiver selecionado
-      return;
-    }
+    const userToSelect = usuarios.find((u) => u.id === participanteId);
 
-    // Se já estiver selecionado, mostra o modal de confirmação
-    if (usuarioSelecionado && usuarioSelecionado.id === participanteId) {
-      setShowConfirmModal(true);
-    } else {
-      // Senão, seleciona para mostrar o hover vermelho
-      const userToSelect = usuarios.find((u) => u.id === participanteId);
-      setUsuarioSelecionado(userToSelect || null);
+    if (userToSelect) {
+      // CORREÇÃO: Seleciona o usuário e abre o modal em um único clique
+      setUsuarioSelecionado(userToSelect);
+      setShowConfirmModal(true);
+    } else {
+        setUsuarioSelecionado(null);
+        setShowConfirmModal(false);
     }
-  };
+  };
 
   // Efeito para fechar o pop-up ao clicar fora
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Checa se o clique foi fora do contêiner principal da sala.
+      // Checa se o clique foi fora do contêiner principal da sala e fora do modal (se estiver aberto).
       if (
         salaContainerRef.current &&
-        !salaContainerRef.current.contains(event.target)
+        !salaContainerRef.current.contains(event.target) &&
+        !event.target.closest('.confirm-modal-overlay') // Ignora cliques no overlay/modal
       ) {
         setUsuarioSelecionado(null);
+        setShowConfirmModal(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // --- FUNÇÃO ATUALIZADA (com remoção local para o dono) ---
-  const handleExpulsar = async () => {
-    if (!salaInfo || !usuarioSelecionado || actionLoading || !isDonoDaSala)
-      return;
+  // --- FUNÇÃO ATUALIZADA (com remoção local para o dono) ---
+  const handleExpulsar = async () => {
+    if (!salaInfo || !usuarioSelecionado || actionLoading || !isDonoDaSala)
+      return;
 
-    setShowConfirmModal(false);
-    setActionLoading(true);
-    const idUsuarioExpulso = usuarioSelecionado.id;
+    setShowConfirmModal(false);
+    setActionLoading(true);
+    const idUsuarioExpulso = usuarioSelecionado.id;
 
-    try {
-      await salaService.expulsarUsuario(codigo, idUsuarioExpulso);
+    try {
+      await salaService.expulsarUsuario(codigo, idUsuarioExpulso);
 
-      // Remove o usuário da lista local do dono
-      setUsuarios((prev) => prev.filter((u) => u.id !== idUsuarioExpulso)); 
+      // Remove o usuário da lista local do dono
+      setUsuarios((prev) => prev.filter((u) => u.id !== idUsuarioExpulso)); 
 
-      setUsuarioSelecionado(null); // Fecha o pop-up
-    } catch (err) {
-      setErrorMsg("Falha ao expulsar usuário. Apenas o dono pode fazer isso.");
-    } finally {
-      setActionLoading(false);
-    }
-  };
+      setUsuarioSelecionado(null); // Fecha o pop-up
+    } catch (err) {
+      setErrorMsg("Falha ao expulsar usuário. Apenas o dono pode fazer isso.");
+    } finally {
+      setActionLoading(false);
+    }
+  };
 
-  const handleCancelExpulsar = () => {
-    setShowConfirmModal(false);
-    setUsuarioSelecionado(null);
-  };
+  const handleCancelExpulsar = () => {
+    setShowConfirmModal(false);
+    setUsuarioSelecionado(null);
+  };
 
   const carregarDadosIniciais = useCallback(async () => {
     if (!codigo || !user?.id) return;
@@ -147,10 +152,10 @@ export default function Sala() {
       } else {
         setUsuarios([]);
       }
-    } catch (err) {
-      if (isMountedRef.current)
-        setErrorMsg("Falha ao carregar informações da sala.");
-    } finally {
+    } catch (err) {
+      if (isMountedRef.current)
+        setErrorMsg("Falha ao carregar informações da sala.");
+    } finally {
       if (isMountedRef.current) setLoading(false);
     }
   }, [codigo, user?.id]);
@@ -198,29 +203,29 @@ export default function Sala() {
                 return [...prev, novoUsuario];
               });
 
-              // Busca dados completos do usuário (ex: avatar) via API
-              userService
-                .getUserById(novoUsuario.id)
-                .then((fullUser) => {
-                  if (isMountedRef.current && fullUser) {
-                    setUsuarios((prev) =>
-                      prev.map((u) => (u.id === fullUser.id ? fullUser : u))
-                    );
-                  }
-                })
-                .catch(() => {});
+              // Busca dados completos do usuário (ex: avatar) via API
+              userService
+                .getUserById(novoUsuario.id)
+                .then((fullUser) => {
+                  if (isMountedRef.current && fullUser) {
+                    setUsuarios((prev) =>
+                      prev.map((u) => (u.id === fullUser.id ? fullUser : u))
+                    );
+                  }
+                })
+                .catch(() => {});
             } else if (payload.type === "USUARIO_SAIU") {
                 setUsuarios((prev) =>
                   prev.filter((u) => u.id !== payload.idUsuario)
                 );
                 setUsuarioSelecionado(null);
-            } else if (payload.type === "SALA_FECHADA") {
-                navigate("/game", { replace: true });
-            }
+            } else if (payload.type === "SALA_FECHADA") {
+                navigate("/game", { replace: true });
+            }
 
-          } catch (e) {
-            // Erro silencioso no WebSocket
-          }
+          } catch (e) {
+            // Erro silencioso no WebSocket
+          }
         });
 
 
@@ -230,20 +235,20 @@ export default function Sala() {
             try {
                 const payload = JSON.parse(message.body);
             
-              
-              if (payload.type === "EXPULSO") {
-                  // O WebSocket está responsável por redirecionar.
-                  navigate("/game", { replace: true });
-              }
-          } catch (e) {
-              // Erro silencioso no WebSocket privado
-          }
+              
+              if (payload.type === "EXPULSO") {
+                  // O WebSocket está responsável por redirecionar.
+                  navigate("/game", { replace: true });
+              }
+          } catch (e) {
+              // Erro silencioso no WebSocket privado
+          }
         });
         
 
       },
-      onStompError: () => {},
-      onWebSocketError: () => {},
+      onStompError: () => {},
+      onWebSocketError: () => {},
     });
 
     client.activate();
@@ -273,19 +278,19 @@ export default function Sala() {
 
 // 🚀 NOVO: Efeito de Contingência para Expulsão/Saída
 useEffect(() => {
-    // Esta lógica monitora se o usuário logado desapareceu da lista de participantes.
-    // Se ele desaparecer da lista (via mensagem USUARIO_SAIU) mas o redirecionamento 
-    // privado do WebSocket (EXPULSO) falhou, nós forçamos a navegação.
-    if (loading || !user || !salaInfo) return;
+    // Esta lógica monitora se o usuário logado desapareceu da lista de participantes.
+    // Se ele desaparecer da lista (via mensagem USUARIO_SAIU) mas o redirecionamento 
+    // privado do WebSocket (EXPULSO) falhou, nós forçamos a navegação.
+    if (loading || !user || !salaInfo) return;
 
-    const userIsStillInList = usuarios.some(p => p.id === user.id);
+    const userIsStillInList = usuarios.some(p => p.id === user.id);
 
-    // Se o usuário logado NÃO é o dono E NÃO está mais na lista, ele foi expulso/saiu.
-    if (!isDonoDaSala && !userIsStillInList && !actionLoading) {
-        // Navega de volta, garantindo que o cliente não fique preso na sala.
-        navigate("/game", { replace: true });
-    }
-    
+    // Se o usuário logado NÃO é o dono E NÃO está mais na lista, ele foi expulso/saiu.
+    if (!isDonoDaSala && !userIsStillInList && !actionLoading) {
+        // Navega de volta, garantindo que o cliente não fique preso na sala.
+        navigate("/game", { replace: true });
+    }
+    
 }, [usuarios, user, isDonoDaSala, loading, navigate, salaInfo, actionLoading]);
 
 
@@ -299,9 +304,9 @@ useEffect(() => {
         destination,
         body: JSON.stringify({ idUsuario: user.id }),
       });
-    } catch (err) {
-      setErrorMsg("Falha ao enviar comando de iniciar jogo.");
-    } finally {
+    } catch (err) {
+      setErrorMsg("Falha ao enviar comando de iniciar jogo.");
+    } finally {
       setActionLoading(false);
     }
   };
@@ -324,9 +329,9 @@ useEffect(() => {
         // Redireciona imediatamente, corrigindo o bug onde o WS falhava
         navigate("/game", { replace: true });
       }
-    } catch (err) {
-      setErrorMsg("Erro ao sair/desmanchar. Tente novamente.");
-    } finally {
+    } catch (err) {
+      setErrorMsg("Erro ao sair/desmanchar. Tente novamente.");
+    } finally {
       setActionLoading(false);
     }
   };
@@ -371,19 +376,19 @@ useEffect(() => {
             ) : usuarios.length === 0 ? (
               <div className="sala-mensagem">Aguardando jogadores...</div>
             ) : (
-              usuarios.map((participante) => {
-                const avatarSrc = getAvatarSrc(participante.avatar);
-                const isSelected = usuarioSelecionado?.id === participante.id;
-                const canBeExpelled = isDonoDaSala && participante.id !== user?.id;
+              usuarios.map((participante) => {
+                const avatarSrc = getAvatarSrc(participante.avatar);
+                const isSelected = usuarioSelecionado?.id === participante.id;
+                const canBeExpelled = isDonoDaSala && participante.id !== user?.id;
 
-                return (
-                  
-                  <div
-                    key={participante.id}
-                    className={`sala-user ${isSelected && canBeExpelled ? "selected-user" : ""}`}
-                    onClick={() => handleUserClick(participante.id)}
-                    ref={(el) => (userCardRefs.current[participante.id] = el)}
-                  >
+                return (
+                  
+                  <div
+                    key={participante.id}
+                    className={`sala-user ${isSelected && canBeExpelled ? "selected-user" : ""}`}
+                    onClick={() => handleUserClick(participante.id)}
+                    ref={(el) => (userCardRefs.current[participante.id] = el)}
+                  >
                     {/* Container do Avatar */}
                     <div className="sala-avatar">
                       <img
@@ -415,37 +420,37 @@ useEffect(() => {
                 );
               })
             )}
-          </div>
-        </div>
-      </div>
+          </div>
+        </div>
+      </div>
 
-      {/* Modal de Confirmação de Expulsão */}
-      {showConfirmModal && usuarioSelecionado && (
-        <div className="confirm-modal-overlay" onClick={handleCancelExpulsar}>
-          <div className="confirm-modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3 className="confirm-modal-title">Confirmar Expulsão</h3>
-            <p className="confirm-modal-message">
-              Tem certeza que deseja expulsar <strong>{usuarioSelecionado.nome || "este usuário"}</strong> da sala?
-            </p>
-            <div className="confirm-modal-buttons">
-              <button
-                className="confirm-btn confirm-btn-cancel"
-                onClick={handleCancelExpulsar}
-                disabled={actionLoading}
-              >
-                Cancelar
-              </button>
-              <button
-                className="confirm-btn confirm-btn-confirm"
-                onClick={handleExpulsar}
-                disabled={actionLoading}
-              >
-                {actionLoading ? "Expulsando..." : "Confirmar"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
+      {/* Modal de Confirmação de Expulsão */}
+      {showConfirmModal && usuarioSelecionado && (
+        <div className="confirm-modal-overlay" onClick={handleCancelExpulsar}>
+          <div className="confirm-modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3 className="confirm-modal-title">Confirmar Expulsão</h3>
+            <p className="confirm-modal-message">
+              Tem certeza que deseja expulsar <strong>{usuarioSelecionado.nome || "este usuário"}</strong> da sala?
+            </p>
+            <div className="confirm-modal-buttons">
+              <button
+                className="confirm-btn confirm-btn-cancel"
+                onClick={handleCancelExpulsar}
+                disabled={actionLoading}
+              >
+                Cancelar
+              </button>
+              <button
+                className="confirm-btn confirm-btn-confirm"
+                onClick={handleExpulsar}
+                disabled={actionLoading}
+              >
+                {actionLoading ? "Expulsando..." : "Confirmar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }
