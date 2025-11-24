@@ -39,7 +39,7 @@ export default defineConfig(({ command, mode }) => {
     },
     server: {
       port: 3000,
-      open: true,
+      open: false,
       proxy: {
         // Configuração do proxy para a API
         '/api': {
