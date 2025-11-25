@@ -44,7 +44,7 @@ export default function GameContent() {
   useEffect(() => {
     loadRankingData(); // Recarregar dados periodicamente (opcional)
 
-    const interval = setInterval(loadRankingData, 30000);
+    const interval = setInterval(loadRankingData, 300000);
     return () => clearInterval(interval);
   }, [loadRankingData]); // ✅ 4. Dependência corrigida para 'loadRankingData'
 
