@@ -117,14 +117,16 @@ export default function PerfilModal({
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleEdit = () => {
-    setForm({
-      name: user.name,
-      bio: user.bio || "",
-      avatar: user.avatar || "", // O valor no estado 'user' já está limpo
-    });
-    setIsEditing(true);
-  };
+  const handleEdit = () => {
+    // Garante que o avatar seja inicializado corretamente
+    const avatarInicial = cleanAvatarName(user.avatar?.trim()) || user.avatar || "";
+    setForm({
+      name: user.name,
+      bio: user.bio || "",
+      avatar: avatarInicial, // O valor no estado 'user' já está limpo
+    });
+    setIsEditing(true);
+  };
 
   // ****** CORREÇÃO APLICADA AQUI ******
   const handleAvatarSelect = (key) => {
@@ -179,10 +181,12 @@ export default function PerfilModal({
       </div>
     );
 
-  // --- Puxar avatar corretamente ---
-  // A lógica de limpeza é crucial se o usuário ainda tiver o hash no BD
-  const avatarKey = cleanAvatarName(user.avatar?.trim());
-  const avatarSrc = avatarMap[avatarKey] || avatarMap[avatarKey?.replace(/\.[^/.]+$/, "")] || userProfileImage;
+  // --- Puxar avatar corretamente ---
+  // Se estiver editando, usa o avatar do form (preview imediato), senão usa o do user
+  const avatarKeyParaExibir = isEditing && form.avatar 
+    ? form.avatar 
+    : cleanAvatarName(user.avatar?.trim());
+  const avatarSrc = avatarMap[avatarKeyParaExibir] || avatarMap[avatarKeyParaExibir?.replace(/\.[^/.]+$/, "")] || userProfileImage;
 
   return (
     <div className="perfil-modal-wrapper">
@@ -266,22 +270,25 @@ export default function PerfilModal({
             </div>
           </div>
 
-          {/* Bio */}
-          <div className="perfil-bio-section">
-            <label className="perfil-bio-label">BIOGRAFIA</label>
-            {isEditing ? (
-              <textarea
-                name="bio"
-                value={form.bio}
-                onChange={handleChange}
-                placeholder="Digite sua biografia"
-                rows={3}
-                maxLength={200}
-              />
-            ) : (
-              <p className="perfil-bio-text">{user.bio}</p>
-            )}
-          </div>
+          {/* Bio */}
+          <div className="perfil-bio-section">
+            <label className="perfil-bio-label">BIOGRAFIA</label>
+            {isEditing ? (
+              <div className="perfil-bio-edit-container">
+                <textarea
+                  name="bio"
+                  value={form.bio}
+                  onChange={handleChange}
+                  placeholder="Digite sua biografia"
+                  rows={3}
+                  maxLength={100}
+                />
+                <span className="bio-character-count">{form.bio.length}/100</span>
+              </div>
+            ) : (
+              <p className="perfil-bio-text">{user.bio}</p>
+            )}
+          </div>
 
           {/* Botões de salvar/editar */}
           {isEditing && (

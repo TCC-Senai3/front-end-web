@@ -22,6 +22,24 @@ export const getPontuacaoUsuario = async (userId) => {
   }
 };
 
+// Buscar pontuação atualizada do usuário logado (sem precisar do userId)
+export const getPontuacaoAtual = async () => {
+  try {
+    const response = await api.get("/usuarios/me");
+    const pontuacao = response.data?.pontuacao;
+    
+    // Retorna a pontuação se existir, caso contrário retorna 0
+    // Usa !== undefined para permitir que 0 seja um valor válido
+    if (pontuacao !== undefined && pontuacao !== null) {
+      return Number(pontuacao);
+    }
+    return 0;
+  } catch (error) {
+    console.error("Erro ao buscar pontuação atual do usuário:", error);
+    throw error;
+  }
+};
+
 // Adicionar pontos ao usuário
 export const adicionarPontos = async (userId, pontos) => {
   try {
@@ -108,6 +126,7 @@ export const getRankingSala = async (idSala) => {
 const rankingService = {
   getRankingGlobal,
   getPontuacaoUsuario,
+  getPontuacaoAtual,
   adicionarPontos,
   definirPontuacao,
   getHistoricoUsuario,

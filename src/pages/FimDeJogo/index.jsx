@@ -39,6 +39,8 @@ export default function FimDeJogo() {
   const [ranking, setRanking] = useState([]);
   const [loadingPage, setLoadingPage] = useState(true);
   const [refreshError, setRefreshError] = useState(null);
+  const [pontuacaoAtual, setPontuacaoAtual] = useState(0);
+  const [carregandoPontuacao, setCarregandoPontuacao] = useState(true);
 
   // --- TRAVA DE SEGURANÇA (REF) ---
   // useRef mantém o valor entre renderizações e não causa re-render
@@ -65,7 +67,33 @@ export default function FimDeJogo() {
     return trophies[pos] || image8;
   };
 
-  // --- EFEITO 1: ATUALIZA HEADER (COM TRAVA) ---
+  // --- EFEITO 1: BUSCA PONTUAÇÃO INICIAL DO BACKEND ---
+  useEffect(() => {
+    if (authLoading || !user?.id) return;
+
+    const buscarPontuacaoInicial = async () => {
+      try {
+        setCarregandoPontuacao(true);
+        const pontuacao = await rankingService.getPontuacaoAtual();
+        if (pontuacao !== undefined) {
+          setPontuacaoAtual(pontuacao);
+          console.log(`Pontuação inicial carregada do backend: ${pontuacao}`);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar pontuação inicial:", error);
+        // Em caso de erro, usa a pontuação do user como fallback
+        if (user?.pontuacao !== undefined) {
+          setPontuacaoAtual(user.pontuacao);
+        }
+      } finally {
+        setCarregandoPontuacao(false);
+      }
+    };
+
+    buscarPontuacaoInicial();
+  }, [authLoading, user?.id]);
+
+  // --- EFEITO 1.5: ATUALIZA HEADER (COM TRAVA) ---
   useEffect(() => {
     // Se o auth ainda está carregando, espera.
     if (authLoading) return;
@@ -74,11 +102,11 @@ export default function FimDeJogo() {
     if (jaAtualizouRef.current) return;
 
     const runRefresh = async () => {
-      console.log("Tentando atualizar pontuação do usuário (Uma vez)...");
+      console.log("Tentando atualizar header do usuário (Uma vez)...");
       jaAtualizouRef.current = true; // <--- TRAVA IMEDIATAMENTE
       try {
         await refreshUserData();
-        console.log("Pontuação atualizada com sucesso.");
+        console.log("Header atualizado com sucesso.");
       } catch (error) {
         console.error("Erro silencioso ao atualizar header:", error);
       }
@@ -86,6 +114,50 @@ export default function FimDeJogo() {
 
     runRefresh();
   }, [authLoading, refreshUserData]);
+
+  // --- EFEITO 3: ATUALIZAÇÃO AUTOMÁTICA DE PONTOS (POLLING) ---
+  useEffect(() => {
+    if (!user?.id || authLoading || carregandoPontuacao) return;
+
+    let intervalId;
+    let isMounted = true;
+
+    const atualizarPontos = async () => {
+      try {
+        const novaPontuacao = await rankingService.getPontuacaoAtual();
+        
+        if (isMounted && novaPontuacao !== undefined && novaPontuacao !== null) {
+          // Atualiza apenas se a pontuação mudou
+          setPontuacaoAtual((pontuacaoAnterior) => {
+            if (novaPontuacao !== pontuacaoAnterior) {
+              // Atualiza também o header através do refreshUserData
+              refreshUserData().catch(err => 
+                console.error("Erro ao atualizar header:", err)
+              );
+              console.log(`Pontos atualizados automaticamente: ${pontuacaoAnterior} -> ${novaPontuacao}`);
+              return novaPontuacao;
+            }
+            return pontuacaoAnterior;
+          });
+        }
+      } catch (error) {
+        console.error("Erro ao atualizar pontos automaticamente:", error);
+      }
+    };
+
+    // Primeira atualização imediata após o carregamento inicial
+    atualizarPontos();
+
+    // Configura polling a cada 2 segundos (mais frequente para atualização mais rápida)
+    intervalId = setInterval(atualizarPontos, 2000);
+
+    return () => {
+      isMounted = false;
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [user?.id, authLoading, carregandoPontuacao, refreshUserData]);
 
 
   // --- EFEITO 2: BUSCA O RANKING DA SALA ---
@@ -160,7 +232,9 @@ export default function FimDeJogo() {
         <div className="pontuacao-total">
           <h2>
             Sua Pontuação Total: 
-            <span className="score-highlight">{user?.pontuacao ?? "..."}</span>
+            <span className="score-highlight">
+              {carregandoPontuacao ? "..." : pontuacaoAtual}
+            </span>
           </h2>
         </div>
 
@@ -170,13 +244,14 @@ export default function FimDeJogo() {
            <div style={{marginTop: 20, color: '#fff'}}>Ranking indisponível.</div>
         )}
 
-        {/* PÓDIO */}
+        {/* PÓDIO - Layout reorganizado */}
         {podiumData.length > 0 && (
-          <div className="podium">
-            <h2>Pódio da Partida</h2>
-            {podiumData.map((jogador) => (
-                <div key={jogador.id} className={`podium-col pos-${jogador.posicao}`}>
-                  <img src={getTrophy(jogador.posicao)} alt={`Posição ${jogador.posicao}`} className="trophy" />
+          <div className="podium-wrapper">
+            <h2 className="podium-title">Pódio da Partida</h2>
+            <div className="podium-content">
+              {podiumData.slice(0, 1).map((jogador) => (
+                <div key={jogador.id} className="podium-first-place">
+                  <img src={getTrophy(jogador.posicao)} alt={`Posição ${jogador.posicao}`} className="trophy-large" />
                   <div className="user-card">
                     <div className="avatar">
                        <img 
@@ -189,7 +264,8 @@ export default function FimDeJogo() {
                   </div>
                   <div className="points">{jogador.pontos} pts</div>
                 </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
 
@@ -199,7 +275,7 @@ export default function FimDeJogo() {
           </button>
         </div>
 
-        {/* LISTA COMPLETA */}
+        {/* LISTA COMPLETA - Posicionada no canto inferior esquerdo */}
         {ranking.length > 0 && (
           <div className="lista-final">
             <h2>Classificação Geral</h2>
