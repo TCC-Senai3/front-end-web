@@ -3,7 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../../components/header";
 import salaService from "../../services/salaService";
 import userService from "../../services/userService";
-import { useAuth } from "../../hooks/useAuth";
+// ✅ CORREÇÃO 1: Importar useAuth
+import { useAuth } from "../../hooks/useAuth"; 
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import "./style.css"; 
@@ -17,7 +18,8 @@ import patoIcon from "../../assets/images/Pato.svg";
 export default function Sala() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  // ✅ CORREÇÃO 2: Desestruturar getAuthToken do useAuth
+  const { user, getAuthToken } = useAuth(); 
 
   const codigo = location.state?.codigo || null;
   const [usuarios, setUsuarios] = useState([]);
@@ -59,8 +61,8 @@ export default function Sala() {
 
   const handleUserClick = (participanteId) => {
     if (!isDonoDaSala) return;
-    
-    // Se clicar em si mesmo, deseleciona e sai
+    
+    // Se clicar em si mesmo, deseleciona e sai
     if (participanteId === user.id) {
       setUsuarioSelecionado(null);
       return;
@@ -69,13 +71,13 @@ export default function Sala() {
     const userToSelect = usuarios.find((u) => u.id === participanteId);
 
     if (userToSelect) {
-      // CORREÇÃO: Seleciona o usuário e abre o modal em um único clique
+      // Seleciona o usuário e abre o modal em um único clique
       setUsuarioSelecionado(userToSelect);
       setShowConfirmModal(true);
     } else {
-        setUsuarioSelecionado(null);
-        setShowConfirmModal(false);
-    }
+        setUsuarioSelecionado(null);
+        setShowConfirmModal(false);
+    }
   };
 
   // Efeito para fechar o pop-up ao clicar fora
@@ -85,10 +87,10 @@ export default function Sala() {
       if (
         salaContainerRef.current &&
         !salaContainerRef.current.contains(event.target) &&
-        !event.target.closest('.confirm-modal-overlay') // Ignora cliques no overlay/modal
+        !event.target.closest('.confirm-modal-overlay') // Ignora cliques no overlay/modal
       ) {
         setUsuarioSelecionado(null);
-        setShowConfirmModal(false);
+        setShowConfirmModal(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -166,6 +168,14 @@ export default function Sala() {
 
     isMountedRef.current = true;
     const socketUrl = "https://tccdrakes.azurewebsites.net/ws";
+    
+    // ✅ CORREÇÃO 3: Obter o token
+    const token = getAuthToken(); 
+    if (!token) {
+      console.error("Token de autenticação não encontrado.");
+      return;
+    }
+
 
     const client = new Client({
       webSocketFactory: () => new SockJS(socketUrl),
@@ -173,8 +183,9 @@ export default function Sala() {
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
       
-      // ✅ ESSENCIAL: Configura o Principal Name para o canal privado /user/queue/...
+      // ✅ CORREÇÃO 4: Adicionar o Authorization Header e o login (Principal Name)
       connectHeaders: {
+          Authorization: `Bearer ${token}`, 
           login: String(user.id),
       },
       
@@ -259,8 +270,8 @@ export default function Sala() {
       if (stompClientRef.current?.active) stompClientRef.current.deactivate();
       setIsConnected(false);
     };
-    // As dependências estão corretas, incluindo 'navigate'
-  }, [codigo, navigate, user?.id]);
+    // ✅ CORREÇÃO 5: Incluir getAuthToken nas dependências do useEffect
+  }, [codigo, navigate, user?.id, getAuthToken]);
 
   // Trigger Carga Inicial (Mantido)
   useEffect(() => {
@@ -276,7 +287,7 @@ export default function Sala() {
   }, [codigo, user?.id, carregarDadosIniciais, navigate]);
 
 
-// 🚀 NOVO: Efeito de Contingência para Expulsão/Saída
+// 🚀 Efeito de Contingência para Expulsão/Saída (Mantido)
 useEffect(() => {
     // Esta lógica monitora se o usuário logado desapareceu da lista de participantes.
     // Se ele desaparecer da lista (via mensagem USUARIO_SAIU) mas o redirecionamento 
@@ -311,7 +322,7 @@ useEffect(() => {
     }
   };
 
-// ✅ CORREÇÃO APLICADA: Redirecionamento forçado no sucesso da API (para saída voluntária)
+// ✅ Redirecionamento forçado no sucesso da API (para saída voluntária) (Mantido)
   const handleDesmanchar = async () => {
     if (!salaInfo || !user) return;
     if (!window.confirm(isDonoDaSala ? "Tem certeza que deseja desmanchar a sala e remover todos os participantes?" : "Tem certeza que deseja sair da sala?"))
@@ -453,4 +464,4 @@ useEffect(() => {
       )}
     </>
   );
-}//,
+}
