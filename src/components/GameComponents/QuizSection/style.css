@@ -295,63 +295,84 @@
 }
 
 .questionarios-item-btn:disabled {
-    background: #cccccc;
-    cursor: not-allowed;
+background: #cccccc;
+cursor: not-allowed;
 }
 
 @media (max-width: 768px) {
-    .questionarios-container {
-        width: 100%;
-        max-width: 400px;
-        padding: 30px 15px 15px 15px;
-        margin: 0 auto;
-        margin-top: -30px;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-        position: relative;
-        z-index: 1;
-    }
+.questionarios-container {
+width: 100%;
+max-width: 360px;
+padding: 24px 16px 16px 16px;
+margin: 12px auto 0 auto;
+overflow: visible;
+display: flex;
+flex-direction: column;
+align-items: stretch;
+justify-content: flex-start;
+position: relative;
+z-index: 1;
+min-height: auto;
+max-height: none;
+box-sizing: border-box;
+}
 
-    .quiz-slogan {
-        width: 280px;
-        top: -15px;
-        z-index: 1;
-    }
+.quiz-slogan {
+width: 260px;
+top: -18px;
+left: 18px;
+z-index: 1;
+}
 
-    .questionarios-item {
-        padding: 15px;
-        width: 100%;
-        box-sizing: border-box;
-    }
+.search-container {
+margin: 12px 0;
+max-width: 100%;
+}
 
-    .questionarios-item-btn {
-        position: relative;
-        right: auto;
-        top: auto;
-        transform: none;
-        margin-top: 10px;
-        opacity: 1;
-        visibility: visible;
-        width: 100%;
-    }
+.questionarios-item {
+padding: 15px;
+width: 100%;
+box-sizing: border-box;
+}
 
-    .questionarios-item:hover .questionarios-item-titulo,
-    .questionarios-item:hover .questionarios-item-desc {
-        max-width: 100%;
-    }
+.questionarios-item-btn {
+position: relative;
+right: auto;
+top: auto;
+transform: none;
+margin-top: 10px;
+opacity: 1;
+visibility: visible;
+width: 100%;
+}
 
-    .questionarios-lista {
-        overflow-x: hidden;
-        overflow-y: auto;
-    }
+.questionarios-item:hover .questionarios-item-titulo,
+.questionarios-item:hover .questionarios-item-desc {
+max-width: 100%;
+}
+
+.questionarios-lista {
+overflow-x: hidden;
+overflow-y: auto;
+}
 }
 
 /* ========== MODAL ESTILOS ========== */
 
 .quiz-modal-overlay {
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background: rgba(0, 0, 0, 0.5);
+backdrop-filter: blur(8px);
+-webkit-backdrop-filter: blur(8px);
+display: flex;
+align-items: center;
+justify-content: center;
+z-index: 9999;
+animation: fadeIn 0.3s ease;
     position: fixed;
     top: 0;
     left: 0;

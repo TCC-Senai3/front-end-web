@@ -1,0 +1,159 @@
+@import '../../assets/font/imports.css';
+
+.home-carousel {
+    width: 100%;
+    background-color: #F4F4F4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 80px 0 60px 0;
+    box-sizing: border-box;
+}
+
+.home-carousel-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    width: 100%;
+}
+
+.home-carousel-arrow {
+    border: none;
+    background: rgba(0, 0, 0, 0.04);
+    color: #3B3939;
+    font-size: 32px;
+    cursor: pointer;
+    padding: 8px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    backdrop-filter: blur(4px);
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.home-carousel-arrow:disabled {
+    cursor: default;
+    opacity: 0.5;
+}
+
+.home-carousel-arrow:hover {
+    background: rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+}
+
+.home-carousel-card {
+    width: 560px;
+    max-width: 95vw;
+    height: 310px;
+    border-radius: 18px;
+    padding: 0;
+    box-sizing: border-box;
+    background: transparent;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.10);
+    color: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    font-family: 'Poppins', 'Blinker', 'Inria Sans', Arial, sans-serif;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.home-carousel-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.16);
+}
+
+.home-carousel-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 18px;
+    display: block;
+}
+
+.home-carousel-arrow-icon {
+    width: 28px;
+    height: 38px;
+}
+
+.home-carousel-logo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.home-carousel-logo-main,
+.home-carousel-logo-sub {
+    font-family: 'Blinker', Arial, sans-serif;
+    font-weight: 700;
+    font-size: 32px;
+    letter-spacing: 0.04em;
+}
+
+.home-carousel-caption {
+    margin-top: 32px;
+    font-size: 14px;
+    font-family: 'Inria Sans', Arial, sans-serif;
+    opacity: 0.95;
+}
+
+.home-carousel-dots {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.home-carousel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    border: none;
+    background-color: #CFCFCF;
+    cursor: pointer;
+    padding: 0;
+}
+
+.home-carousel-dot--active {
+    width: 18px;
+    background-color: #3B3939;
+}
+
+@media (max-width: 768px) {
+    .home-carousel {
+        padding: 60px 0 40px 0;
+    }
+
+    .home-carousel-container {
+        gap: 18px;
+    }
+
+    .home-carousel-card {
+        width: 100%;
+        max-width: 340px;
+        height: auto;
+        padding: 0;
+    }
+
+    .home-carousel-image {
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+        margin: 0 auto;
+        border-radius: 16px;
+    }
+
+    .home-carousel-logo-main,
+    .home-carousel-logo-sub {
+        font-size: 26px;
+    }
+
+    .home-carousel-arrow {
+        font-size: 24px;
+        padding: 4px;
+    }
+}

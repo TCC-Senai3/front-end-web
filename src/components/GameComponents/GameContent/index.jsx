@@ -77,14 +77,14 @@ export default function GameContent() {
           className={`tab-button ${currentSlide === 0 ? "active" : ""}`}
           onClick={() => setCurrentSlide(0)}
         >
-                              Ranking                {" "}
+          Ranking
         </button>
-                       {" "}
+
         <button
           className={`tab-button ${currentSlide === 1 ? "active" : ""}`}
           onClick={() => setCurrentSlide(1)}
         >
-                              Questionário a            {" "}
+          Questionário
         </button>
                    {" "}
       </div>
