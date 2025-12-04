@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import "./style.css";
 import editIcon from "../../assets/images/Vector.png";
 import trophyIcon from "../../assets/images/trophy 1.svg";
@@ -20,14 +21,14 @@ export default function PerfilModal({
   user: propUser,
   isOpen = true,
 }) {
-  const navigate = useNavigate();
-  const [user, setUser] = useState(isMyProfile ? null : propUser);
-  const [form, setForm] = useState({ name: "", bio: "", avatar: "" });
-  const [isEditing, setIsEditing] = useState(false);
-  const [loading, setLoading] = useState(isMyProfile);
-  const [isSaving, setIsSaving] = useState(false);
-  const [showAvatarOptions, setShowAvatarOptions] = useState(false);
-  const { user: authUser } = useAuth();
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [form, setForm] = useState({ name: "", bio: "", avatar: "" });
+  const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [showAvatarOptions, setShowAvatarOptions] = useState(false);
+  const { user: authUser } = useAuth();
 
   // --- Avatares ---
   const avatarMap = {
@@ -56,10 +57,13 @@ export default function PerfilModal({
     { key: "Pato.svg", src: patoIcon, alt: "Pato" },
   ];
 
-  const handleCloseAndNavigate = useCallback(() => {
-    if (propOnClose) propOnClose();
-    navigate("/game");
-  }, [navigate, propOnClose]);
+  const handleCloseAndNavigate = useCallback(() => {
+    if (propOnClose) {
+      propOnClose();
+    } else {
+      navigate("/game");
+    }
+  }, [navigate, propOnClose]);
 
   // --- Buscar dados ---
   useEffect(() => {
@@ -68,33 +72,41 @@ export default function PerfilModal({
       try {
         let fetchedUserData;
 
-        if (isMyProfile) {
-          const myData = await userService.getMeuPerfil();
-          fetchedUserData = {
-            ...myData,
-            name: myData.nome || "Usuário",
-            points: myData.pontuacao || 0,
-            bio: myData.biografia?.trim() || "Sem biografia.",
-            // Limpeza de avatar aqui para garantir que o formulário comece com a chave correta
-            avatar: cleanAvatarName(myData.avatar?.trim()) || "",
-            position: myData.rank || "N/A",
-            memberSince: myData.dataCriacao ? new Date(myData.dataCriacao).getFullYear() : "N/A",
-            online: myData.online || false,
-          };
-        } else if (propUser && propUser.id) {
-          const userData = await userService.getUserById(propUser.id);
-          fetchedUserData = {
-            ...userData,
-            name: userData.nome || "Usuário",
-            points: userData.pontuacao || 0,
-            bio: userData.biografia?.trim() || "Sem biografia.",
-            // Limpeza de avatar para outros usuários
-            avatar: cleanAvatarName(userData.avatar?.trim()) || "",
-            position: userData.rank || "N/A",
-            memberSince: userData.dataCriacao ? new Date(userData.dataCriacao).getFullYear() : "N/A",
-            online: userData.online || false,
-          };
-        }
+        if (isMyProfile) {
+          const myData = await userService.getMeuPerfil();
+          fetchedUserData = {
+            ...myData,
+            name: myData.nome || "Usuário",
+            points: myData.pontuacao || 0,
+            bio: myData.biografia?.trim() || "Sem biografia.",
+            // Limpeza de avatar aqui para garantir que o formulário comece com a chave correta
+            avatar: cleanAvatarName(myData.avatar?.trim()) || "",
+            position: myData.rank || "N/A",
+            memberSince: myData.dataCriacao ? new Date(myData.dataCriacao).getFullYear() : "N/A",
+            online: myData.online || false,
+          };
+        } else if (propUser) {
+          // Sempre busca os dados completos do servidor, mesmo quando propUser é passado
+          const userId = propUser.id || propUser.idUsuario || propUser.id;
+          if (userId) {
+            const userData = await userService.getUserById(userId);
+            fetchedUserData = {
+              ...userData,
+              name: userData.nome || "Usuário",
+              points: userData.pontuacao || 0,
+              bio: userData.biografia?.trim() || "Sem biografia.",
+              // Limpeza de avatar para outros usuários
+              avatar: cleanAvatarName(userData.avatar?.trim()) || "",
+              position: userData.rank || "N/A",
+              memberSince: userData.dataCriacao ? new Date(userData.dataCriacao).getFullYear() : "N/A",
+              online: userData.online || false,
+            };
+          } else {
+            throw new Error("ID do usuário não encontrado");
+          }
+        } else {
+          throw new Error("Dados do usuário não fornecidos");
+        }
 
         setUser(fetchedUserData);
       } catch (error) {
@@ -136,62 +148,55 @@ export default function PerfilModal({
     setShowAvatarOptions(false);
   };
 
-  const handleSave = async () => {
-    if (!authUser) return alert("Você não está autenticado.");
-    if (!form.name.trim()) return alert("O nome não pode estar vazio.");
+  const handleSave = async () => {
+    if (!authUser) return alert("Você não está autenticado.");
 
-    setIsSaving(true);
-    try {
-      const updates = [];
+    setIsSaving(true);
+    try {
+      const updates = [];
 
-      // Atualizar biografia
-      if (form.bio !== user.bio) {
-        updates.push(userService.updateBiografia(authUser.id, { biografia: form.bio }));
-      }
+      // Atualizar biografia
+      if (form.bio !== user.bio) {
+        updates.push(userService.updateBiografia(authUser.id, { biografia: form.bio }));
+      }
 
-      // Atualizar avatar
+      // Atualizar avatar
       // form.avatar contém a string limpa (ex: 'Pato.svg')
-      if (form.avatar !== user.avatar) {
-        updates.push(userService.updateAvatar(authUser.id, { avatar: form.avatar }));
-      }
+      if (form.avatar !== user.avatar) {
+        updates.push(userService.updateAvatar(authUser.id, { avatar: form.avatar }));
+      }
 
-      // Aguarda as atualizações
-      await Promise.all(updates);
+      // Aguarda as atualizações
+      await Promise.all(updates);
 
-      // Atualiza os dados no estado local
-      setUser({ ...user, name: form.name, bio: form.bio, avatar: form.avatar });
-      setIsEditing(false);
-    } catch (error) {
-      console.error("Erro ao salvar perfil:", error);
-      alert("Não foi possível salvar as alterações.");
-    } finally {
-      setIsSaving(false);
-    }
-  };
+      // Atualiza os dados no estado local (mantém o nome original, não atualiza)
+      setUser({ ...user, bio: form.bio, avatar: form.avatar });
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Erro ao salvar perfil:", error);
+      alert("Não foi possível salvar as alterações.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
-  if (!isOpen) return null;
-  if (loading || !user)
-    return (
-      <div className="perfil-modal-wrapper">
-        <div className="perfil-modal-overlay" onClick={handleCloseAndNavigate}>
-          <div className="perfil-modal-container" onClick={(e) => e.stopPropagation()}>
-            <Loader />
-          </div>
-        </div>
-      </div>
-    );
+  if (!isOpen) return null;
 
   // --- Puxar avatar corretamente ---
   // Se estiver editando, usa o avatar do form (preview imediato), senão usa o do user
   const avatarKeyParaExibir = isEditing && form.avatar 
     ? form.avatar 
-    : cleanAvatarName(user.avatar?.trim());
+    : cleanAvatarName(user?.avatar?.trim());
   const avatarSrc = avatarMap[avatarKeyParaExibir] || avatarMap[avatarKeyParaExibir?.replace(/\.[^/.]+$/, "")] || userProfileImage;
 
-  return (
-    <div className="perfil-modal-wrapper">
-      <div className="perfil-modal-overlay" onClick={handleCloseAndNavigate}>
-        <div className="perfil-modal-container" onClick={(e) => e.stopPropagation()}>
+  const modalContent = (
+    <div className="perfil-modal-wrapper">
+      <div className="perfil-modal-overlay" onClick={handleCloseAndNavigate}>
+        <div className="perfil-modal-container" onClick={(e) => e.stopPropagation()}>
+          {loading || !user ? (
+            <Loader />
+          ) : (
+            <>
           <button className="perfil-close-btn" onClick={handleCloseAndNavigate}>
             ×
           </button>
@@ -209,9 +214,9 @@ export default function PerfilModal({
                 className={`perfil-avatar ${isEditing ? "editable" : ""}`}
                 onClick={() => isEditing && setShowAvatarOptions(!showAvatarOptions)} // Só permite abrir se estiver editando
               >
-                <img src={avatarSrc} alt={user.name} className="avatar-image" />
-                {isEditing && <div className="avatar-edit-overlay">Mudar</div>}
-                <div className={`perfil-status-indicator ${user.online ? "online" : "offline"}`}></div>
+                <img src={avatarSrc} alt={user?.name || "Usuário"} className="avatar-image" />
+                {isEditing && <div className="avatar-edit-overlay">Mudar</div>}
+                <div className={`perfil-status-indicator ${user?.online ? "online" : "offline"}`}></div>
               </div>
 
               {showAvatarOptions && (
@@ -230,45 +235,48 @@ export default function PerfilModal({
               )}
             </div>
 
-            {isEditing ? (
-              <div className="perfil-edit-name-container">
-                <input
-                  className="perfil-edit-input"
-                  name="name"
-                  value={form.name}
-                  onChange={handleChange}
-                  placeholder="Digite seu nome"
-                  maxLength={50}
-                />
-                <span className="character-count">{form.name.length}/50</span>
-              </div>
-            ) : (
-              <h3 className="perfil-name">{user.name}</h3>
-            )}
-          </div>
+            {isEditing ? (
+              <div className="perfil-edit-name-container">
+                <input
+                  className="perfil-edit-input"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  placeholder="Digite seu nome"
+                  maxLength={50}
+                  readOnly
+                  disabled
+                  style={{ cursor: 'not-allowed', opacity: 0.6 }}
+                />
+                <span className="character-count">{form.name.length}/50</span>
+              </div>
+            ) : (
+              <h3 className="perfil-name">{user?.name || "Usuário"}</h3>
+            )}
+          </div>
 
-          {/* Estatísticas */}
-          <div className="perfil-stats-grid">
-            <div className="perfil-stat-card">
-              <div className="perfil-stat-icon">
-                <img src={trophyIcon} alt="Troféu" />
-              </div>
-              <div className="perfil-stat-content">
-                <span className="perfil-stat-label">POSIÇÃO NO RANKING</span>
-                <span className="perfil-stat-value">{user.position || "N/A"}</span>
-              </div>
-            </div>
+          {/* Estatísticas */}
+          <div className="perfil-stats-grid">
+            <div className="perfil-stat-card">
+              <div className="perfil-stat-icon">
+                <img src={trophyIcon} alt="Troféu" />
+              </div>
+              <div className="perfil-stat-content">
+                <span className="perfil-stat-label">POSIÇÃO NO RANKING</span>
+                <span className="perfil-stat-value">{user?.position || "N/A"}</span>
+              </div>
+            </div>
 
-            <div className="perfil-stat-card">
-              <div className="perfil-stat-icon">
-                <img src={pointsIcon} alt="Pontos" />
-              </div>
-              <div className="perfil-stat-content">
-                <span className="perfil-stat-label">PONTOS</span>
-                <span className="perfil-stat-value">{user.points}</span>
-              </div>
-            </div>
-          </div>
+            <div className="perfil-stat-card">
+              <div className="perfil-stat-icon">
+                <img src={pointsIcon} alt="Pontos" />
+              </div>
+              <div className="perfil-stat-content">
+                <span className="perfil-stat-label">PONTOS</span>
+                <span className="perfil-stat-value">{user?.points || 0}</span>
+              </div>
+            </div>
+          </div>
 
           {/* Bio */}
           <div className="perfil-bio-section">
@@ -286,23 +294,28 @@ export default function PerfilModal({
                 <span className="bio-character-count">{form.bio.length}/100</span>
               </div>
             ) : (
-              <p className="perfil-bio-text">{user.bio}</p>
+              <p className="perfil-bio-text">{user?.bio || "Sem biografia."}</p>
             )}
           </div>
 
-          {/* Botões de salvar/editar */}
-          {isEditing && (
-            <div className="perfil-action-buttons">
-              <button className="perfil-cancel-btn" onClick={() => setIsEditing(false)}>
-                Cancelar
-              </button>
-              <button className="perfil-save-btn" onClick={handleSave} disabled={isSaving}>
-                {isSaving ? "Salvando..." : "Salvar"}
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+          {/* Botões de salvar/editar */}
+          {isEditing && (
+            <div className="perfil-action-buttons">
+              <button className="perfil-cancel-btn" onClick={() => setIsEditing(false)}>
+                Cancelar
+              </button>
+              <button className="perfil-save-btn" onClick={handleSave} disabled={isSaving}>
+                {isSaving ? "Salvando..." : "Salvar"}
+              </button>
+            </div>
+          )}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  // Usa Portal para renderizar no body, garantindo que seja exibido da mesma forma que na rota /perfil
+  return createPortal(modalContent, document.body);
 }

@@ -58,6 +58,7 @@
   border-radius: 10px;
   position: relative;
   z-index: 10;
+  pointer-events: auto;
 }
 
 
@@ -85,6 +86,8 @@
   appearance: none;
   text-decoration: none;
   user-select: none;
+  pointer-events: auto;
+  touch-action: manipulation;
 }
 
 
@@ -111,12 +114,22 @@
   opacity: 1;
   visibility: visible;
   display: flex !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  position: relative;
+  z-index: 1000 !important;
 }
 
 
-.sala-actions .btn-warning:hover {
+.sala-actions .btn-warning:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 8px 0 #D67700;
+}
+
+.sala-actions .btn-warning:disabled {
+  opacity: 0.6;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
 }
 
 
@@ -343,6 +356,8 @@
   min-width: 120px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  pointer-events: auto;
+  touch-action: manipulation;
 }
 
 .confirm-btn-cancel {
@@ -395,5 +410,4 @@
     width: 100%;
   }
 }
-
 

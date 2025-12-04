@@ -190,6 +190,7 @@ export default function RankingSection() {
         <PerfilModal
           user={selectedUser}
           isMyProfile={false}
+          isOpen={true}
           onClose={handleCloseProfile}
         />
       )}

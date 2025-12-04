@@ -44,34 +44,34 @@
     align-items: center;
     justify-content: space-between;
     margin: 0 0;
-    transition: box-shadow 0.2s;
+    transition: none;
 }
 
 .opcao-card:hover {
-    box-shadow: 0 8px 32px #0003;
+    box-shadow: 0 4px 16px #0002;
 }
 
 .btn-container {
     position: relative;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: none;
     margin-top: auto;
     margin-bottom: 2px;
 }
 
 .btn-container:hover {
-    transform: scale(1.05);
+    transform: none;
 }
 
 .card-btn {
     width: 200px;
     height: 60px;
     cursor: pointer;
-    transition: filter 0.2s;
+    transition: none;
 }
 
 .card-btn:hover {
-    filter: brightness(1.1);
+    filter: none;
 }
 
 .btn-text {
@@ -108,6 +108,7 @@
     color: #555;
     line-height: 1.2;
 }
+
 .opcoes-container {
     display: flex;
     gap: 120px;
@@ -118,8 +119,8 @@
 
 .middle-add-icon {
     transform: rotate(45deg);
-   width: 140px;  
-    height: auto; 
+    width: 140px;
+    height: auto;
 }
 
 /* ========== RESPONSIVIDADE MOBILE ========== */
@@ -127,34 +128,41 @@
 /* Mobile - Fundo branco e esconder slogan */
 @media (max-width: 768px) {
     .jogue-agora-container {
-        background: #ffffff;
-        padding: 30px 20px 40px 20px;
+        background: transparent;
+        padding: 10px 5px 30px 5px;
         margin: 20px auto 0 auto;
         width: 100%;
-        max-width: 450px;
+        max-width: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        box-shadow: none;
+        border-radius: 0;
+        box-sizing: border-box;
+        overflow: visible;
     }
-    
+
     .jogue-agora-slogan {
         display: none;
     }
-    
+
     /* Carrossel mobile - 1 card por vez */
     .carousel-container {
         display: flex;
         align-items: center;
         justify-content: center;
         width: 100%;
-        max-width: 400px;
+        max-width: 100%;
         margin: 0 auto;
-        gap: 0px;
-        padding: 0 15px;
+        gap: 4px;
+        padding: 0 5px;
         min-height: 320px;
+        box-sizing: border-box;
+        overflow: visible;
+        position: relative;
     }
-    
+
     .slides-wrapper {
         flex: 1;
         overflow: visible;
@@ -162,69 +170,134 @@
         justify-content: center;
         align-items: center;
         width: 100%;
-        max-width: 300px;
+        max-width: 100%;
         position: relative;
         min-height: 280px;
-        padding: 20px 0;
+        padding: 20px 40px;
+        box-sizing: border-box;
+        margin: 0;
     }
-    
+
     .slides-container {
         display: flex;
-        transition: transform 0.5s ease-in-out;
+        transition: none;
         width: 200%;
         justify-content: flex-start;
+        overflow: visible;
     }
-    
+
     .mobile-slide {
         width: 100%;
         flex-shrink: 0;
         display: flex;
         justify-content: center;
         align-items: center;
+        overflow: visible;
+        box-sizing: border-box;
     }
-    
+
     .mobile-slide .opcao-card {
         margin: 0 auto;
-        width: 250px;
-        height: 240px;
+        width: 160px;
+        height: 180px;
         flex-shrink: 0;
-        padding: 15px 10px 10px 10px;
-        border-radius: 20px 50px 20px 50px;
+        padding: 8px 8px 8px 8px;
+        border-radius: 16px 32px 16px 32px;
+        box-sizing: border-box;
+        overflow: visible;
+        max-width: calc(100% - 10px);
+    }
+
+    .mobile-slide .card-img {
+        width: 52px;
+        height: 52px;
+    }
+
+    .mobile-slide .opcao-card h3 {
+        font-size: 0.95em;
+    }
+
+    .mobile-slide .opcao-card p {
+        font-size: 0.7em;
+    }
+
+    .mobile-slide .card-btn {
+        width: 160px;
+        height: 46px;
+    }
+
+    .mobile-slide .btn-text {
+        font-size: 1.05em;
+    }
+
+    /* Mobile: remove animações mas mantém clicável */
+    .jogue-agora-container .opcao-card,
+    .jogue-agora-container .opcao-card:hover {
+        transition: none !important;
+        transform: none !important;
+        filter: none !important;
     }
     
+    .jogue-agora-container .btn-container,
+    .jogue-agora-container .btn-container:hover,
+    .jogue-agora-container .card-btn,
+    .jogue-agora-container .card-btn:hover {
+        transition: none !important;
+        transform: none !important;
+        filter: none !important;
+        pointer-events: auto !important; /* Garante que o botão continue clicável */
+    }
+    
+    .jogue-agora-container .btn-text {
+        pointer-events: none; /* Mantém o texto não clicável para não interferir */
+    }
+
     .nav-arrow {
-        background: white;
-        color: #333;
         border: none;
-        border-radius: 50%;
-        width: 45px;
-        height: 45px;
+        background: rgba(0, 0, 0, 0.04);
+        color: #3B3939;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 4px;
+        line-height: 1;
         display: flex;
         align-items: center;
         justify-content: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
+        border-radius: 999px;
+        backdrop-filter: blur(4px);
+        transition: none;
+        box-shadow: none;
         z-index: 10;
-        font-size: 18px;
         flex-shrink: 0;
+        position: absolute;
+        width: 36px;
+        height: 36px;
+        top: 50%;
+        transform: translateY(-50%);
     }
     
+    .nav-arrow.left-arrow {
+        left: -5px;
+    }
+    
+    .nav-arrow.right-arrow {
+        right: -5px;
+    }
+
     .nav-arrow:hover:not(:disabled) {
-        background: #f0f0f0;
-        transform: scale(1.1);
+        background: rgba(0, 0, 0, 0.08);
+        transform: translateY(-50%);
     }
-    
+
     .nav-arrow:disabled {
-        background: #f5f5f5;
-        color: #ccc;
-        cursor: not-allowed;
-        opacity: 0.7;
+        cursor: default;
+        opacity: 0.5;
     }
-    
+
     .slide-indicators {
         display: none;
     }
-    
+
     .indicator {
         display: none;
     }

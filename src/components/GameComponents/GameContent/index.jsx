@@ -84,7 +84,7 @@ export default function GameContent() {
           className={`tab-button ${currentSlide === 1 ? "active" : ""}`}
           onClick={() => setCurrentSlide(1)}
         >
-                              Questionário a            {" "}
+          Questionário
         </button>
                    {" "}
       </div>

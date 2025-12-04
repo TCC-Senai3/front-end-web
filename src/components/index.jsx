@@ -15,6 +15,7 @@ export { default as Errado } from './errado';
 
 // Home Components
 export { default as Intro } from './HomeComponents/Intro';
+export { default as Carousel } from './Carousel';
 export { default as InformationCards } from './HomeComponents/InformationCards';
 export { default as ContactSection } from './HomeComponents/ContactSection';
 

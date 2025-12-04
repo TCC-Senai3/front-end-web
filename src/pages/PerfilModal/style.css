@@ -124,7 +124,7 @@
 
 @media (max-width: 480px) {
   .perfil-edit-icon {
-    bottom: -60px;
+    bottom: 15px;
     right: 10px;
   }
   

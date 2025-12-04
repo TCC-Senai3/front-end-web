@@ -294,7 +294,6 @@ export default function Header() {
                                 (Array.isArray(user?.roles) && user.roles.includes('ROLE_ADMIN'))) && (
                                 <div className="mobile-menu-item" onClick={() => handleMobileMenuClick('CRIAR QUIZ')}>CRIAR QUIZ</div>
                             )}
-                            <div className="mobile-menu-item" onClick={() => handleMobileMenuClick('USUÁRIOS')}>USUÁRIOS</div>
                             <div className="mobile-menu-item mobile-menu-item-logout" onClick={() => handleMobileMenuClick('SAIR')}>SAIR</div>
                         </div>
                     </div>
