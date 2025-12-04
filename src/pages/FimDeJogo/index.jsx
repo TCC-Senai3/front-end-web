@@ -229,14 +229,14 @@ export default function FimDeJogo() {
           </p>
         </div>
         
-        <div className="pontuacao-total">
+        {/* <div className="pontuacao-total">
           <h2>
             Sua Pontuação Total: 
             <span className="score-highlight">
               {carregandoPontuacao ? "..." : pontuacaoAtual}
             </span>
           </h2>
-        </div>
+        </div> */}
 
         {refreshError && <div style={errorStyle}>{refreshError}</div>}
         
