@@ -29,9 +29,8 @@ export default function Footer() {
                 <div className="footer-section">
                     <h2>Redes Sociais</h2>
                     <div className="social-icons">
-                        <img src={discordIcon} alt="Discord" />
-                        <img src={githubIcon} alt="GitHub" />
-                        <img src={instagramIcon} alt="Instagram" />
+                       <a href="https://github.com/TCC-Senai3"><img src={githubIcon} alt="GitHub" /></a>
+                        <a href="https://www.instagram.com/senaiskillup?igsh=dmlnMjdoMjNyYWMz&utm_source=qr"><img src={instagramIcon} alt="Instagram" /></a>
                     </div>
                 </div>
             </div>
