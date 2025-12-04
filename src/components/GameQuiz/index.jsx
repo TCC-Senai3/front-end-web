@@ -13,7 +13,7 @@ import { useAuth } from "../../hooks/useAuth";
 export default function GameQuiz({ quizData, codigoSala, idSala }) {
   const navigate = useNavigate();
   
-  // Destruturar a função de atualização do Contexto para corrigir o Header
+  // ✅ Destruturar a função de atualização do Contexto para corrigir o Header
   const { user, updateUserScore } = useAuth(); 
 
   // --- Estados do Componente ---
@@ -28,7 +28,7 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [score, setScore] = useState(0); // Pontuação Total (vinda do Backend)
-  const [acertos, setAcertos] = useState(0); // ✅ NOVO: Contagem local de acertos (quantidade)
+  const [acertos, setAcertos] = useState(0); // ✅ Contagem local de acertos (quantidade)
   const [showCountdown, setShowCountdown] = useState(true); 
 
   // --- Efeito: Inicializa o quiz ---
@@ -62,6 +62,7 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
           if (prevTime <= 1) {
             clearInterval(timerId);
             
+            // Se o tempo acabou e NENHUMA resposta foi selecionada, marca como errado.
             if (selectedAnswer === null) {
               setIsCorrect(false);
             }
@@ -85,6 +86,7 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
 
   // --- Função: Clique na Alternativa ---
   const handleAnswerSelect = async (alternativa) => {
+    // Bloqueia clique se já respondeu, ou se estiver na contagem/resultado
     if (selectedAnswer || showResultScreen || loading || error || !currentQuestion || !user || showCountdown) return;
 
     const idUsuario = user?.id;
@@ -97,7 +99,7 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
     const acertou = alternativa.correta === true;
     setIsCorrect(acertou); 
 
-    // ✅ Incrementa a contagem de acertos localmente
+    // ✅ Incrementa a contagem de acertos localmente (apenas para exibir no final)
     if (acertou) {
         setAcertos(prev => prev + 1);
     }
@@ -114,16 +116,18 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
         idSala: idSalaNumerico
       };
       
+      // 1. Envia para a API e aguarda o cálculo do Back-end
       const apiResponse = await enviarResposta(respostaPayload);
       
-      // ✅ Atualiza o score com o valor correto do Back-end
+      // 2. Atualiza Score Local e Global com o valor do Back-end
+      // Se acertou E o Back-end retornou a pontuação total atualizada
       if (acertou && apiResponse && apiResponse.pontuacaoTotalAtualizada !== undefined) {
           const novoScore = apiResponse.pontuacaoTotalAtualizada;
           
-          // A. Atualiza o score LOCAL
+          // A. Atualiza o estado local para a tela final (FimDeJogo)
           setScore(novoScore);
-          
-          // B. Sincroniza o Header
+
+          // B. Atualiza o Contexto Global para corrigir o Header imediatamente
           if (typeof updateUserScore === 'function') {
               updateUserScore(novoScore);
           }
@@ -153,8 +157,8 @@ export default function GameQuiz({ quizData, codigoSala, idSala }) {
       navigate("/fim", { 
         state: {
           quizId: quiz?.idFormulario || quiz?.id,
-          pontuacao: score, // Pontuação Total (Pontos)
-          acertos: acertos, // ✅ Quantidade de perguntas acertadas
+          pontuacao: score, // Pontuação Total Acumulada (Pontos)
+          acertos: acertos, // Quantidade de perguntas acertadas (ex: 4 de 10)
           totalPerguntas: quiz?.perguntas?.length || 0,
           codigoSala: codigoSala,
           idSala: idSala
