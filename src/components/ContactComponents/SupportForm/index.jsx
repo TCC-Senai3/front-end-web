@@ -10,7 +10,7 @@ export default function SupportForm() {
         e.preventDefault(); 
 
         // ✅ EMAIL ATUALIZADO AQUI
-        const emailDestino = "osdrakedosenai@gmail.com"; 
+        const emailDestino = "senaiskillup@gmail.com"; 
         
         const subject = encodeURIComponent(`Suporte (Página Suporte): ${nome} - ${email}`);
         const body = encodeURIComponent(mensagem);
@@ -72,8 +72,8 @@ export default function SupportForm() {
                     <h2 className="support-title">Contato</h2>
                     <p className="support-description">
                         Entre em contato direto conosco<br />
-                        <a href="mailto:osdrakedosenai@gmail.com" style={{color: '#1cb0fc', textDecoration: 'underline', fontWeight: 500}}>
-                            osdrakedosenai@gmail.com
+                        <a href="mailto:senaiskillup@gmail.com" style={{color: '#1cb0fc', textDecoration: 'underline', fontWeight: 500}}>
+                            senaiskillup@gmail.com
                         </a>
                     </p>
                 </div>

@@ -11,7 +11,7 @@ export default function ContactForm() {
         e.preventDefault(); 
 
         // ✅ EMAIL ATUALIZADO AQUI
-        const emailDestino = "osdrakedosenai@gmail.com"; 
+        const emailDestino = "senaiskillup@gmail.com"; 
         
         const subject = encodeURIComponent(`Contato (Página Contato): ${nome} - ${email}`);
         const body = encodeURIComponent(mensagem);
