@@ -281,7 +281,7 @@ export const useAuth = () => {
       logout: () => {},
       updateUserData: async () => {},
       refreshUserData: async () => {}, 
-      getAuthToken: () => null, // ✅ VALOR PADRÃO
+      getAuthToken: () => null, // ✅ VALOR P
     }
   );
 };
