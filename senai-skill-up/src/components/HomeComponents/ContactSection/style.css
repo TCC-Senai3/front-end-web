@@ -1,0 +1,62 @@
+@import '../../../assets/font/imports.css';
+
+.productive {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    width: 500px;
+    height: 400px;
+    background: url(/src/assets/images/Group\ 14.png) center center no-repeat;
+    background-size: contain;
+    background-color: transparent;
+    color: #222;
+    padding: 40px 40px 30px 40px;
+    border-radius: 20px;
+    margin: 40px auto;
+    box-shadow: none;
+    position: relative;
+}
+
+.productive h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    color: #222;
+    text-align: left;
+}
+
+.productive p {
+    font-size: 1rem;
+    margin: 0 0 18px 0;
+    color: #222;
+    text-align: left;
+}
+
+.contact-btn {
+    background: #fff;
+    color: #00ABFF;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    transition: background 0.2s, color 0.2s;
+    margin-top: 10px;
+    margin-bottom: 0;
+    display: inline-block;
+}
+
+.contact-btn:hover {
+    background: #1f88bd;
+    color: #000000;
+}
+
+.contact-btn a {
+    color: inherit;
+    text-decoration: none;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}

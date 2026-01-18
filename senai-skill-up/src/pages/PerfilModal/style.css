@@ -1,0 +1,315 @@
+/* Overlay escuro */
+.perfil-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+/* Container principal do modal */
+.perfil-modal-container {
+  background: white;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 500px;
+  min-height: 600px; /* altura mínima aumentada */
+  max-height: 90vh; /* altura máxima para não sair da tela */
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease-out;
+  padding-top: 30px;
+  padding-bottom: 60px; /* espaço extra na parte inferior para o lápis */
+  overflow-y: auto; /* scroll interno se necessário */
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Faixa colada ao container (como jogue-agora-slogan) */
+.perfil-slogan {
+  position: absolute;
+  top: -40px; /* valor negativo para "colar" na borda superior */
+  left: 25px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Botão de fechar */
+.perfil-close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 28px;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+  color: #333;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
+  font-weight: 300;
+}
+
+.perfil-close-btn:hover {
+  background-color: #f0f0f0;
+}
+
+/* Ícone de edição */
+.perfil-edit-icon {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.perfil-edit-icon img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.perfil-edit-icon:hover {
+  transform: scale(1.1);
+}
+
+/* Seção do avatar */
+.perfil-avatar-section {
+  text-align: center;
+  padding: 10px 20px 20px 20px;
+}
+
+.perfil-avatar {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid #e0e0e0;
+  margin: 0 auto 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.perfil-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.perfil-status-indicator {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #28a745;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.perfil-name {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.perfil-email {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* Grid de estatísticas 2x2 */
+.perfil-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  padding: 20px;
+}
+
+.perfil-stat-card {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-height: 80px;
+  justify-content: center;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.perfil-stat-card:hover {
+  background: #e3f2fd;
+  border-color: #007bff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+}
+
+.perfil-stat-icon {
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.perfil-stat-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.perfil-stat-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.perfil-stat-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.perfil-stat-value {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+.perfil-stat-bio {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* Inputs de edição */
+.perfil-edit-input {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.perfil-edit-input-small {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 12px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.perfil-edit-textarea {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 12px;
+  box-sizing: border-box;
+  text-align: center;
+  resize: vertical;
+  min-height: 40px;
+}
+
+/* Botões de ação */
+.perfil-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  padding: 20px;
+  margin-top: 10px;
+}
+
+.perfil-save-btn, .perfil-cancel-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.perfil-save-btn {
+  background: #28a745;
+  color: white;
+}
+
+.perfil-save-btn:hover {
+  background: #218838;
+}
+
+.perfil-cancel-btn {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.perfil-cancel-btn:hover {
+  background: #d0d0d0;
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+  .perfil-modal-container {
+    margin: 10px;
+    max-width: calc(100% - 20px);
+  }
+  
+  .perfil-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .perfil-avatar {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .perfil-name {
+    font-size: 20px;
+  }
+}

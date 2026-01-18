@@ -1,0 +1,458 @@
+/* Responsividade removida */
+
+header {
+  background-color: #00A2FF;
+  padding: 10px 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.right-section {
+  display: flex;
+  align-items: center;
+  gap: 45px; /* distância entre todos os elementos */
+  margin-left: auto;
+  flex: 0 0 auto;
+}
+
+/* Responsividade removida */
+
+.logo-section {
+  flex: 0 0 auto;
+  margin-right: auto;
+}
+
+.logo-section .logo-link {
+  text-decoration: none;
+  font-size: 26px;
+  font-weight: bold;
+  color: white;
+}
+
+.logo-section .logo-text {
+  font-weight: 700;
+}
+
+
+.nav-section .nav-link {
+  text-decoration: none;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  background: #007ACC;
+  padding: 8px 15px;
+  border-radius: 20px;
+  position: relative;
+  cursor: pointer;
+}
+
+.user-profile .avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.user-profile .username {
+  font-size: 12px;
+  color: white;
+  margin-right: 5px;
+}
+
+.user-profile .dropdown-arrow {
+  font-size: 10px;
+  color: white;
+}
+
+.points-section {
+  display: flex;
+  align-items: center;
+}
+
+.points-section .medal-icon {
+  width: 35px;
+  height: 35px;
+  margin-right: 4px;
+}
+
+.points-section .points-number {
+  font-size: 20px;
+  font-weight: bold;
+  color: black;
+}
+
+.settings-section {
+  margin-left: 80px; /* distância dos pontos até a engrenagem */
+  position: relative;
+}
+
+.settings-section .settings-icon {
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+}
+
+/* Dropdown Menu Styles */
+.settings-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  z-index: 1000;
+  animation: fadeInDown 0.2s ease-out;
+}
+
+.dropdown-arrow {
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid #007bff;
+  margin-left: auto;
+  margin-right: 20px;
+}
+
+.dropdown-content {
+  background: linear-gradient(180deg, #007bff 0%, #0056b3 100%);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 120px;
+  overflow: hidden;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.dropdown-item {
+  color: white;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-item:active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Animação para o dropdown */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fechar dropdown ao clicar fora */
+.settings-section:focus-within .settings-dropdown {
+  display: block;
+}
+
+/* ========================================
+   DROPDOWN DO PERFIL DO USUÁRIO
+   ======================================== */
+
+.user-profile-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 8px;
+  z-index: 1000;
+  animation: fadeInDown 0.2s ease-out;
+}
+
+.user-dropdown-arrow {
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid #007bff;
+  margin-left: 20px;
+}
+
+.user-dropdown-content {
+  background: linear-gradient(180deg, #007bff 0%, #0056b3 100%);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 140px;
+  overflow: hidden;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.user-dropdown-item {
+  color: white;
+  padding: 16px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.user-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.user-dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.user-dropdown-item:active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.user-dropdown-item.admin-item {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  border-left: 3px solid #fff;
+  font-weight: 700;
+}
+
+.user-dropdown-item.admin-item:hover {
+  background: linear-gradient(135deg, #ff5252, #d63031);
+}
+
+/* ========================================
+   MENU HAMBURGER
+   ======================================== */
+
+.hamburger-btn {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1001;
+}
+
+.hamburger-line {
+  width: 25px;
+  height: 3px;
+  background-color: white;
+  margin: 2px 0;
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+.hamburger-line.active:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger-line.active:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-line.active:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
+/* ========================================
+   MENU MOBILE
+   ======================================== */
+
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.mobile-menu {
+  background-color: #00A2FF;
+  width: 280px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+  animation: slideInLeft 0.3s ease-out;
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.mobile-menu-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mobile-menu-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.mobile-menu-close:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.mobile-user-profile {
+  padding: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.mobile-user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.mobile-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.mobile-user-details {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.mobile-username {
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.mobile-points {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobile-medal {
+  width: 20px;
+  height: 20px;
+}
+
+.mobile-points-number {
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.mobile-menu-options {
+  flex: 1;
+  padding: 20px 0;
+}
+
+.mobile-menu-item {
+  color: white;
+  padding: 15px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mobile-menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.mobile-menu-item-logout {
+  color: #ff6b6b;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 10px;
+}
+
+.mobile-menu-item-logout:hover {
+  background-color: rgba(255, 107, 107, 0.1);
+}
+
+/* ========================================
+   RESPONSIVIDADE DO HEADER
+   ======================================== */
+
+/* Tablet e Mobile */
+@media (max-width: 768px) {
+  .hamburger-btn {
+    display: flex;
+  }
+  
+  .right-section {
+    display: none;
+  }
+  
+  .logo-section .logo-link {
+    font-size: 20px;
+  }
+}
+
+/* Mobile Pequeno */
+@media (max-width: 480px) {
+  .mobile-menu {
+    width: 100vw;
+  }
+  
+  .logo-section .logo-link {
+    font-size: 18px;
+  }
+}

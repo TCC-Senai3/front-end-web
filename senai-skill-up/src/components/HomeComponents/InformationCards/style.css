@@ -1,0 +1,42 @@
+@import '../../../assets/font/imports.css';
+
+.background {
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', 'Blinker', 'Inria Sans', Arial, sans-serif;
+    font-weight: 600;
+    color: #3B3939;
+    background-color: #F4F4F4;
+    width: 100%;
+}
+
+.informations {
+    display: flex;
+    justify-content: center;
+    padding: 150px 0 90px 0;
+    width: 100%;
+    text-align: center;
+    display: grid;
+    grid-template-columns: 300px 300px;
+    gap: 40px;
+    font-family: 'Blinker', Arial, sans-serif;
+    font-weight: 600;
+    color: #2F2E2E;
+}
+
+.informations img {
+    width: 13%;
+    padding-bottom: 15px;
+    display: block;
+    margin: 0 auto;
+}
+
+.informations h3 {
+    width: 97%;
+}
+
+.informations p {
+    width: 97%;
+    font-size: 13px;
+    padding-top: 10px;
+}

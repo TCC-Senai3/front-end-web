@@ -1,0 +1,14 @@
+@import './responsive.css';
+
+/* Layout principal */
+.terms-wrapper {
+    display: flex;
+    background: #f6f7f8;
+    justify-content: flex-start;
+    padding: 0;
+    margin-top: 0;
+    min-height: 100vh;
+    align-items: flex-start;
+}
+
+/* Responsividade movida para arquivo separado: responsive.css */

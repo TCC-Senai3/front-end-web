@@ -1,0 +1,17 @@
+@import '../../assets/font/imports.css';
+@import './responsive.css';
+
+/* ===================== GLOBAL STYLES ===================== */
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background: #f6f6f6;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+/* Responsividade movida para arquivo separado: responsive.css */

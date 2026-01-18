@@ -1,0 +1,111 @@
+.game-background {
+    width: 100%;
+    display: block;
+}
+
+.jogue-agora-container {
+    background: #D8E6FB;
+    border-radius: 18px;
+    padding: 50px 40px 40px 40px;
+    margin: 40px auto 0 auto;
+    width: fit-content;
+    position: relative;
+    box-shadow: 0 4px 24px #0001;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Slogan colado ao container, com possibilidade de sobrepor usando z-index */
+.jogue-agora-slogan {
+    position: absolute;
+    top: -40px; /* valor negativo para "colar" na borda superior */
+    left: 25px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.opcoes-container {
+    display: flex;
+    gap: 35px;
+    margin-top: 5px;
+    justify-content: center;
+}
+
+.opcao-card {
+    background: #e9dddd;
+    width: 240px;
+    height: 240px;
+    border-radius: 20px 50px 20px 50px;
+    padding: 10px 10px 5px 10px;
+    text-align: center;
+    box-shadow: 0 4px 16px #0002;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 0;
+    transition: box-shadow 0.2s;
+}
+
+.opcao-card:hover {
+    box-shadow: 0 8px 32px #0003;
+}
+
+.btn-container {
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.2s;
+    margin-top: auto;
+    margin-bottom: 2px;
+}
+
+.btn-container:hover {
+    transform: scale(1.05);
+}
+
+.card-btn {
+    width: 200px;
+    height: 60px;
+    cursor: pointer;
+    transition: filter 0.2s;
+}
+
+.card-btn:hover {
+    filter: brightness(1.1);
+}
+
+.btn-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.4em;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    pointer-events: none;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.card-img {
+    width: 70px; 
+    height: 70px;
+    margin: 5px 0; 
+}
+
+.opcao-card h3 {
+    margin: 0 0 3px 0; 
+    color: #333;
+    font-size: 1.2em; 
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.opcao-card p {
+    font-size: 0.8em; 
+    margin: 0 0 10px 0; 
+    color: #555;
+    line-height: 1.2;
+}

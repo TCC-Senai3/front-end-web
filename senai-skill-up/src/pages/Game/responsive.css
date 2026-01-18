@@ -1,0 +1,56 @@
+/* ========================================
+   RESPONSIVIDADE - PÁGINA GAME
+   ======================================== */
+
+/* ========================================
+   LAYOUT PRINCIPAL
+   ======================================== */
+
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) {
+    .game-content-wrapper {
+        flex-direction: column;
+        align-items: center;
+        gap: 25px;
+        margin: 50px auto 0 auto;
+    }
+}
+
+/* Mobile Grande (576px - 768px) */
+@media (max-width: 768px) {
+    .game-content-wrapper {
+        margin: 40px auto 0 auto;
+        gap: 20px;
+        padding: 0 20px;
+    }
+
+    .game-spacing {
+        height: 60px;
+    }
+}
+
+/* Mobile Médio (480px - 576px) */
+@media (max-width: 576px) {
+    .game-content-wrapper {
+        margin: 30px auto 0 auto;
+        gap: 15px;
+        padding: 0 15px;
+    }
+
+    .game-spacing {
+        height: 50px;
+    }
+}
+
+/* Mobile Pequeno (até 480px) */
+@media (max-width: 480px) {
+    .game-content-wrapper {
+        margin: 20px auto 0 auto;
+        gap: 10px;
+        padding: 0 10px;
+    }
+
+    .game-spacing {
+        height: 40px;
+    }
+}

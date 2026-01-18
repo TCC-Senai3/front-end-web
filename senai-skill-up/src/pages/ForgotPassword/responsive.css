@@ -1,0 +1,122 @@
+/* ========================================
+   RESPONSIVIDADE - PÁGINA FORGOT PASSWORD
+   ======================================== */
+
+/* ========================================
+   LAYOUT PRINCIPAL
+   ======================================== */
+
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) {
+    .forgot-password-content {
+        gap: 35px;
+        padding: 18px;
+    }
+
+    .form-content {
+        max-width: 320px;
+    }
+
+    .form-title {
+        font-size: 15px;
+    }
+
+    .btn-enviar {
+        padding: 11px 23px;
+        font-size: 13px;
+    }
+}
+
+/* Mobile Grande (576px - 768px) */
+@media (max-width: 768px) {
+    .forgot-password-content {
+        flex-direction: column;
+        gap: 20px;
+        padding: 15px;
+    }
+
+    .illustration-section {
+        max-width: 100%;
+        max-height: 40%;
+    }
+
+    .form-section {
+        max-width: 100%;
+        max-height: 60%;
+    }
+
+    .form-title {
+        font-size: 14px;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+
+    .forgot-password-form {
+        gap: 12px;
+    }
+
+    .btn-enviar {
+        padding: 10px 20px;
+        font-size: 12px;
+    }
+}
+
+/* Mobile Médio (480px - 576px) */
+@media (max-width: 576px) {
+    .forgot-password-content {
+        padding: 12px;
+        gap: 18px;
+    }
+
+    .form-title {
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+
+    .forgot-password-form {
+        gap: 10px;
+    }
+
+    .btn-enviar {
+        padding: 9px 18px;
+        font-size: 11px;
+    }
+
+    .footer {
+        padding: 12px 18px;
+    }
+
+    .footer-text {
+        font-size: 13px;
+    }
+}
+
+/* Mobile Pequeno (até 480px) */
+@media (max-width: 480px) {
+    .forgot-password-content {
+        padding: 10px;
+        gap: 15px;
+    }
+
+    .form-title {
+        font-size: 12px;
+        margin-bottom: 10px;
+    }
+
+    .forgot-password-form {
+        gap: 8px;
+    }
+
+    .btn-enviar {
+        padding: 8px 16px;
+        font-size: 10px;
+    }
+
+    .footer {
+        padding: 10px 15px;
+    }
+
+    .footer-text {
+        font-size: 12px;
+    }
+}

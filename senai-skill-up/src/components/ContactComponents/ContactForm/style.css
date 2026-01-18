@@ -1,0 +1,123 @@
+.contact-main {
+    background-color: #e2e9ee;
+    width: 850px;
+    padding: 30px 40px 30px 40px;
+    border-radius: 0;
+    margin-left: 40px;
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    border: none;
+    box-shadow: none;
+}
+
+.contact-title {
+    font-size: 20px;
+    color: #222;
+    position: relative;
+    padding-left: 20px;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.contact-title::before {
+    content: "";
+    height: 22px;
+    width: 6px;
+    background-color: #1cb0fc;
+    position: absolute;
+    left: 0;
+    top: 2px;
+    border-radius: 10px;
+}
+
+.contact-description {
+    color: #626361;
+    margin-bottom: 25px;
+    margin-left: 0;
+    margin-top: 12px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.contact-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 60px;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.contact-form-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0;
+    border-radius: 8px;
+    width: 100%;
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    min-width: 350px;
+    max-width: 400px;
+    align-items: flex-start;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.contact-form-label {
+    font-size: 14px;
+    color: #000;
+    margin-bottom: 5px;
+    margin-top: 10px;
+    font-weight: 400;
+    text-align: left;
+    font-family: 'Poppins', sans-serif;
+}
+
+.contact-form-input {
+    width: 402.31px;
+    height: 37.98px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.contact-form-textarea {
+    width: 402.31px;
+    height: 168.19px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #ABABAB;
+    resize: none;
+}
+
+.contact-form-button {
+    background-color: #1cb0fc;
+    color: white;
+    padding: 10px 0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 120px;
+    margin-top: 10px;
+    align-self: flex-start;
+}
+
+.contact-form-button:hover {
+    background-color: #1f88bd;
+    color: #000000;
+}
+
+.contact-image {
+    /* ajuste para imagem ao lado do form */
+}

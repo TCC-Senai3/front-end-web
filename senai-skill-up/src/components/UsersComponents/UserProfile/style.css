@@ -1,0 +1,18 @@
+@import './responsive.css';
+
+.admin-users-container {
+  min-height: 100vh;
+  background: #3498db;
+  padding: 0;
+}
+
+.admin-users-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: calc(100vh - 80px);
+  padding: 32px;
+}
+
+
+
+/* Responsividade removida */
