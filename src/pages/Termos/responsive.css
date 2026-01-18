@@ -1,0 +1,155 @@
+/* ========================================
+   RESPONSIVIDADE - PÁGINA TERMOS
+   ======================================== */
+
+/* Mobile (768px e abaixo) */
+@media (max-width: 768px) {
+    .terms-wrapper {
+        flex-direction: column;
+        padding: 0;
+        margin: 0;
+        background: #fff;
+        min-height: 100vh;
+        align-items: stretch;
+    }
+
+    /* Header responsivo */
+    header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        width: 100%;
+    }
+
+    /* Ocultar sidebar e botões */
+    .contact-sidebar {
+        display: none !important;
+    }
+
+    .contact-sidebar-btn {
+        display: none !important;
+    }
+
+    /* Ocultar imagens dos balões */
+    .contact-image,
+    .support-image,
+    .terms-image {
+        display: none !important;
+    }
+
+    /* Conteúdo principal dos termos */
+    .terms-main,
+    .terms-content {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 20px !important;
+        background-color: #fff !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+    /* Título dos termos responsivo */
+    .terms-title {
+        font-size: 20px !important;
+        margin-bottom: 15px !important;
+        padding-left: 15px !important;
+        color: #333 !important;
+        font-weight: 600 !important;
+    }
+
+    .terms-title::before {
+        content: "";
+        width: 4px !important;
+        height: 20px !important;
+        background-color: #1cb0fc;
+        position: absolute;
+        left: 0;
+        top: 2px;
+        border-radius: 2px;
+    }
+
+    /* Conteúdo dos termos responsivo */
+    .terms-text,
+    .terms-section {
+        font-size: 14px !important;
+        line-height: 1.6 !important;
+        color: #555 !important;
+        margin-bottom: 20px !important;
+        text-align: justify !important;
+    }
+
+    .terms-section h2,
+    .terms-section h3 {
+        font-size: 16px !important;
+        color: #333 !important;
+        margin: 20px 0 10px 0 !important;
+        font-weight: 600 !important;
+    }
+
+    .terms-section h2 {
+        font-size: 18px !important;
+        margin-top: 25px !important;
+    }
+
+    .terms-section p {
+        margin-bottom: 15px !important;
+        text-indent: 0 !important;
+    }
+
+    .terms-section ul,
+    .terms-section ol {
+        padding-left: 20px !important;
+        margin-bottom: 15px !important;
+    }
+
+    .terms-section li {
+        margin-bottom: 8px !important;
+        line-height: 1.5 !important;
+    }
+
+    /* Scroll suave para conteúdo longo */
+    .terms-content {
+        overflow-y: auto !important;
+        max-height: calc(100vh - 60px) !important;
+    }
+
+    /* Espaçamento entre seções */
+    .terms-section + .terms-section {
+        border-top: 1px solid #eee !important;
+        padding-top: 20px !important;
+        margin-top: 25px !important;
+    }
+}
+
+/* Mobile pequeno (480px e abaixo) */
+@media (max-width: 480px) {
+    .terms-main,
+    .terms-content {
+        padding: 15px !important;
+    }
+
+    .terms-title {
+        font-size: 18px !important;
+        padding-left: 12px !important;
+    }
+
+    .terms-text,
+    .terms-section {
+        font-size: 13px !important;
+        line-height: 1.5 !important;
+    }
+
+    .terms-section h2 {
+        font-size: 16px !important;
+    }
+
+    .terms-section h3 {
+        font-size: 14px !important;
+    }
+
+    .terms-section ul,
+    .terms-section ol {
+        padding-left: 15px !important;
+    }
+}

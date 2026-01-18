@@ -1,0 +1,204 @@
+.fim-container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #00A6FF 0%, #22C0EC 100%);
+  padding-top: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.fim-title {
+  color: #ffffff;
+  font-weight: 900;
+  margin: 24px 0 12px;
+  text-align: center;
+}
+
+.resultado-quiz {
+  text-align: center;
+  margin: 12px 0;
+}
+
+.resultado-quiz p {
+  color: #ffffff;
+  font-size: 18px;
+  margin: 0;
+}
+
+.score-highlight {
+  font-weight: 900;
+  font-size: 20px;
+}
+
+.pontuacao-total {
+  text-align: center;
+  margin: 16px 0 24px;
+}
+
+.pontuacao-total h2 {
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 28px;
+  margin: 0;
+}
+
+.recompensas { text-align: center; margin-bottom: 20px; }
+.recompensas-title { color: #cfeaff; font-weight: 800; font-size: 12px; letter-spacing: .5px; }
+.recompensas-row { display: inline-flex; align-items: center; gap: 14px; margin: 10px 0 12px; }
+.recompensas-box { display: inline-flex; gap: 8px; align-items: center; }
+.recompensa-ico { width: 24px; height: 24px; }
+.recompensa-valor { color: #fff; font-weight: 900; font-size: 22px; }
+.fim-sair { background: #59d2ff; color: #043c54; border: none; font-weight: 900; padding: 10px 28px; border-radius: 10px; box-shadow: 0 6px 0 rgba(0,0,0,.2); cursor: pointer; position: fixed; top: 90px; right: 24px; z-index: 1500; }
+.fim-sair:hover { transform: translateY(-1px); }
+
+/* Pódio reorganizado */
+.podium-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 24px 0;
+  width: 100%;
+  max-width: 800px;
+  position: relative;
+}
+
+.podium-title {
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 24px;
+  align-self: flex-start;
+  margin-left: 15%;
+  margin-bottom: 20px;
+}
+
+.podium-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.podium-first-place {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.trophy-large {
+  height: 180px;
+  margin-bottom: 20px;
+}
+
+.user-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 12px 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.15);
+  margin-bottom: 12px;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: url('../../assets/images/user-profile 1.png') center/cover no-repeat, #eee;
+  flex-shrink: 0;
+}
+.avatar.small { width: 28px; height: 28px; }
+
+.user-name { 
+  font-weight: 800; 
+  font-size: 16px;
+  color: #000;
+}
+
+.points {
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 18px;
+  margin-top: 8px;
+}
+
+.lista-final { 
+  width: 100%;
+  max-width: 600px;
+  margin: 40px auto;
+  text-align: center;
+}
+
+.lista-final h2 {
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 24px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.linha-user { 
+  display: grid; 
+  grid-template-columns: 60px 1fr 100px; 
+  align-items: center; 
+  background: rgba(255,255,255,0.12); 
+  border-radius: 10px; 
+  padding: 10px 14px; 
+  color: #fff; 
+  margin-bottom: 10px; 
+}
+.col-pos { font-weight: 900; }
+.col-nome { display: flex; align-items: center; gap: 10px; font-weight: 800; }
+.col-ganho { text-align: right; font-weight: 900; color: #bdf8bd; }
+
+.fim-actions { 
+  display: flex; 
+  justify-content: center; 
+  margin: 32px 0 40px;
+}
+.btn-proximo { 
+  background: #22D1EC; 
+  color: #ffffff; 
+  border: none; 
+  font-weight: 900; 
+  padding: 20px 80px; 
+  border-radius: 12px;
+  box-shadow: 0 8px 0 #1FBDD5; 
+  cursor: pointer;
+  font-size: 32px;
+  letter-spacing: 2px;
+  transition: transform 0.1s;
+}
+.btn-proximo:hover { transform: translateY(-2px); }
+.btn-proximo:active { transform: translateY(2px); box-shadow: 0 4px 0 #1FBDD5; }
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .btn-proximo {
+    padding: 16px 50px;
+    font-size: 24px;
+    letter-spacing: 1px;
+    box-shadow: 0 6px 0 #1FBDD5;
+  }
+  
+  .btn-proximo:active {
+    box-shadow: 0 3px 0 #1FBDD5;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn-proximo {
+    padding: 14px 40px;
+    font-size: 20px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 5px 0 #1FBDD5;
+  }
+  
+  .btn-proximo:active {
+    box-shadow: 0 2px 0 #1FBDD5;
+  }
+}
+
+

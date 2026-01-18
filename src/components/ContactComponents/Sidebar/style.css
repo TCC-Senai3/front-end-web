@@ -1,0 +1,42 @@
+.contact-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 30px;
+    margin-top: 50px;
+    padding-top: 20px;
+}
+
+.contact-sidebar-btn {
+    background: #e2e9ee;
+    border: none;
+    padding: 16px 0;
+    width: 246.86px;
+    height: 67.75px;
+    color: #333;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-align: left;
+    padding-left: 18px;
+}
+
+.contact-sidebar-btn.active,
+.contact-sidebar-btn:hover {
+    background: #cfdbe6;
+    font-weight: bold;
+}
+
+/* ========================================
+   RESPONSIVIDADE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .contact-sidebar {
+        display: none;
+    }
+
+    .contact-sidebar-btn {
+        display: none;
+    }
+}

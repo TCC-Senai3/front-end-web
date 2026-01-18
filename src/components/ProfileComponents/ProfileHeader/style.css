@@ -1,0 +1,110 @@
+.perfil-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 18px;
+    padding: 28px 40px;
+    box-shadow: 0 2px 8px #0001;
+    gap: 32px;
+    max-width: 1140px;
+    margin-bottom: 24px;
+    box-sizing: border-box;
+}
+
+.perfil-avatar img {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 4px solid #e3eefd;
+    background: #fff;
+}
+
+.perfil-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.perfil-info-flex {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;
+}
+
+.perfil-nome-pontos {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0;
+}
+
+.perfil-nome {
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: underline;
+    color: #222;
+    font-family: 'Poppins', sans-serif;
+}
+
+.perfil-pontos {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #222;
+    text-align: center;
+    margin-top: 0;
+}
+
+.perfil-medal-icon {
+    width: 25px;
+    height: 25px;
+    margin-right: 5px;
+}
+
+.perfil-bio {
+    color: #444;
+    font-size: 1em;
+    margin-top: 6px;
+}
+
+.perfil-bio-final {
+    flex: 1;
+    margin-left: 20px;
+}
+
+.perfil-bio-textarea {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 8px;
+    font-family: inherit;
+    font-size: 0.9em;
+}
+
+.perfil-bio-btn-salvar {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.9em;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.perfil-bio-btn-cancelar {
+    background: #f44336;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.9em;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.perfil-bio-lapis {
+    opacity: 0.7;
+}

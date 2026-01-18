@@ -1,0 +1,88 @@
+@import '../../../assets/font/imports.css';
+
+.intro {
+    color: white;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    text-align: center;
+    row-gap: 15.2px; /* Reduzido em 5% de 16px */
+    padding-top: 68.4px; /* Reduzido em 5% de 72px */
+    background-position: 0px 144.4px; /* Reduzido em 5% de 152px */
+    background-size: 100%;
+    background-color: transparent;
+    font-family: 'Poppins', 'Blinker', 'Inria Sans', Arial, sans-serif;
+    position: relative;
+    z-index: 1;
+}
+
+.intro::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #2E96F1;
+    z-index: -1;
+}
+
+.imgIntroMobile {
+    width: 43.32%; /* Reduzido em 5% de 45.6% */
+    font-size: 19.76px; /* Reduzido em 5% de 20.8px */
+    display: none;
+}
+
+.imgIntro {
+    width: 35.72%; /* Reduzido em 5% de 37.6% */
+    height: 30.4%; /* Reduzido em 5% de 32% */
+}
+
+.Skill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#Senai,
+#Up {
+    font-size: 48px;
+    font-family: 'Blinker', Arial, sans-serif;
+    text-transform: uppercase;
+    line-height: 1.2;
+    color: #FFFFFF;
+    font-family: 'Poppins', 'Blinker', 'Inria Sans', Arial, sans-serif;
+}
+
+#Up {
+    font-weight: bold;
+}
+
+.intro p {
+    width: 29.64%; /* Reduzido em 5% de 31.2% */
+    line-height: 20px;
+    padding: 10px 0;
+    color: #FFFFFF;
+    margin-top: -18px;
+    font-family: 'Inria Sans', Arial, sans-serif;
+}
+
+.botaoIntro {
+    background-color: #FFFFFF;
+    color: #00ABFF;
+    width: 175px;
+    height: 50px;
+    margin-bottom: 20px;
+    border-radius: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Blinker', Arial, sans-serif;
+    font-weight: 600;
+}
+
+.botaoIntro:hover {
+    background-color: #1f88bd;
+    color: #000000;
+}

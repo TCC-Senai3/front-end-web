@@ -1,0 +1,91 @@
+/* ========================================
+   RESPONSIVIDADE - COMPONENTE CONNECTION ERROR
+   ======================================== */
+
+/* ========================================
+   LAYOUT PRINCIPAL
+   ======================================== */
+
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) {
+    .connection-error-container {
+        padding: 0px 15px 15px;
+    }
+
+    .error-icon {
+        padding: 50px 30px;
+        max-width: 450px;
+    }
+
+    .error-image {
+        width: 250px;
+        height: 250px;
+    }
+
+    .error-message h2 {
+        font-size: 28px;
+    }
+}
+
+/* Mobile Grande (576px - 768px) */
+@media (max-width: 768px) {
+    .connection-error-container {
+        padding: 0px 15px 15px;
+    }
+
+    .error-icon {
+        padding: 40px 25px;
+        max-width: 400px;
+    }
+
+    .error-image {
+        width: 200px;
+        height: 200px;
+    }
+
+    .error-message h2 {
+        font-size: 24px;
+    }
+}
+
+/* Mobile Médio (480px - 576px) */
+@media (max-width: 576px) {
+    .connection-error-container {
+        padding: 0px 12px 12px;
+    }
+
+    .error-icon {
+        padding: 30px 20px;
+        max-width: 350px;
+    }
+
+    .error-image {
+        width: 180px;
+        height: 180px;
+    }
+
+    .error-message h2 {
+        font-size: 20px;
+    }
+}
+
+/* Mobile Pequeno (até 480px) */
+@media (max-width: 480px) {
+    .connection-error-container {
+        padding: 0px 10px 10px;
+    }
+
+    .error-icon {
+        padding: 25px 15px;
+        max-width: 300px;
+    }
+
+    .error-image {
+        width: 150px;
+        height: 150px;
+    }
+
+    .error-message h2 {
+        font-size: 18px;
+    }
+}

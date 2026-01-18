@@ -1,0 +1,122 @@
+/* ========================================
+   RESPONSIVIDADE - PÁGINA LOAD HOST
+   ======================================== */
+
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) {
+    .loadhost-icon {
+        width: 300px;
+        height: 300px;
+    }
+    
+    .loadhost-form {
+        max-width: 380px;
+        padding: 28px 24px;
+    }
+    
+    .loadhost-title {
+        font-size: 22px;
+        margin-bottom: 25px;
+    }
+}
+
+/* Mobile Grande (480px - 768px) */
+@media (max-width: 768px) {
+    .loadhost-center {
+        padding: 15px;
+        gap: 20px;
+    }
+
+    .loadhost-icon {
+        width: 200px;
+        height: 200px;
+    }
+
+    .loadhost-title {
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+
+    .loadhost-form {
+        max-width: 320px;
+        padding: 24px 20px;
+    }
+
+    .loadhost-input {
+        font-size: 15px;
+        padding: 14px 16px;
+    }
+
+    .loadhost-btn {
+        font-size: 15px;
+        padding: 14px 0;
+    }
+}
+
+/* Mobile Pequeno (até 480px) */
+@media (max-width: 480px) {
+    .loadhost-center {
+        padding: 12px;
+        gap: 18px;
+    }
+
+    .loadhost-icon {
+        width: 160px;
+        height: 160px;
+    }
+
+    .loadhost-title {
+        font-size: 18px;
+        margin-bottom: 18px;
+    }
+
+    .loadhost-form {
+        max-width: 300px;
+        padding: 20px 16px;
+    }
+
+    .loadhost-input {
+        font-size: 14px;
+        padding: 12px 14px;
+    }
+
+    .loadhost-btn {
+        font-size: 14px;
+        padding: 12px 0;
+    }
+}
+
+/* Mobile Muito Pequeno (até 360px) */
+@media (max-width: 360px) {
+    .loadhost-center {
+        padding: 8px;
+        gap: 15px;
+    }
+
+    .loadhost-icon {
+        width: 140px;
+        height: 140px;
+    }
+
+    .loadhost-title {
+        font-size: 16px;
+        margin-bottom: 15px;
+    }
+
+    .loadhost-form {
+        max-width: 280px;
+        padding: 16px 12px;
+    }
+
+    .loadhost-input {
+        font-size: 13px;
+        padding: 10px 12px;
+    }
+
+    .loadhost-btn {
+        font-size: 13px;
+        padding: 10px 0;
+    }
+}
+
+

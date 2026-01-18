@@ -1,0 +1,362 @@
+/* ========================================
+   ARQUIVO PRINCIPAL DE ESTILOS
+   ======================================== */
+
+/* Importação das fontes do Google */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Importação dos estilos globais */
+@import './styles/global.css';
+
+/* Reset adicional para garantir compatibilidade */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+  background-color: #ffffff;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #333333;
+  line-height: 1.6;
+}
+
+/* Estilos para elementos específicos do React */
+#root {
+  min-height: 100vh;
+}
+
+/* Estilos para links do React Router */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+/* Estilos para botões */
+button {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0;
+  overflow: visible;
+  text-transform: none;
+  -webkit-appearance: button;
+  appearance: button;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Estilos para inputs */
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0;
+  overflow: visible;
+}
+
+/* Estilos para imagens */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Estilos para listas */
+ul, ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Estilos para tabelas */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* Estilos para elementos de formulário */
+fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+legend {
+  border: 0;
+  padding: 0;
+  white-space: normal;
+}
+
+/* Estilos para elementos de mídia */
+audio, video {
+  display: inline-block;
+}
+
+/* Estilos para elementos SVG */
+svg {
+  overflow: hidden;
+  vertical-align: middle;
+}
+
+/* Estilos para elementos de código */
+code, pre {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.875em;
+}
+
+/* Estilos para elementos de citação */
+blockquote {
+  margin: 0;
+  padding: 0;
+}
+
+/* Estilos para elementos de endereço */
+address {
+  font-style: normal;
+  line-height: inherit;
+}
+
+/* Estilos para elementos de definição */
+dfn {
+  font-style: italic;
+}
+
+/* Estilos para elementos de marcação */
+mark {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 0.125em 0.25em;
+}
+
+/* Estilos para elementos de pequeno texto */
+small {
+  font-size: 0.875em;
+}
+
+/* Estilos para elementos de sublinhado */
+u {
+  text-decoration: underline;
+}
+
+/* Estilos para elementos de texto riscado */
+s {
+  text-decoration: line-through;
+}
+
+/* Estilos para elementos de texto sobrescrito */
+sup {
+  position: relative;
+  font-size: 0.75em;
+  line-height: 0;
+  vertical-align: baseline;
+  top: -0.5em;
+}
+
+/* Estilos para elementos de texto subscrito */
+sub {
+  position: relative;
+  font-size: 0.75em;
+  line-height: 0;
+  vertical-align: baseline;
+  bottom: -0.25em;
+}
+
+/* Estilos para elementos de texto em negrito */
+b, strong {
+  font-weight: bolder;
+}
+
+/* Estilos para elementos de texto em itálico */
+i, em {
+  font-style: italic;
+}
+
+/* Estilos para elementos de texto com código */
+code {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.875em;
+  color: #e83e8c;
+  background-color: #f8f9fa;
+  padding: 0.125em 0.25em;
+  border-radius: 0.25rem;
+}
+
+/* Estilos para elementos de texto com teclado */
+kbd {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.875em;
+  color: #fff;
+  background-color: #212529;
+  padding: 0.125em 0.25em;
+  border-radius: 0.25rem;
+}
+
+/* Estilos para elementos de texto com amostra */
+samp {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.875em;
+}
+
+/* Estilos para elementos de texto com variável */
+var {
+  font-style: italic;
+}
+
+/* Estilos para elementos de texto com abreviação */
+abbr[title] {
+  text-decoration: underline dotted;
+  cursor: help;
+}
+
+/* Estilos para elementos de texto com data/hora */
+time {
+  font-weight: 500;
+}
+
+/* Estilos para elementos de texto com progresso */
+progress {
+  vertical-align: baseline;
+}
+
+/* Estilos para elementos de texto com medidor */
+meter {
+  vertical-align: baseline;
+}
+
+/* Estilos para elementos de texto com detalhes */
+details {
+  display: block;
+}
+
+/* Estilos para elementos de texto com resumo */
+summary {
+  display: list-item;
+  cursor: pointer;
+}
+
+/* Estilos para elementos de texto com menu */
+menu {
+  display: block;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Estilos para elementos de texto com diálogo */
+dialog {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: -moz-fit-content;
+  width: fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
+  margin: auto;
+  border: solid;
+  padding: 1em;
+  background: white;
+  color: black;
+}
+
+/* Estilos para elementos de texto com canvas */
+canvas {
+  display: inline-block;
+}
+
+/* Estilos para elementos de texto com mapa */
+map {
+  display: inline;
+}
+
+/* Estilos para elementos de texto com objeto */
+object {
+  display: inline-block;
+}
+
+/* Estilos para elementos de texto com incorporação */
+embed {
+  display: inline-block;
+}
+
+/* Estilos para elementos de texto com iframe */
+iframe {
+  border: 0;
+}
+
+/* Estilos para elementos de texto com área */
+area {
+  display: inline;
+}
+
+/* Estilos para elementos de texto com base */
+base {
+  display: none;
+}
+
+/* Estilos para elementos de texto com link */
+link {
+  display: none;
+}
+
+/* Estilos para elementos de texto com meta */
+meta {
+  display: none;
+}
+
+/* Estilos para elementos de texto com script */
+script {
+  display: none;
+}
+
+/* Estilos para elementos de texto com estilo */
+style {
+  display: none;
+}
+
+/* Estilos para elementos de texto com título */
+title {
+  display: none;
+}
+
+/* Estilos para elementos de texto com cabeçalho */
+head {
+  display: none;
+}
+
+/* Estilos para elementos de texto com corpo */
+body {
+  display: block;
+}
+
+/* Estilos para elementos de texto com html */
+html {
+  display: block;
+}

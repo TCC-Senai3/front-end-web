@@ -1,0 +1,192 @@
+.ranking-container {
+    background: #D8E6FB;
+    border-radius: 12px;
+    width: 280px;
+    min-height: 400px;
+    max-height: 520px;
+    box-sizing: border-box;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* Faixa colada ao container (como jogue-agora-slogan) */
+.ranking-slogan {
+    position: absolute;
+    top: -28px; /* valor negativo para colar na borda - igual ao quiz */
+    left: 18px;
+    z-index: 1;
+    pointer-events: none;
+    width: 250px;
+    height: auto;
+}
+
+.ranking-pesquisa-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 8px 10px;
+    box-shadow: 0 1px 4px #0001;
+}
+
+.ranking-pesquisa-input {
+    border: none;
+    outline: none;
+    flex: 1;
+    font-size: 16px;
+    background: transparent;
+    padding: 0;
+}
+
+.ranking-pesquisa-icon {
+    color: #888;
+    margin-left: 0px;
+    width: 24px;
+    height: 24px;
+}
+
+.ranking-lista {
+    flex: 1;
+    max-height: 420px; /* ~8 itens visíveis antes de scrollar */
+    overflow-y: auto;
+    overflow-x: visible;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    background: #D8E6FB;
+    word-wrap: break-word;
+    word-break: break-word;
+    margin-top: 12px;
+}
+
+.ranking-lista::-webkit-scrollbar {
+    display: none;
+}
+
+.ranking-item {
+    display: flex;
+    min-height: 48px;
+    width: 100%;
+    position: relative;
+    padding: 6px 70px 6px 8px;
+    align-items: center;
+    background: #fff;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    box-sizing: border-box;
+    transition: box-shadow 0.2s, background 0.2s, transform 0.2s;
+    cursor: pointer;
+    overflow: visible;
+}
+
+.ranking-item:hover {
+    box-shadow: 0 4px 16px #0002;
+    background: #f0f6ff !important;
+    transform: translateY(-2px) scale(1.01);
+}
+
+.ranking-pos {
+    font-size: 22px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    line-height: 1;
+    margin-right: 8px;
+}
+
+.ranking-pos-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-right: 8px;
+}
+
+.ranking-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.ranking-nome {
+    flex: 1;
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    min-width: 0;
+    line-height: 1.2;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+.ranking-points-container {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.ranking-pontos {
+    font-weight: bold;
+    color: #000000; /* Cor preta */
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.ranking-medal-icon {
+    width: 25px;
+    height: 25px;
+    margin-right: 5px;
+    flex-shrink: 0;
+}
+
+/* Ajustes para responsividade mobile */
+@media (max-width: 768px) {
+    .ranking-container {
+        width: 100%;
+        max-width: 340px;
+        margin: 0 auto;
+        padding: 20px 14px 12px 14px;
+        min-height: auto;
+        max-height: none;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        position: relative;
+        box-sizing: border-box;
+    }
+    
+    .ranking-slogan {
+        width: 260px;
+        top: -12px;
+        left: 40%;
+        transform: translateX(-50%);
+    }
+    
+    .ranking-pesquisa-container {
+        width: 100%;
+        margin-bottom: 6px;
+    }
+
+    .ranking-lista {
+        width: 100%;
+        margin-top: 6px;
+        max-height: 360px; /* altura menor no mobile, mantendo scroll após ~8 itens */
+        overflow-y: auto;
+    }
+}

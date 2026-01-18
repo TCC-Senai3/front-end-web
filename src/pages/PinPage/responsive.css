@@ -1,0 +1,198 @@
+/* ========================================
+   RESPONSIVIDADE - PÁGINA PIN PAGE
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* Container principal */
+    .pinpage-bg {
+        min-height: 100vh;
+        width: 100vw;
+        padding: 0;
+    }
+
+    .pinpage-center {
+        padding: 20px;
+        min-height: calc(100vh - 80px);
+        gap: 30px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* Logo responsivo */
+    .pinpage-logo {
+        width: 300px;
+        height: auto;
+        margin-top: 0;
+        margin-bottom: 20px;
+        max-width: 90vw;
+    }
+
+    /* Formulário responsivo */
+    .pinpage-form {
+        width: 100%;
+        max-width: 350px;
+        min-width: auto;
+        padding: 30px 25px;
+        margin: 0;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        background: white;
+    }
+
+    /* Input responsivo */
+    .pinpage-input {
+        font-size: 16px;
+        padding: 16px 14px;
+        border-radius: 8px;
+        border: 2px solid #ddd;
+        margin-bottom: 20px;
+        transition: border-color 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .pinpage-input:focus {
+        border-color: #0094FF;
+        outline: none;
+    }
+
+    .pinpage-input::placeholder {
+        color: #999;
+        font-weight: 400;
+    }
+
+    /* Botão responsivo */
+    .pinpage-btn {
+        font-size: 16px;
+        padding: 16px 0;
+        border-radius: 8px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #0094FF, #00A6FF);
+        box-shadow: 0 4px 15px rgba(0,148,255,0.3);
+    }
+
+    .pinpage-btn:hover {
+        background: linear-gradient(135deg, #007ACC, #0094FF);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,148,255,0.4);
+    }
+
+    .pinpage-btn:active {
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 480px) {
+    .pinpage-center {
+        padding: 15px;
+        gap: 20px;
+    }
+
+    /* Logo ainda menor */
+    .pinpage-logo {
+        width: 250px;
+        max-width: 85vw;
+    }
+
+    /* Formulário compacto */
+    .pinpage-form {
+        max-width: 320px;
+        padding: 25px 20px;
+        margin: 0 10px;
+    }
+
+    /* Input compacto */
+    .pinpage-input {
+        font-size: 15px;
+        padding: 14px 12px;
+        margin-bottom: 15px;
+    }
+
+    /* Botão compacto */
+    .pinpage-btn {
+        font-size: 15px;
+        padding: 14px 0;
+    }
+}
+
+@media (max-width: 360px) {
+    .pinpage-center {
+        padding: 10px;
+        gap: 15px;
+    }
+
+    .pinpage-logo {
+        width: 200px;
+        max-width: 80vw;
+    }
+
+    .pinpage-form {
+        max-width: 300px;
+        padding: 20px 15px;
+        margin: 0 5px;
+    }
+
+    .pinpage-input {
+        font-size: 14px;
+        padding: 12px 10px;
+        margin-bottom: 12px;
+    }
+
+    .pinpage-btn {
+        font-size: 14px;
+        padding: 12px 0;
+    }
+}
+
+/* Melhorias adicionais para UX */
+@media (max-width: 768px) {
+    /* Animação de entrada */
+    .pinpage-logo {
+        animation: fadeInDown 0.6s ease-out;
+    }
+
+    .pinpage-form {
+        animation: fadeInUp 0.6s ease-out 0.2s both;
+    }
+
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Estados de loading */
+    .pinpage-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* Feedback visual melhorado */
+    .pinpage-input:invalid {
+        border-color: #ff4444;
+    }
+
+    .pinpage-input:valid {
+        border-color: #00cc44;
+    }
+}

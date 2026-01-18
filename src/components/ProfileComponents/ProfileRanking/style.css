@@ -1,0 +1,99 @@
+.perfil-ranking-card {
+    background: #F1F7FF;
+    border-radius: 16px;
+    padding: 18px 20px;
+    min-width: 320px;
+    max-width: 340px;
+    box-shadow: 0 0 0 8px #f5f6fa, 0 2px 8px #0001;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    align-items: stretch;
+}
+
+.perfil-ranking-top-mock {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+.perfil-ranking-avatar-mock {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+}
+
+.perfil-nome-mock {
+    flex: 1;
+    font-weight: bold;
+    color: #222;
+    font-size: 0.95em;
+}
+
+.perfil-pontos-mock {
+    font-weight: bold;
+    color: #222;
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.perfil-medal-icon-mock {
+    width: 20px;
+    height: 20px;
+}
+
+.perfil-ranking-search-mock {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 8px;
+    padding: 8px 12px;
+    box-shadow: 0 1px 4px #0001;
+}
+
+.perfil-ranking-search-mock input {
+    border: none;
+    outline: none;
+    flex: 1;
+    font-size: 14px;
+    background: transparent;
+}
+
+.perfil-ranking-search-icon-mock {
+    width: 18px;
+    height: 18px;
+    color: #888;
+    margin-left: 8px;
+}
+
+.perfil-ranking-lista-mock {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.perfil-ranking-item-mock {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.perfil-ranking-item-mock:hover {
+    background: #e3eefd;
+}
+
+.perfil-ranking-item-mock-atual {
+    background: #fff;
+    border: 2px solid #4CAF50;
+}
